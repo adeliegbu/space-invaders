@@ -5,6 +5,7 @@ par : Loann CORDEL, Adélie GIBOU
 codé en python
 programme 
 """
+import projectile
 
 class Player:
     def __init__(self, x, y, width=50, height=30, speed=20):
@@ -25,4 +26,3 @@ class Player:
     def shoot(self):
         """Créer un projectile."""
         return Projectile(self.x + self.width // 2, self.y)
-
