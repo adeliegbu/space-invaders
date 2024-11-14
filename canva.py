@@ -24,7 +24,7 @@ canvas.pack(fill="both", expand=True)
 canvas.create_image(0, 0, image=background_photo, anchor="nw")
 
 # Label pour le score
-score_label = tk.Label(canvas, text=print(Score), font=("Helvetica", 16), bg="darkblue", fg="white")
+score_label = tk.Label(canvas, text=str(Score), font=("Helvetica", 16), bg="darkblue", fg="white")
 canvas.create_window(10, 10, anchor="nw", window=score_label)  # Aligné en haut à gauche
 
 logo_image = Image.open("space_logo.png")
