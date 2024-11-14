@@ -1,6 +1,7 @@
 import tkinter as tk
 import main
 from PIL import Image, ImageTk
+from score import Score
 
 # Initialisation de la fenêtre principale
 fenetre = tk.Tk()
@@ -23,7 +24,7 @@ canvas.pack(fill="both", expand=True)
 canvas.create_image(0, 0, image=background_photo, anchor="nw")
 
 # Label pour le score
-score_label = tk.Label(canvas, text=, font=("Helvetica", 16), bg="darkblue", fg="white")
+score_label = tk.Label(canvas, text=print(Score), font=("Helvetica", 16), bg="darkblue", fg="white")
 canvas.create_window(10, 10, anchor="nw", window=score_label)  # Aligné en haut à gauche
 
 logo_image = Image.open("space_logo.png")
@@ -43,11 +44,6 @@ canvas.create_window(screen_width // 2, screen_height // 2 + 100, anchor="center
 bouton_quitter = tk.Button(canvas, text="Quitter", command=quitter, height=2, width=20, font=button_font, bg="yellow", fg="darkblue")
 canvas.create_window(screen_width // 2, screen_height // 2 + 200, anchor="center", window=bouton_quitter)  # Aligné en haut à droite
 
-
-
-
-# Initialisation du score
-score = 0
 
 # Lancement de la boucle principale
 fenetre.mainloop()
