@@ -6,8 +6,7 @@ codé en python
 programme 
 """
 
-
-class vaisseau:
+class Vaisseau:
     def _init_(self,position,vitesse):
         self.position=position
         self.vitesse=vitesse
