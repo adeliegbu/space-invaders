@@ -1,6 +1,6 @@
-from modele.alien import Alien
-from modele.player import Player
-from modele.projectile import Projectile
+from alien import Alien
+from player import Player
+from projectile import Projectile
 
 class Game:
     def __init__(self, canvas_width, canvas_height):
