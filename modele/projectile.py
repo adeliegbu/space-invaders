@@ -6,7 +6,7 @@ codé en python
 programme 
 """
 
-class projectile:
+class Projectile:
     def _init_(self,position,vitesse):
         self.position=position
         self.vitesse=vitesse
