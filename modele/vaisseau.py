@@ -10,4 +10,3 @@ class Vaisseau:
     def _init_(self,position,vitesse):
         self.position=position
         self.vitesse=vitesse
-    def 
