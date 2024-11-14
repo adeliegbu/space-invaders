@@ -5,3 +5,9 @@ par : Loann CORDEL, Adélie GIBOU
 codé en python
 programme 
 """
+
+class projectile:
+    def _init_(self,position,vitesse):
+        self.position=position
+        self.vitesse=vitesse
+    def 
