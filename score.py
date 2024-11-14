@@ -11,5 +11,5 @@ class Score:
         self.score=score
 
     def __str__(self):
-        return self.score 
+        return "Score = " + self.score
         

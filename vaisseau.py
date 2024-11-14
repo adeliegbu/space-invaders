@@ -6,6 +6,7 @@ codé en python
 programme 
 """
 from tkinter import Tk
+import projectile
 class Vaisseau:
     def __init__(self, canvas):
         self.canvas = canvas
