@@ -1,49 +1,88 @@
-import tkinter as tk
-import main
-from PIL import Image, ImageTk
-from score import Score
+"""
+objectif : Mettre en place l'interface visuel de Space Invaders.
+date :  15 nov 2024
+par : Loann CORDEL, Adélie GIBOU
+"""
 
-# Initialisation de la fenêtre principale
+import tkinter as tk
+from PIL import Image, ImageTk
+from regles import rules_text
+
+# Création de la fenêtre
 fenetre = tk.Tk()
 fenetre.attributes("-fullscreen", True)
 
-# Fonction pour quitter l'application
-def quitter():
-    fenetre.destroy()
-
-# Chargement et redimensionnement de l'image de fond
+#variables concernant les dimensions de l'écran
 screen_width = fenetre.winfo_screenwidth()
 screen_height = fenetre.winfo_screenheight()
-background_image = Image.open("background_invader.jpg")
-background_image = background_image.resize((screen_width, screen_height), Image.LANCZOS)
-background_photo = ImageTk.PhotoImage(background_image)
+x0, y0 = screen_width // 2, screen_height // 2
 
-# Création du canvas pour afficher l'image de fond
+#Image de fond
+bg_image = Image.open("background_invader.jpg")
+bg_image = ImageTk.PhotoImage(bg_image.resize((screen_width, screen_height), Image.LANCZOS))
+
+#création du canvas
 canvas = tk.Canvas(fenetre, width=screen_width, height=screen_height, highlightthickness=0)
 canvas.pack(fill="both", expand=True)
-canvas.create_image(0, 0, image=background_photo, anchor="nw")
+canvas.create_image(0, 0, image=bg_image, anchor="nw")
 
+
+'''
 # Label pour le score
 score_label = tk.Label(canvas, text=str(Score), font=("Helvetica", 16), bg="darkblue", fg="white")
 canvas.create_window(10, 10, anchor="nw", window=score_label)  # Aligné en haut à gauche
-
+'''
 logo_image = Image.open("space_logo.png")
 logo_image = logo_image.resize((500, 200), Image.LANCZOS)
 logo_photo = ImageTk.PhotoImage(logo_image)
-canvas.create_image(screen_width // 2, screen_height // 10, image=logo_photo, anchor="n")
+canvas.create_image(x0, y0 // 5, image=logo_photo, anchor="n")
 
 # Boutons du menu
-button_font = ("Helvetica", 12, "bold")
+class Button:
+    def __init__(self, text, command, x, y):
+        self.button = tk.Button(canvas, text=text, command=command, height=2, width=20, font=("Helvetica", 12, "bold"), bg="yellow", fg="darkblue")
+        self.x = x
+        self.y = y
 
-bouton_new_game = tk.Button(canvas, text="Nouvelle Partie", command=main.new_game, height=2, width=20, font=button_font, bg="yellow", fg="darkblue")
-canvas.create_window(screen_width // 2, screen_height // 2, anchor="center", window=bouton_new_game)  # Aligné en haut à droite
+    def hide(self):
+        canvas.delete(canvas.create_window(self.x, self.y, anchor="center", window=self.button))
 
-bouton_show_rules = tk.Button(canvas, text="Règles", command=main.show_rules, height=2, width=20, font=button_font, bg="yellow", fg="darkblue")
-canvas.create_window(screen_width // 2, screen_height // 2 + 100, anchor="center", window=bouton_show_rules)  # Aligné en haut à droite
+    def show(self):
+        canvas.create_window(self.x, self.y, anchor="center", window=self.button)
 
-bouton_quitter = tk.Button(canvas, text="Quitter", command=quitter, height=2, width=20, font=button_font, bg="yellow", fg="darkblue")
-canvas.create_window(screen_width // 2, screen_height // 2 + 200, anchor="center", window=bouton_quitter)  # Aligné en haut à droite
+
+rules_window = tk.Label(canvas, text=str(rules_text),font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
+
+#Fonctions d'update de l'affichage
+
+def rules():
+    button_new_game.hide()
+    button_rules.hide()
+    button_leave.hide()
+    button_menu.show()
+    canvas.create_window(x0, y0 + 50, anchor="center", window=rules_window)
+
+def new_game():
+    pass
+
+def menu():
+    button_new_game.show()
+    button_rules.show()
+    button_leave.show()
+    button_menu.hide()
+    canvas.delete(canvas.create_window(x0, y0 + 50, anchor="center", window=rules_window))
+
+
+def leave():
+    fenetre.destroy()
+
+
+button_new_game = Button("Nouvelle Partie", new_game, x0, y0)
+button_rules = Button("Règles", rules, x0, y0 + 100)
+button_leave = Button("Quitter", leave, x0, y0 + 200)
+button_menu = Button("Menu", menu, x0, y0 + 280)
 
 
 # Lancement de la boucle principale
+menu()
 fenetre.mainloop()
