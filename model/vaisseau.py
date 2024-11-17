@@ -5,8 +5,9 @@ par : Loann CORDEL, Adélie GIBOU
 codé en python
 programme 
 """
-from tkinter import Tk
-import projectile
+
+from model.projectile import Projectile
+
 class Vaisseau:
     def __init__(self, canvas):
         self.canvas = canvas

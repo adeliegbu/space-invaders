@@ -4,7 +4,8 @@ date :  14 nov 2024
 par : Loann CORDEL, Adélie GIBOU
 codé en python
 programme 
-""" 
+"""
+
 class Alien:
     def __init__(self, x, y, speed=1):
         self.x = x
