@@ -48,7 +48,7 @@ def new_game():
     button_rules.hide()
     button_leave.hide()
     canvas.delete(canvas.create_image(x0, y0 // 5, image=logo_image, anchor="n"))
-    c.game()
+    game()
 
 def rules():
     button_new_game.hide()
@@ -68,10 +68,10 @@ def menu():
 def leave():
     fenetre.destroy()
 
-button_new_game = c.Button(canvas, "Nouvelle Partie", new_game, x0, y0)
-button_rules = c.Button(canvas, "Règles", rules, x0, y0 + 100)
-button_leave = c.Button(canvas, "Quitter", leave, x0, y0 + 200)
-button_menu = c.Button(canvas, "Menu", menu, x0, y0 + 280)
+button_new_game = Button(canvas, "Nouvelle Partie", new_game, x0, y0)
+button_rules = Button(canvas, "Règles", rules, x0, y0 + 100)
+button_leave = Button(canvas, "Quitter", leave, x0, y0 + 200)
+button_menu = Button(canvas, "Menu", menu, x0, y0 + 280)
 
 
 # Lancement de la boucle principale
