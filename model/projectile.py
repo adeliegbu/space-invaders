@@ -1,28 +1,20 @@
-"""
-objectif : réaliser le jeu Space Invaders.
-date :  14 nov 2024
-par : Loann CORDEL, Adélie GIBOU
-codé en python
-programme 
-"""
-
+# model/projectile.py
 class Projectile:
-    def __init__(self,canvas, x, y, way):
+    def __init__(self, canvas, x, y, type, image):
         self.canvas = canvas
         self.x = x
         self.y = y
-        self.height = 25
-        self.width = 10
-        self.speed = 10
-        self.way = way
-    
-    def get_postion(self):
-        return self.x, self.y
-    
+        self.type = type
+        self.image = image
+        self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
+        self.speed = self.type * 10
+
     def move(self):
-        """Déplacer le projectile vers le haut."""
-        self.y -= self.speed * self.way
-        self.canvas.coords(self.image, self.x, self.y, self.x + self.height, self.y + self.width)
-        self.canvas.move()
+        """Déplacer le projectile."""
+        self.y += self.speed
+        self.canvas.move(self.id, 0, self.speed)
+        if self.y < 0 or self.y > self.canvas.winfo_height():
+            self.canvas.delete(self.id)
 
-
+    def get_position(self):
+        return self.x, self.y

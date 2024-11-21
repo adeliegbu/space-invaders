@@ -54,7 +54,6 @@ class View:
         self.button_leave.place(x=self.x0, y=self.y0 + 200, anchor="center")
         self.button_menu.place_forget()
         self.rules_label.place_forget()
-        self.controller.update(False)
         self.canvas.delete(self.controller.player.dead())
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
 

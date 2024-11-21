@@ -1,13 +1,14 @@
 from model.projectile import Projectile
 
 class Ship:
-    def __init__(self, canvas, x, y, type, image):
+    def __init__(self, canvas, x, y, type, image, projectile_image):
         self.canvas = canvas
-        self.width = 50
+        self.width = 60
         self.height = 30
         self.x = x
         self.y = y
         self.image = image
+        self.projectile_image = projectile_image
         self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
 
         if type == "player":
@@ -34,7 +35,7 @@ class Ship:
 
     def shoot(self):
         """Créer un projectile."""
-        return Projectile(self.canvas, self.x, self.y, self.type)
+        return Projectile(self.canvas, self.x, self.y - self.height, self.type, self.projectile_image)
     
     def hit(self):
         proj_x, proj_y = Projectile.get_position()
