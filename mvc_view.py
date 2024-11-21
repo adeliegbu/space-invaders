@@ -9,76 +9,66 @@ from PIL import Image, ImageTk
 from mvc_controller import Button
 from visuel.regles import rules_text
 
+class View:
+    def __init__(self):
+        self.fenetre = tk.Tk()
+        self.fenetre.attributes("-fullscreen", True)
 
-# Création de la fenêtre
-fenetre = tk.Tk()
-fenetre.attributes("-fullscreen", True)
+        self.screen_width = self.fenetre.winfo_screenwidth()
+        self.screen_height = self.fenetre.winfo_screenheight()
+        self.x0, self.y0 = self.screen_width // 2, self.screen_height // 2
 
-#variables concernant les dimensions de l'écran
-screen_width = fenetre.winfo_screenwidth()
-screen_height = fenetre.winfo_screenheight()
-x0, y0 = screen_width // 2, screen_height // 2
+        self.bg_image = Image.open("visuel/background_invader.jpg")
+        self.bg_image = ImageTk.PhotoImage(self.bg_image.resize((self.screen_width, self.screen_height), Image.LANCZOS))
 
-#Image de fond
-bg_image = Image.open("visuel/background_invader.jpg")
-bg_image = ImageTk.PhotoImage(bg_image.resize((screen_width, screen_height), Image.LANCZOS))
+        self.canvas = tk.Canvas(self.fenetre, width=self.screen_width, height=self.screen_height, highlightthickness=0)
+        self.canvas.pack(fill="both", expand=True)
+        self.canvas.create_image(0, 0, image=self.bg_image, anchor="nw")
 
-#création du canvas
-canvas = tk.Canvas(fenetre, width=screen_width, height=screen_height, highlightthickness=0)
-canvas.pack(fill="both", expand=True)
-canvas.create_image(0, 0, image=bg_image, anchor="nw")
+        self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
+        self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.jpg").resize((50,35), Image.LANCZOS))
+        self.projectile_image = ImageTk.PhotoImage(Image.open("visuel/projectile.png").rotate(90).resize((150,70), Image.LANCZOS))
 
+        self.rules_window = tk.Label(self.canvas, text=str(rules_text),font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
-'''
-# Label pour le score
-score_label = tk.Label(canvas, text=str(Score), font=("Helvetica", 16), bg="darkblue", fg="white")
-canvas.create_window(10, 10, anchor="nw", window=score_label)  # Aligné en haut à gauche
-'''
+        self.button_new_game = Button(self.canvas, "Nouvelle Partie", self.new_game, self.x0, self.y0)
+        self.button_rules = Button(self.canvas, "Règles", self.rules, self.x0, self.y0 + 100)
+        self.button_leave = Button(self.canvas, "Quitter", self.leave, self.x0, self.y0 + 200)
+        self.button_menu = Button(self.canvas, "Menu", self.menu, self.x0, self.y0 + 280)
 
-#image du logo
-logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
-alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.jpg").resize((50,35), Image.LANCZOS))
-projectile_image = ImageTk.PhotoImage(Image.open("visuel/projectile.png").rotate(90).resize((150,70), Image.LANCZOS))
+        self.menu()
 
+    def new_game(self):
+        self.button_new_game.hide()
+        self.button_rules.hide()
+        self.button_leave.hide()
+        self.canvas.delete(self.canvas.create_image(self.x0, self.y0 // 5, image=self.logo_image, anchor="n"))
+        self.game()
 
-#fenêtre des règles
-rules_window = tk.Label(canvas, text=str(rules_text),font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
+    def rules(self):
+        self.button_new_game.hide()
+        self.button_rules.hide()
+        self.button_leave.hide()
+        self.button_menu.show()
+        self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window)
 
+    def menu(self):
+        self.button_new_game.show()
+        self.button_rules.show()
+        self.button_leave.show()
+        self.button_menu.hide()
+        self.canvas.delete(self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window))
+        self.canvas.create_image(self.x0, self.y0 // 5, image=self.logo_image, anchor="n")
+        self.canvas.create_image(self.x0, self.y0 // 10, image=self.alien_image, anchor="n")
+        self.canvas.create_image(self.x0, self.y0 // 10, image=self.projectile_image, anchor="n")
 
-#Fonctions d'update de l'affichage
-def new_game():
-    button_new_game.hide()
-    button_rules.hide()
-    button_leave.hide()
-    canvas.delete(canvas.create_image(x0, y0 // 5, image=logo_image, anchor="n"))
-    game()
+    def leave(self):
+        self.fenetre.destroy()
 
-def rules():
-    button_new_game.hide()
-    button_rules.hide()
-    button_leave.hide()
-    button_menu.show()
-    canvas.create_window(x0, y0 + 50, anchor="center", window=rules_window)
-
-def menu():
-    button_new_game.show()
-    button_rules.show()
-    button_leave.show()
-    button_menu.hide()
-    canvas.delete(canvas.create_window(x0, y0 + 50, anchor="center", window=rules_window))
-    canvas.create_image(x0, y0 // 5, image=logo_image, anchor="n")
-    canvas.create_image(x0, y0 // 10, image=alien_image, anchor="n")
-    canvas.create_image(x0, y0 // 10, image=projectile_image, anchor="n")
-
-def leave():
-    fenetre.destroy()
-
-button_new_game = Button(canvas, "Nouvelle Partie", new_game, x0, y0)
-button_rules = Button(canvas, "Règles", rules, x0, y0 + 100)
-button_leave = Button(canvas, "Quitter", leave, x0, y0 + 200)
-button_menu = Button(canvas, "Menu", menu, x0, y0 + 280)
+    def run(self):
+        self.fenetre.mainloop()
 
 
-# Lancement de la boucle principale
-menu()
-fenetre.mainloop()
+if __name__ == "__main__":
+    app = View()
+    app.run()
