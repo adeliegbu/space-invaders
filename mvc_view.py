@@ -20,7 +20,7 @@ screen_height = fenetre.winfo_screenheight()
 x0, y0 = screen_width // 2, screen_height // 2
 
 #Image de fond
-bg_image = Image.open("tp-space-invaders-cordel-gibou/visuel/background_invader.jpg")
+bg_image = Image.open("visuel/background_invader.jpg")
 bg_image = ImageTk.PhotoImage(bg_image.resize((screen_width, screen_height), Image.LANCZOS))
 
 #création du canvas
@@ -36,7 +36,9 @@ canvas.create_window(10, 10, anchor="nw", window=score_label)  # Aligné en haut
 '''
 
 #image du logo
-logo_image = ImageTk.PhotoImage(Image.open("tp-space-invaders-cordel-gibou/visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
+logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
+alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.jpg").resize((50,35), Image.LANCZOS))
+
 
 #fenêtre des règles
 rules_window = tk.Label(canvas, text=str(rules_text),font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
@@ -64,6 +66,7 @@ def menu():
     button_menu.hide()
     canvas.delete(canvas.create_window(x0, y0 + 50, anchor="center", window=rules_window))
     canvas.create_image(x0, y0 // 5, image=logo_image, anchor="n")
+    canvas.create_image(x0, y0 // 10, image=alien_image, anchor="n")
 
 def leave():
     fenetre.destroy()
