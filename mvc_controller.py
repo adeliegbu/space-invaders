@@ -1,7 +1,6 @@
-import tkinter as tk
-from PIL import Image, ImageTk
+from random import uniform
 
-from mvc_model import Ship, Player, Alien, Projectile
+from mvc_model import Player, Alien
 from mvc_view import View
 
 class Controller:
@@ -71,12 +70,16 @@ class Controller:
                 self.shoot()
 
             for alien in self.aliens:
-                alien.move()
+                if alien.move():
+                    for alien in self.aliens:
+                        alien.direction = - alien.direction
+                        alien.move_down()
+                    break
             for projectile in self.projectiles:
                 projectile.move()
 
             self.hit()
-
+            
             self.view.canvas.after(16, self.update)  # Appeler cette méthode à nouveau après 16 ms (environ 60 fois par seconde)
 
     def run(self):

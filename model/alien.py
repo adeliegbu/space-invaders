@@ -11,9 +11,7 @@ class Alien(Ship):
         """Déplacer l'alien."""
         self.x += self.direction * self.speed
         self.canvas.move(self.id, self.direction * self.speed, 0)
-        if self.x < 0 or self.x > self.canvas.winfo_width():
-            self.direction = -self.direction
-            self.move_down()
+        return self.x -25 < 0 or self.x + 25 > self.canvas.winfo_width()
 
     def move_down(self):
         """Déplacer le vaisseau vers le bas."""
