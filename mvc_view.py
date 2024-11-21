@@ -6,7 +6,6 @@ par : Loann CORDEL, Adélie GIBOU
 
 import tkinter as tk
 from PIL import Image, ImageTk
-from mvc_controller import Button
 from visuel.regles import rules_text
 
 
@@ -20,7 +19,7 @@ screen_height = fenetre.winfo_screenheight()
 x0, y0 = screen_width // 2, screen_height // 2
 
 #Image de fond
-bg_image = Image.open("tp-space-invaders-cordel-gibou/visuel/background_invader.jpg")
+bg_image = Image.open("visuel/background_invader.jpg")
 bg_image = ImageTk.PhotoImage(bg_image.resize((screen_width, screen_height), Image.LANCZOS))
 
 #création du canvas
@@ -36,7 +35,7 @@ canvas.create_window(10, 10, anchor="nw", window=score_label)  # Aligné en haut
 '''
 
 #image du logo
-logo_image = ImageTk.PhotoImage(Image.open("tp-space-invaders-cordel-gibou/visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
+logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
 
 #fenêtre des règles
 rules_window = tk.Label(canvas, text=str(rules_text),font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
@@ -67,6 +66,19 @@ def menu():
 
 def leave():
     fenetre.destroy()
+
+class Button:
+    def __init__(self, canvas, text, command, x, y):
+        self.button = tk.Button(canvas, text=text, command=command, height=2, width=20, font=("Helvetica", 12, "bold"), bg="yellow", fg="darkblue")
+        self.canvas = canvas
+        self.x = x
+        self.y = y
+
+    def hide(self):
+        self.canvas.delete(self.canvas.create_window(self.x, self.y, anchor="center", window=self.button))
+
+    def show(self):
+        self.canvas.create_window(self.x, self.y, anchor="center", window=self.button)
 
 button_new_game = Button(canvas, "Nouvelle Partie", new_game, x0, y0)
 button_rules = Button(canvas, "Règles", rules, x0, y0 + 100)
