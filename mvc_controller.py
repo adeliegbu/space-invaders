@@ -8,7 +8,7 @@ programme
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from mvc_model import Player, Alien, Projectile
+from mvc_model import Vaisseau
 from mvc_view import View
 
 
@@ -17,31 +17,22 @@ class Controller:
         self.view = View()
         self.score = 0
         self.life = 3
+        self.player = Vaisseau(self.view.canvas, 9*self.view.x0 // 10, self.view.y0, "player")
+        self.aliens = []
+        self.projectiles = []
+        self.player_image = self.canvas.create_image(self.x0, 9 * self.y0 // 10, image=self.view.player_image, anchor="center")
+        self.update()
 
     def game(self):
-        self.view.canvas.bind("<Left>", self.move_left)
-        self.view.canvas.bind("<Right>", self.move_right)
-        self.view.canvas.bind("<space>", self.shoot)
+        self.view.canvas.bind("<Left>", self.player.move_left)
+        self.view.canvas.bind("<Right>", self.player.move_right)
+        self.view.canvas.bind("<space>", self.player.shoot)
         self.view.canvas.focus_set()
-        self.view.canvas.create_window(self.view.x0, self.view.y0 + 50, anchor="center", window=self.view.button_menu)
-        self.view.canvas.create_window(self.view.x0, self.view.y0 + 150, anchor="center", window=self.view.button_leave)
-
-    def alien_hit(self):
-        self.score += 10
-
-    def player_hit(self):
-        self.life -= 1
+        self.view.canvas.pack()
     
-    def shoot():
-        tk.Entry()
 
 
 
 
 
-
-def game():
-    from mvc_view import canvas, x0, y0
-    vaisseau_image = ImageTk.PhotoImage(Image.open("invaders.webp").resize((500, 200), Image.LANCZOS))
-    canvas.create_image(x0, y0 // 5, image=vaisseau_image, anchor="n")
 
