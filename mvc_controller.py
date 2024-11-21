@@ -7,6 +7,8 @@ programme
 """
 import tkinter as tk
 from PIL import Image, ImageTk
+
+from mvc_model import Player, Alien, Projectile
 from mvc_view import View
 
 
@@ -15,6 +17,14 @@ class Controller:
         self.view = View()
         self.score = 0
         self.life = 3
+
+    def game(self):
+        self.view.canvas.bind("<Left>", self.move_left)
+        self.view.canvas.bind("<Right>", self.move_right)
+        self.view.canvas.bind("<space>", self.shoot)
+        self.view.canvas.focus_set()
+        self.view.canvas.create_window(self.view.x0, self.view.y0 + 50, anchor="center", window=self.view.button_menu)
+        self.view.canvas.create_window(self.view.x0, self.view.y0 + 150, anchor="center", window=self.view.button_leave)
 
     def alien_hit(self):
         self.score += 10
