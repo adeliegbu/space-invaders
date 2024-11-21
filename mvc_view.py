@@ -54,8 +54,13 @@ class View:
         self.button_leave.place(x=self.x0, y=self.y0 + 200, anchor="center")
         self.button_menu.place_forget()
         self.rules_label.place_forget()
-        self.canvas.delete(self.controller.player.dead())
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
+        self.controller.stop_update()
+        self.controller.player.dead()
+        for alien in self.controller.aliens:
+            alien.dead()
+        for projectile in self.controller.projectiles:
+            projectile.out_of_screen()
 
     def leave(self):
         self.fenetre.quit()
