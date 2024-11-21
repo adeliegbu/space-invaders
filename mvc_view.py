@@ -6,10 +6,14 @@ par : Loann CORDEL, Adélie GIBOU
 
 import tkinter as tk
 from PIL import Image, ImageTk
+
 from visuel.regles import rules_text
+from mvc_controller import Controller
 
 class View:
     def __init__(self):
+        self.controller = Controller()
+
         self.fenetre = tk.Tk()
         self.fenetre.attributes("-fullscreen", True)
 
@@ -42,7 +46,7 @@ class View:
         self.button_leave.place_forget()
         self.button_menu.place_forget()
         self.canvas.delete(self.canvas.create_image(self.x0, self.y0 // 5, image=self.logo_image, anchor="n"))
-        self.game()
+        self.controller.game()
 
     def rules(self):
         self.button_new_game.place_forget()

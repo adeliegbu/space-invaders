@@ -7,29 +7,21 @@ programme
 """
 
 class Projectile:
-    def __init__(self, x, y, speed=10):
+    def __init__(self,canvas, x, y, speed, way):
+        self.canvas = canvas
         self.x = x
         self.y = y
+        self.height = 25
+        self.width = 10
         self.speed = speed
+        self.way = way
     
     def get_postion(self):
         return self.x, self.y
-
-class Projectile_player(Projectile):
-    def __init__(self, x, y, speed=10):
-        super().__init__(x, y, speed)
     
     def move(self):
         """Déplacer le projectile vers le haut."""
-        self.y -= self.speed
+        self.y -= self.speed * self.way
         self.canvas.coords(self.image, self.x, self.y, self.x + self.height, self.y + self.width)
 
-
-class Projectile_alien(Projectile):
-    def __init__(self, x, y, speed=10):
-        super().__init__(x, y, speed)
-    
-    def move(self):
-        """Déplacer le projectile vers le haut."""
-        self.y += self.speed
 
