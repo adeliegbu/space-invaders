@@ -59,8 +59,8 @@ class View:
         self.button_menu.hide()
         self.canvas.delete(self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window))
         self.canvas.create_image(self.x0, self.y0 // 5, image=self.logo_image, anchor="n")
-        self.canvas.create_image(self.x0, self.y0 // 10, image=self.alien_image, anchor="n")
-        self.canvas.create_image(self.x0, self.y0 // 10, image=self.projectile_image, anchor="n")
+        # self.canvas.create_image(self.x0, self.y0 // 10, image=self.alien_image, anchor="n")
+        # self.canvas.create_image(self.x0, self.y0 // 10, image=self.projectile_image, anchor="n")
 
     def leave(self):
         self.fenetre.destroy()
