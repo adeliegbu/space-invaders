@@ -6,7 +6,6 @@ par : Loann CORDEL, Adélie GIBOU
 
 import tkinter as tk
 from PIL import Image, ImageTk
-from mvc_controller import Button
 from visuel.regles import rules_text
 
 class View:
@@ -67,6 +66,7 @@ class View:
 
     def run(self):
         self.fenetre.mainloop()
+
 
 
 if __name__ == "__main__":

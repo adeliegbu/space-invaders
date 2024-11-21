@@ -5,7 +5,7 @@ par : Loann CORDEL, Adélie GIBOU
 codé en python
 programme 
 """
-
+from projectile import Projectile
 class Alien:
     def __init__(self, x, y, speed=1):
         self.x = x
@@ -23,3 +23,7 @@ class Alien:
         elif self.x <= 0:  # Limite gauche
             self.direction = 1
             self.y += 30  # L'alien descend d'une ligne
+    
+    def hit(self):
+        alien_x, alien_y = Projectile.get_position()
+        return alien_x -25 <= self.x and self.x <= alien_x + 25 and alien_y -50 <= self.y and self.y <= alien_y + 15
