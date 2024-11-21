@@ -29,6 +29,8 @@ class View:
         self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.jpg").resize((50, 35), Image.LANCZOS))
         self.projectile_image = ImageTk.PhotoImage(Image.open("visuel/projectile.png").rotate(90).resize((150, 70), Image.LANCZOS))
         self.player_image = ImageTk.PhotoImage(Image.open("visuel/invaders.webp").resize((50,50), Image.LANCZOS))
+        self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((50,50), Image.LANCZOS))
+
 
         self.rules_window = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
