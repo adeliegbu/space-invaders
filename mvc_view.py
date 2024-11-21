@@ -50,6 +50,15 @@ class View:
         self.button_menu.place(x=self.x0, y=self.y0 + 280, anchor="center")
         self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window)
 
+
+    def menu(self):
+        self.button_new_game.show()
+        self.button_rules.show()
+        self.button_leave.show()
+        self.button_menu.hide()
+        self.canvas.delete(self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window))
+        self.canvas.create_image(self.x0, self.y0 // 5, image=self.logo_image, anchor="n")
+
     def leave(self):
         self.fenetre.quit()
 
