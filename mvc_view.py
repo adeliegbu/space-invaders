@@ -47,17 +47,8 @@ class View:
         self.button_new_game.place_forget()
         self.button_rules.place_forget()
         self.button_leave.place_forget()
-        self.button_menu.place(x=self.x0, y=self.y0 + 280, anchor="center")
+        self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
         self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window)
-
-
-    def menu(self):
-        self.button_new_game.show()
-        self.button_rules.show()
-        self.button_leave.show()
-        self.button_menu.hide()
-        self.canvas.delete(self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window))
-        self.canvas.create_image(self.x0, self.y0 // 5, image=self.logo_image, anchor="n")
 
     def leave(self):
         self.fenetre.quit()
@@ -67,15 +58,17 @@ class View:
         self.button_rules.place(x=self.x0, y=self.y0 + 100, anchor="center")
         self.button_leave.place(x=self.x0, y=self.y0 + 200, anchor="center")
         self.button_menu.place_forget()
-    
-    def show_image(self, image, x, y):
-        self.canvas.create_image(x, y, image=image, anchor="center")
+        self.canvas.delete(self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window))
+        self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
+
+    def run(self):
+        self.menu()
+        self.fenetre.mainloop()
 
     def game(self):
         # Implémentation de la méthode game
         pass
 
 if __name__ == "__main__":
-    view = View()
-    view.menu()
-    view.fenetre.mainloop()
+    space_invaders = View()
+    space_invaders.run()
