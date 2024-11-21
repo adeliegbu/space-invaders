@@ -1,13 +1,7 @@
-"""
-objectif : Mettre en place l'interface visuel de Space Invaders.
-date :  15 nov 2024
-par : Loann CORDEL, Adélie GIBOU
-"""
-
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from visuel.regles import rules_text
+from visuel.rules import rules_text
 
 class View:
     def __init__(self):
@@ -28,11 +22,9 @@ class View:
         self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
         self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.jpg").resize((50, 35), Image.LANCZOS))
         self.projectile_image = ImageTk.PhotoImage(Image.open("visuel/projectile.png").rotate(90).resize((150, 70), Image.LANCZOS))
-        self.player_image = ImageTk.PhotoImage(Image.open("visuel/invaders.webp").resize((50,50), Image.LANCZOS))
-        self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((50,50), Image.LANCZOS))
+        self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((50, 50), Image.LANCZOS))
 
-
-        self.rules_window = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
+        self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
         self.button_new_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.new_game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_rules = tk.Button(self.canvas, text="Règles", command=self.rules, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
@@ -43,33 +35,26 @@ class View:
         from mvc_controller import Controller
         self.button_new_game.place_forget()
         self.button_rules.place_forget()
-        self.button_menu.place_forget()
-        self.canvas.delete(self.canvas.create_image(self.x0, self.y0 // 5, image=self.logo_image, anchor="n"))
-        self.canvas.create_image(self.x0, 9 * self.y0 // 10, image=self.player_image, anchor="center")
-        Controller.game()
+        self.button_leave.place_forget()
+        self.button_menu.place(x=2 * self.x0 - 10, y=10, anchor="ne")
+        self.canvas.delete(self.logo_id)
+        controller.game()
 
     def rules(self):
         self.button_new_game.place_forget()
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
-        self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window)
-
-    def leave(self):
-        self.fenetre.quit()
+        self.rules_label.place(x=self.x0, y=self.y0 + 50, anchor="center")
 
     def menu(self):
         self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
         self.button_rules.place(x=self.x0, y=self.y0 + 100, anchor="center")
         self.button_leave.place(x=self.x0, y=self.y0 + 200, anchor="center")
         self.button_menu.place_forget()
-        self.canvas.delete(self.canvas.create_window(self.x0, self.y0 + 50, anchor="center", window=self.rules_window))
-        self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
+        self.rules_label.place_forget()
+        self.
+        self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
 
-    def run(self):
-        self.menu()
-        self.fenetre.mainloop()
-
-if __name__ == "__main__":
-    space_invaders = View()
-    space_invaders.run()
+    def leave(self):
+        self.fenetre.quit()
