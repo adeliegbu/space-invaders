@@ -38,6 +38,7 @@ canvas.create_window(10, 10, anchor="nw", window=score_label)  # Aligné en haut
 #image du logo
 logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
 alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.jpg").resize((50,35), Image.LANCZOS))
+projectile_image = ImageTk.PhotoImage(Image.open("visuel/projectile.png").rotate(90).resize((150,70), Image.LANCZOS))
 
 
 #fenêtre des règles
@@ -67,6 +68,7 @@ def menu():
     canvas.delete(canvas.create_window(x0, y0 + 50, anchor="center", window=rules_window))
     canvas.create_image(x0, y0 // 5, image=logo_image, anchor="n")
     canvas.create_image(x0, y0 // 10, image=alien_image, anchor="n")
+    canvas.create_image(x0, y0 // 10, image=projectile_image, anchor="n")
 
 def leave():
     fenetre.destroy()
