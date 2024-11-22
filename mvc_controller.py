@@ -14,7 +14,7 @@ class Controller:
         self.player = Player(self.view.canvas, self.view.x0, 17 * self.view.y0 // 10, image=self.view.player_image, projectile_image=self.view.projectile_image)
         self.player_cooldown = Cooldown(500)
 
-        self.aliens = [Alien(self.view.canvas, self.view.x0 - i * 60, self.view.y0 // 3, image=self.view.alien_image, projectile_image=self.view.projectile_image) for i in range(-4, 5)]
+        self.aliens_matrix = [[Alien(self.view.canvas, self.view.x0 - i * 60, self.view.y0 // 3 - j * 40, image=self.view.alien_image, projectile_image=self.view.projectile_image) for i in range(-4, 5)] for j in range(-2, 3)]
         self.alien_cooldown = Cooldown(1000)
         self.alien_direction = 1
                 
