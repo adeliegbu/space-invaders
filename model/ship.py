@@ -14,9 +14,9 @@ class Ship:
     def get_position(self):
         return self.x, self.y
 
-    def shoot(self,type):
+    def shoot(self, type):
         """Créer un projectile."""
-        return Projectile(self.canvas, self.x, self.y - self.height, type, self.projectile_image)
+        return Projectile(self.canvas, self.x, self.y - type * self.height, type, self.projectile_image)
     
     def dead(self):
         self.canvas.delete(self.id)

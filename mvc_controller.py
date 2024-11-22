@@ -1,4 +1,4 @@
-from random import uniform
+from random import choice
 
 from mvc_model import Player, Alien
 from mvc_view import View
@@ -8,8 +8,10 @@ class Controller:
         self.view = View(self)
         self.score = 0
         self.keys_pressed = set()
-        self.can_shoot = True
-        self.shoot_cooldown = 500
+        self.player_can_shoot = True
+        self.alien_can_shoot = True
+        self.player_shoot_cooldown = 500
+        self.alien_shoot_cooldown = 1000
         self.updating = True
         self.alien_direction = 1
         self.player = Player(self.view.canvas, self.view.x0, 17 * self.view.y0 // 10, image=self.view.player_image, projectile_image=self.view.projectile_image)
@@ -32,15 +34,26 @@ class Controller:
     def key_release(self, event):
         self.keys_pressed.discard(event.keysym)  # Retirer la touche relâchée de l'ensemble
 
-    def reset_shoot(self):
-        self.can_shoot = True
+    def reset_shoot(self, type):
+        if type == "player":
+            self.player_can_shoot = True
+            self.alien_shoot_cooldown = 500
+        elif type == "alien":
+            self.alien_can_shoot = True
+            self.alien_shoot_cooldown = 1000
 
-    def shoot(self):
-        if self.can_shoot:
+    def shoot(self, type):
+        if type == "player":
             projectile = self.player.shoot()
             self.projectiles.append(projectile)
-            self.can_shoot = False
-            self.view.canvas.after(self.shoot_cooldown, self.reset_shoot)
+            self.player_can_shoot = False
+
+        elif type == "alien":
+            alien_shooting = choice(self.aliens)
+            projectile = alien_shooting.shoot()
+            self.projectiles.append(projectile)
+            self.alien_can_shoot = False
+            self.view.canvas.after(self.alien_shoot_cooldown, self.reset_shoot("alien"))
     
     def stop_update(self):
         self.updating = False
@@ -66,8 +79,8 @@ class Controller:
                 self.player.move_left()
             if "Right" in self.keys_pressed:
                 self.player.move_right()
-            if "space" in self.keys_pressed:
-                self.shoot()
+            if "space" in self.keys_pressed and self.player_can_shoot:
+                self.shoot("player")
 
             for alien in self.aliens:
                 if alien.move():
@@ -75,6 +88,20 @@ class Controller:
                         alien.direction = - alien.direction
                         alien.move_down()
                     break
+            
+            if self.alien_can_shoot:
+               self.shoot("alien")
+
+            if self.player_shoot_cooldown >= 0:
+                self.player_shoot_cooldown -= 16
+                if self.player_can_shoot <= 0:
+                    self.reset_shoot("player")
+            
+            if self.alien_shoot_cooldown >= 0:
+                self.alien_shoot_cooldown -= 16
+                if self.alien_can_shoot <= 0:
+                    self.reset_shoot("alien")
+
             for projectile in self.projectiles:
                 projectile.move()
 
