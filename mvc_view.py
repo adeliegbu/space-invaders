@@ -62,6 +62,5 @@ class View:
         for projectile in self.controller.projectiles:
             projectile.out_of_screen()
 
-
     def leave(self):
         self.fenetre.quit()

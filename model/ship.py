@@ -7,6 +7,7 @@ class Ship:
         self.height = 30
         self.x = x
         self.y = y
+        self.cooldown_var = 0
         self.image = image
         self.projectile_image = projectile_image
         self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
@@ -15,8 +16,10 @@ class Ship:
         return self.x, self.y
 
     def shoot(self, type):
-        """Créer un projectile."""
+        self.cooldown_var = 0  # Réinitialiser la variable de cooldown après chaque tir
         return Projectile(self.canvas, self.x, self.y - type * self.height, type, self.projectile_image)
-    
+            
     def dead(self):
         self.canvas.delete(self.id)
+    
+

@@ -10,3 +10,4 @@ from model.projectile import Projectile
 from model.ship import Ship
 from model.player import Player
 from model.alien import Alien
+from model.cooldown import Cooldown
