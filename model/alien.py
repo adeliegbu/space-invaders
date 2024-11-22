@@ -3,14 +3,17 @@ from model.ship import Ship
 class Alien(Ship):
     def __init__(self, canvas, x, y, image, projectile_image):
         super().__init__(canvas, x, y, image=image, projectile_image=projectile_image)
-        self.direction = 1
         self.life = 1
         self.speed = 5
+        self.height = 30
 
-    def move(self):
-        """Déplacer l'alien."""
-        self.x += self.direction * self.speed
-        self.canvas.move(self.id, self.direction * self.speed, 0)
+    def move(self, direction):
+        self.x += direction * self.speed
+        if direction == 0:
+            self.y += self.height
+        self.canvas.move(self.id, direction * self.speed, (1 - abs(direction)) * self.height)
+    
+    def border_hit(self):
         return self.x -25 < 0 or self.x + 25 > self.canvas.winfo_width()
 
     def move_down(self):
@@ -19,4 +22,4 @@ class Alien(Ship):
         self.canvas.move(self.id, 0, 30)
 
     def shoot(self):
-        return super().shoot(-1)
+        return super().shoot(-1, self.height)

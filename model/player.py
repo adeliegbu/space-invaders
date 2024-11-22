@@ -5,6 +5,7 @@ class Player(Ship):
         super().__init__(canvas, x, y, image=image, projectile_image=projectile_image)
         self.life = 3
         self.speed = 8
+        self.height = 50
 
     def move_left(self):
         """Déplacer le vaisseau à gauche."""
@@ -19,4 +20,4 @@ class Player(Ship):
             self.canvas.move(self.id, self.speed, 0)
             
     def shoot(self):
-        return super().shoot(1)
+        return super().shoot(1, self.height)

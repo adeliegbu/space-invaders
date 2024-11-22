@@ -3,11 +3,8 @@ from model.projectile import Projectile
 class Ship:
     def __init__(self, canvas, x, y, image, projectile_image):
         self.canvas = canvas
-        self.width = 60
-        self.height = 30
         self.x = x
         self.y = y
-        self.cooldown_var = 0
         self.image = image
         self.projectile_image = projectile_image
         self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
@@ -15,9 +12,8 @@ class Ship:
     def get_position(self):
         return self.x, self.y
 
-    def shoot(self, type):
-        self.cooldown_var = 0  # Réinitialiser la variable de cooldown après chaque tir
-        return Projectile(self.canvas, self.x, self.y - type * self.height, type, self.projectile_image)
+    def shoot(self, type, height):
+        return Projectile(self.canvas, self.x, self.y - type * height, type, self.projectile_image)
             
     def dead(self):
         self.canvas.delete(self.id)

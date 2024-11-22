@@ -57,9 +57,12 @@ class View:
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
         self.controller.stop_update()
         self.controller.player.dead()
-        for alien in self.controller.aliens:
-            alien.dead()
-        for projectile in self.controller.projectiles:
+        for alien_row in self.controller.aliens_matrix:
+            for alien in alien_row:
+                    alien.dead()
+        for projectile in self.controller.projectiles_player:
+            projectile.out_of_screen()
+        for projectile in self.controller.projectiles_alien:
             projectile.out_of_screen()
 
     def leave(self):
