@@ -5,7 +5,7 @@ class Alien(Ship):
         super().__init__(canvas, x, y, image=image, projectile_image=projectile_image)
         self.direction = 1
         self.life = 1
-        self.speed = 3
+        self.speed = 5
 
     def move(self):
         """Déplacer l'alien."""

@@ -10,16 +10,6 @@ class Ship:
         self.image = image
         self.projectile_image = projectile_image
         self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
-
-        if type == "player":
-            self.type = 1
-            self.speed = 5
-            self.life = 3
-
-        elif type == "alien":
-            self.type = -1
-            self.speed = 3
-            self.life = 1
     
     def get_position(self):
         return self.x, self.y

@@ -7,7 +7,7 @@ class Projectile:
         self.type = type
         self.image = image
         self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
-        self.speed = - self.type * 10
+        self.speed = - self.type * 15
 
     def get_position(self):
         return self.x, self.y
