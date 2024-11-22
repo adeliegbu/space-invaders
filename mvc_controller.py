@@ -107,6 +107,10 @@ class Controller:
 
             self.hit()
             
+            self.player.update_cooldown()  # Incrémenter la variable de cooldown du joueur
+            for alien in self.aliens:
+                alien.update_cooldown()  # Incrémenter la variable de cooldown des aliens
+            
             self.view.canvas.after(16, self.update)  # Appeler cette méthode à nouveau après 16 ms (environ 60 fois par seconde)
 
     def run(self):
