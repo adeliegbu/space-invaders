@@ -1,23 +1,11 @@
 from model.ship import Ship
 
 class Player_ship(Ship):
-    def __init__(self, canvas, x, y, image, projectile_image):
-        super().__init__(canvas, x, y, image, projectile_image)
-        self.life = 3
-        self.speed = 8
-        self.height = 50
-
-    def move_left(self):
-        """Déplacer le vaisseau à gauche."""
-        if self.x - 30 > 0:  # Empêche le vaisseau de sortir à gauche
-            self.x -= self.speed
-            self.canvas.move(self.id, -self.speed, 0)
-        
-    def move_right(self):
-        """Déplacer le vaisseau à droite."""
-        if self.x + 30 < self.canvas.winfo_width():  # Empêche le vaisseau de sortir à droite
-            self.x += self.speed
-            self.canvas.move(self.id, self.speed, 0)
+    def __init__(self, canvas, x, y, image):
+        super().__init__(canvas, x, y, life=3, x_speed=8, y_speed=0, width=60, height=80, image=image)
+    
+    def get_dimensions(self):
+        return super().get_dimensions(self.width, self.height)
             
-    def shoot(self):
-        return super().shoot(1, self.height)
+    def shoot(self, projectile, projectile_image):
+        return super().shoot(projectile, 1, self.height, projectile_image)

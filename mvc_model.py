@@ -11,5 +11,6 @@ from model.ship import Ship
 from model.player_ship import Player_ship
 from model.alien_ship import Alien_ship
 from model.cooldown import Cooldown
-from model.alien_matrix import Alien_matrix
-from model.player import Player
+from model.aliens import Aliens
+from model.players import Players
+from model.projectiles_shot import Projectiles_shot

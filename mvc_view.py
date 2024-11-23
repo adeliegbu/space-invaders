@@ -39,7 +39,7 @@ class View:
         self.button_leave.place_forget()
         self.button_menu.place(x=2 * self.x0 - 10, y=10, anchor="ne")
         self.canvas.delete(self.logo_id)
-        self.controller.main()
+        self.controller.new_game()
 
     def rules(self):
         self.button_new_game.place_forget()
@@ -58,11 +58,8 @@ class View:
 
         self.controller.stop_update()
         self.controller.players.delete()
-        self.controller.aliens_matrix.delete()
-        for projectile in self.controller.projectiles_player:
-            projectile.out_of_screen()
-        for projectile in self.controller.projectiles_alien:
-            projectile.out_of_screen()
+        self.controller.aliens.delete()
+        self.controller.projectiles_shot.delete()
 
     def leave(self):
         self.fenetre.quit()
