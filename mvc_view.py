@@ -55,8 +55,9 @@ class View:
         self.button_menu.place_forget()
         self.rules_label.place_forget()
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
+
         self.controller.stop_update()
-        self.controller.player.dead()
+        self.controller.players.delete()
         self.controller.aliens_matrix.delete()
         for projectile in self.controller.projectiles_player:
             projectile.out_of_screen()

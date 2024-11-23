@@ -1,6 +1,6 @@
 from random import choice
 
-from mvc_model import Player, Cooldown, Alien
+from mvc_model import Player, Cooldown, Alien_matrix
 from mvc_view import View
 
 class Controller:
@@ -9,25 +9,25 @@ class Controller:
 
         self.score = 0
         self.keys_pressed = set()
-        self.updating = True
+        self.updating = False
 
-        self.player = Player(self.view.canvas, self.view.x0, 17 * self.view.y0 // 10, image=self.view.player_image, projectile_image=self.view.projectile_image)
-        self.player_cooldown = Cooldown(500)
-
-        self.aliens_matrix = [[Alien(self.view.canvas, self.view.x0 - j * 60, self.view.y0 // 3 - i * 40, image=self.view.alien_image, projectile_image=self.view.projectile_image) for i in range(-2, 3)] for j in range(-4, 5)] 
-        self.alien_cooldown = Cooldown(1000)
-        self.alien_direction = 1
+        self.players_cooldown = Cooldown(400)
+        self.players = Player(self.view.canvas, self.view.x0, 17 * self.view.y0 // 10, image=self.view.player_image, projectile_image=self.view.projectile_image)
+        
+        self.alien_cooldown = Cooldown(200)
+        self.aliens_matrix = Alien_matrix(self.view.canvas, self.view.x0, self.view.y0 // 3 ,image=self.view.alien_image, projectile_image=self.view.projectile_image, line=5, column=9)
 
         self.projectiles_player = []
         self.projectiles_alien = []
 
-    def main(self):
-        self.player = Player(self.view.canvas, self.view.x0, 17 * self.view.y0 // 10, image=self.view.player_image, projectile_image=self.view.projectile_image)
-        self.aliens_matrix = [[Alien(self.view.canvas, self.view.x0 - j * 60, self.view.y0 // 3 - i * 40, image=self.view.alien_image, projectile_image=self.view.projectile_image) for i in range(-2, 3)] for j in range(-4, 5)] 
-        self.projectiles = []
         self.view.canvas.bind("<KeyPress>", self.key_press)
         self.view.canvas.bind("<KeyRelease>", self.key_release)
         self.view.canvas.focus_set()
+    
+    def main(self):
+        self.players.create_player()
+        self.aliens_matrix.create_matrix() 
+
         self.updating = True
         self.update()
 
@@ -38,19 +38,16 @@ class Controller:
         self.keys_pressed.discard(event.keysym)  # Retirer la touche relâchée de l'ensemble
 
     def shoot(self, type):
-        if type == "player" and self.player_cooldown.cooldown_ended():
-            projectile = self.player.shoot()
+        if type == "player 1" and self.players_cooldown.cooldown_ended() and self.players.define_player(1)[0]:
+            projectile = self.players.define_player(1)[1].shoot()
             self.projectiles_player.append(projectile)
-            self.player_cooldown.cooldown_reset()
+            self.players_cooldown.cooldown_reset()
 
-        if type == "alien" and self.aliens_matrix:
-            non_empty_aliens_rows = [row for row in self.aliens_matrix if row]  # Filtrer les listes non vides
-            alien_row_shooting = choice(non_empty_aliens_rows)
-            alien_shooting = alien_row_shooting[0]
-            if self.alien_cooldown.cooldown_ended():
-                projectile = alien_shooting.shoot()
-                self.projectiles_alien.append(projectile)
-                self.alien_cooldown.cooldown_reset()
+        if type == "alien" and self.aliens_matrix and self.alien_cooldown.cooldown_ended():
+            alien_shooting = self.aliens_matrix.alien_shooting()
+            projectile = alien_shooting.shoot()
+            self.projectiles_alien.append(projectile)
+            self.alien_cooldown.cooldown_reset()
     
     def stop_update(self):
         self.updating = False
@@ -58,44 +55,41 @@ class Controller:
     def hit(self):
         for projectile in self.projectiles_alien:
             x_projectile, y_projectile = projectile.get_position()
-            x_player, y_player = self.player.get_position()
- 
-            if x_projectile -30 <= x_player and x_player <= x_projectile + 30 and y_projectile - 10 <= y_player and y_player <= y_projectile + 45:
-                self.player.life -= 1
-                if self.player.life == 0:
-                    self.player.dead()
-                projectile.out_of_screen()
-                self.projectiles_alien.remove(projectile)
+            for player in self.players.player:
+                x_player, y_player = player.get_position()
+
+                if x_projectile - 30 <= x_player <= x_projectile + 30 and y_projectile - 10 <= y_player <= y_projectile + 45:
+                    player.life -= 1
+                    if player.life == 0:
+                        self.players.remove_player(player)
+                    projectile.out_of_screen()
+                    self.projectiles_alien.remove(projectile)
 
         for projectile in self.projectiles_player:
             x_projectile, y_projectile = projectile.get_position()
-            for alien_row in self.aliens_matrix:
-                for alien in alien_row:
+            for row in self.aliens_matrix.alien_matrix:
+                for alien in row:
                     x_alien, y_alien = alien.get_position()
-                    if x_projectile -25 <= x_alien and x_alien <= x_projectile + 25 and y_projectile -37 <= y_alien and y_alien <= y_projectile + 15:
-                        alien.life -= 1
-                        if alien.life == 0:
-                            alien.dead()
+                    if x_projectile - 25 <= x_alien <= x_projectile + 25 and y_projectile - 37 <= y_alien <= y_projectile + 15:
+                        alien.dead()
                         projectile.out_of_screen()
-                        alien_row.remove(alien)
+                        self.aliens_matrix.remove_alien(alien)
                         self.projectiles_player.remove(projectile)
-                        self.score += 10
+                        self.score += 100
 
     def update(self):
         if self.updating:
-            if "Left" in self.keys_pressed:
-                self.player.move_left()
-            if "Right" in self.keys_pressed:
-                self.player.move_right()
+            if "Left" in self.keys_pressed and self.players.define_player(1)[0]:
+                self.players.define_player(1)[1].move_left()
+            if "Right" in self.keys_pressed and self.players.define_player(1)[0]:
+                self.players.define_player(1)[1].move_right()
             
-            for alien_row in self.aliens_matrix:
-                for alien in alien_row:
-                    alien.move(self.alien_direction)
-                    if alien.border_hit():
-                        for alien_row in self.aliens_matrix:
-                            for alien in alien_row:
-                                self.alien_direction = - self.alien_direction
-                                alien.move_down()                       
+            if "q" in self.keys_pressed and self.players.define_player(2)[0]:
+                self.players.define_player(2)[1].move_left()
+            if "d" in self.keys_pressed and self.players.define_player(2)[0]:
+                self.players.define_player(2)[1].move_right()
+            
+            self.aliens_matrix.move()
  
             for projectile in self.projectiles_player:
                 projectile.move()  
@@ -104,19 +98,24 @@ class Controller:
 
             self.hit()
 
-            self.player_cooldown.cooldown_update()
+            self.players_cooldown.cooldown_update()
             self.alien_cooldown.cooldown_update()
 
             if "space" in self.keys_pressed:
-                self.shoot("player")
+                self.shoot("player 1")
 
             self.shoot("alien")
+            
+            if "Escape" in self.keys_pressed:
+                self.stop_update()
+                self.view.menu()
             
             self.view.canvas.after(16, self.update)  # Appeler cette méthode à nouveau après 16 ms (environ 60 fois par seconde)
 
     def run(self):
         self.view.menu()
         self.view.fenetre.mainloop()
+
 
 if __name__ == "__main__":
     space_invaders = Controller()

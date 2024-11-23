@@ -1,23 +1,29 @@
-from model.ship import Ship
+from model.player_ship import Player_ship
 
-class Player(Ship):
+class Player():
     def __init__(self, canvas, x, y, image, projectile_image):
-        super().__init__(canvas, x, y, image=image, projectile_image=projectile_image)
-        self.life = 3
-        self.speed = 8
-        self.height = 50
+        self.canvas = canvas   
+        self.x = x
+        self.y = y
+        self.image = image
+        self.projectile_image = projectile_image
+        self.player = []
 
-    def move_left(self):
-        """Déplacer le vaisseau à gauche."""
-        if self.x - 30 > 0:  # Empêche le vaisseau de sortir à gauche
-            self.x -= self.speed
-            self.canvas.move(self.id, -self.speed, 0)
-        
-    def move_right(self):
-        """Déplacer le vaisseau à droite."""
-        if self.x + 30 < self.canvas.winfo_width():  # Empêche le vaisseau de sortir à droite
-            self.x += self.speed
-            self.canvas.move(self.id, self.speed, 0)
-            
-    def shoot(self):
-        return super().shoot(1, self.height)
+    def create_player(self):
+        self.x = self.canvas.winfo_width() // 2
+        self.player.append(Player_ship(self.canvas, self.x, self.y, image=self.image, projectile_image=self.projectile_image))
+    
+    def define_player(self, number):
+        if number <= len(self.player):
+            return True, self.player[number - 1]
+        return False, None
+    
+    def remove_player(self, player):
+        if player in self.player:
+            player.dead()
+            self.player.remove(player)
+    
+    def delete(self):
+        for player in self.player:
+            player.dead()
+        self.player = []

@@ -8,6 +8,8 @@ programme
 
 from model.projectile import Projectile
 from model.ship import Ship
-from model.player import Player
-from model.alien import Alien
+from model.player_ship import Player_ship
+from model.alien_ship import Alien_ship
 from model.cooldown import Cooldown
+from model.alien_matrix import Alien_matrix
+from model.player import Player

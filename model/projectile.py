@@ -6,9 +6,9 @@ class Projectile:
         self.y = y
         self.type = type
         self.image = image
-        self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
         self.speed = - self.type * 15
-
+        self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
+        
     def get_position(self):
         return self.x, self.y
     
@@ -17,7 +17,7 @@ class Projectile:
         self.y += self.speed
         self.canvas.move(self.id, 0, self.speed)
         if self.y < 0 or self.y > self.canvas.winfo_height():
-            self.out_of_screen
+            self.out_of_screen()
     
     def out_of_screen(self):
         self.canvas.delete(self.id)
