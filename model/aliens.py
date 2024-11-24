@@ -2,14 +2,16 @@ from random import choice
 
 from model.alien_ship import Alien_ship
 from model.bonus_ship import Bonus_ship
+from model.cooldown import Cooldown
 
 class Aliens():
-    def __init__(self, canvas, line, column, number_alien_hit, image):
+    def __init__(self, canvas, line, column, number_alien_hit, image, cooldown):
         self.canvas = canvas
         self.line = line
         self.column = column
         self.number_alien_hit = number_alien_hit
         self.image = image
+        self.cooldown = cooldown
         self.x_direction = 1
         self.y_direction = 0
         self.matrix = [[]]    # matrice des aliens en vies, la première ligne sera réservée aux aliens bonus
@@ -22,23 +24,24 @@ class Aliens():
                 row.append(alien)
             self.matrix.append(row)
     
-    def move(self):
+    def update(self, projectile, projectile_image):
         if self.border_hit():
             self.x_direction *= -1
             self.y_direction = 1
         for bonus in self.matrix[0]:
             if self.bonus_border_hit(bonus):
-                bonus.dead()
+                bonus.delete()
                 self.remove_alien(bonus)
+
         for row in self.matrix[1:]:
             for alien in row:
                 alien.move(self.x_direction, self.y_direction)
         for bonus in self.matrix[0]:
-            bonus.move()
+            bonus.update()
+        
         self.y_direction = 0
-    
-    def increase_number_alien_hit(self):
-        self.number_alien_hit += 1
+        self.shoot(self.cooldown, projectile, projectile_image)
+        self.cooldown.update()
         if self.should_increase_speed():
             self.increase_speed
         if self.should_add_bonus():
@@ -61,7 +64,7 @@ class Aliens():
             x_bonus = 50
         else:
             x_bonus = self.canvas.winfo_width() - 50
-        self.matrix[0].append(Bonus_ship(self.canvas, x_bonus, 80, bonus_direction, image))
+        self.matrix[0].append(Bonus_ship(self.canvas, x_bonus, 80, image, Cooldown(50), bonus_direction))
 
     def border_hit(self):
         for row in self.matrix[1:]:
@@ -82,7 +85,7 @@ class Aliens():
     def got_hit(self, alien):
         alien.got_hit()
         self.remove_alien(alien)
-        self.increase_number_alien_hit()
+        self.number_alien_hit += 1
 
     def alien_shooting(self):
         non_empty_row = [row for row in self.matrix[1:] if row]
@@ -90,10 +93,10 @@ class Aliens():
             shooting_row = choice(non_empty_row)
             return shooting_row[-1]
     
-    def shoot(self, cooldown, projectile, projectile_image):
+    def shoot(self, projectile, projectile_image):
         alien_shooting = self.alien_shooting()
         if alien_shooting:
-            alien_shooting.shoot(cooldown, projectile, projectile_image)
+            alien_shooting.shoot(self.cooldown, projectile, projectile_image)
         for bonus in self.matrix[0]:
             bonus.shoot(projectile, projectile_image)
 
@@ -103,9 +106,9 @@ class Aliens():
                 row.remove(alien)
                 break   
  
-    def delete(self):
+    def reset(self):
         for row in self.matrix:
             for alien in row:
-                alien.dead()
+                alien.delete()
+        self.x_direction = 1
         self.matrix = [[]]
-

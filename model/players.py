@@ -27,3 +27,7 @@ class Players():
         for player in self.list:
             player.dead()
         self.list = []
+    
+    def update(self):
+        for player in self.list:
+            player.update()

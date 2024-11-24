@@ -1,23 +1,6 @@
-# model/projectile.py
-class Projectile:
-    def __init__(self, canvas, x, y, type, image):
-        self.canvas = canvas
-        self.x = x
-        self.y = y
+from model.object import Object
+
+class Projectile(Object):
+    def __init__(self, canvas, x, y, image, type):
+        super().__init__(canvas, x, y, x_speed=0, y_speed=20, width=9, height=50, image=image)
         self.type = type
-        self.speed = - self.type * 20
-        self.image = image
-        self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
-        
-    def get_position(self):
-        return self.x, self.y
-    
-    def move(self):
-        """Déplacer le projectile."""
-        self.y += self.speed
-        self.canvas.move(self.id, 0, self.speed)
-        if self.y < 0 or self.y > self.canvas.winfo_height():
-            self.out_of_screen()
-    
-    def out_of_screen(self):
-        self.canvas.delete(self.id)

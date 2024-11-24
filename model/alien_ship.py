@@ -8,5 +8,5 @@ class Alien_ship(Ship):
         return super().get_dimensions(self.width, self.height)
 
     def shoot(self, cooldown, projectile, projectile_image):
-        return super().shoot(cooldown, projectile, -1, self.height, projectile_image)
+        return super().shoot(cooldown, projectile, -1, projectile_image)
     

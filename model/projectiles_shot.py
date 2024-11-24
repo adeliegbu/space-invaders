@@ -20,24 +20,18 @@ class Projectiles_shot():
     
     def players_hit(self, players):
         for projectile in self.by_aliens_list:
-            x_projectile, y_projectile = projectile.get_position()
             for player in players.list:
-                x_player, y_player = player.get_position()
-                player_width, player_height = player.get_dimensions()
-                if x_projectile - player_width // 2 <= x_player <= x_projectile + player_width // 2 and y_projectile - player_height <= y_player <= y_projectile + player_height:
-                    projectile.out_of_screen()
+                if projectile.collide(player):
+                    projectile.delete()
                     self.remove_projectile(projectile)
                     players.got_hit(player)
 
     def aliens_hit(self, aliens):
         for projectile in self.by_players_list:
-            x_projectile, y_projectile = projectile.get_position()
             for row in aliens.matrix:
                 for alien in row:
-                    x_alien, y_alien = alien.get_position()
-                    alien_width, alien_height = alien.get_dimensions()
-                    if x_projectile - alien_width // 2 <= x_alien <= x_projectile + alien_width // 2 and y_projectile - alien_height <= y_alien <= y_projectile + alien_height:
-                        projectile.out_of_screen()
+                    if projectile.collide(alien):
+                        projectile.delete()
                         self.remove_projectile(projectile)
                         aliens.got_hit(alien)
 
@@ -49,8 +43,8 @@ class Projectiles_shot():
     
     def delete(self):
         for projectile in self.by_players_list:
-            projectile.out_of_screen()
+            projectile.delete()
         for projectile in self.by_aliens_list:
-            projectile.out_of_screen()
+            projectile.delete()
         self.by_players_list = []
         self.by_aliens_list = []
