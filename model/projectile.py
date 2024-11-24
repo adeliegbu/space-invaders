@@ -5,7 +5,7 @@ class Projectile:
         self.x = x
         self.y = y
         self.type = type
-        self.speed = - self.type * 15
+        self.speed = - self.type * 20
         self.image = image
         self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
         

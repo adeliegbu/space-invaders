@@ -28,28 +28,28 @@ class View:
         self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((50, 50), Image.LANCZOS))
         self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
-        self.button_new_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.new_game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
+        self.button_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_rules = tk.Button(self.canvas, text="Règles", command=self.rules, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_leave = tk.Button(self.canvas, text="Quitter", command=self.leave, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_menu = tk.Button(self.canvas, text="Menu", command=self.menu, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
 
-    def new_game(self):
-        self.button_new_game.place_forget()
+    def game(self):
+        self.button_game.place_forget()
         self.button_rules.place_forget()
         self.button_leave.place_forget()
-        self.button_menu.place(x=2 * self.x0 - 10, y=10, anchor="ne")
+        self.button_menu.place_forget()
         self.canvas.delete(self.logo_id)
         self.controller.new_game()
 
     def rules(self):
-        self.button_new_game.place_forget()
+        self.button_game.place_forget()
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
         self.rules_label.place(x=self.x0, y=self.y0 + 50, anchor="center")
 
     def menu(self):
-        self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
+        self.button_game.place(x=self.x0, y=self.y0, anchor="center")
         self.button_rules.place(x=self.x0, y=self.y0 + 100, anchor="center")
         self.button_leave.place(x=self.x0, y=self.y0 + 200, anchor="center")
         self.button_menu.place_forget()
