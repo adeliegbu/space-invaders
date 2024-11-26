@@ -16,7 +16,7 @@ class Controller:
         self.p1, self.p2 = None, None
         self.player_cooldown = Cooldown(400)
         
-        self.aliens = Aliens(self.view.canvas, line=4, column=7, number_alien_hit=1, image=self.view.alien_image, cooldown=Cooldown(200))
+        self.aliens = Aliens(self.view.canvas, line=4, column=7, image=self.view.alien_image, cooldown=Cooldown(200))
 
         self.projectiles_shot = Projectiles(self.view.canvas)
 

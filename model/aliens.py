@@ -6,17 +6,12 @@ from model.cooldown import Cooldown
 from model.group_object import Group_object
 
 class Aliens(Group_object):
-    def __init__(self, canvas,image, cooldown):
+    def __init__(self, canvas, cooldown):
         super().__init__(canvas)
-        self.canvas = canvas
-        self.line = line
-        self.column = column
-        self.number_alien_hit = 0
-        self.image = image
         self.cooldown = cooldown
+        self.number_alien_hit = 0
         self.x_direction = 1
         self.y_direction = 0
-        self.matrix = [[]]    # matrice des aliens en vies, la première ligne sera réservée aux aliens bonus
 
     def create_objects(self, x, line, column):
         super().create_objects(Alien_ship, x, self.canvas.winfo_screenheight() // 3, line, column, pad_x=20, pad_y=10)
@@ -41,16 +36,6 @@ class Aliens(Group_object):
             self.x_direction *= -1
             self.y_direction = 1
 
-        self.shoot(projectile, projectile_image)
-        self.cooldown.update()
-        if self.should_increase_speed():
-            self.increase_speed()
-            self.number_alien_hit += 1
-        if self.should_add_bonus():
-            self.add_bonus(self.image)
-            self.number_alien_hit += 1
-
-    
     def should_increase_speed(self):
         return self.number_alien_hit % 10 == 0
     
@@ -95,4 +80,6 @@ class Aliens(Group_object):
     def reset(self):
         super().reset()
         self.x_direction = 1
+        self.y_direction = 0
+        self.number_alien_hit = 0
 
