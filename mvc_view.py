@@ -25,7 +25,7 @@ class View:
         self.player_image = ImageTk.PhotoImage(Image.open("visuel/invaders.webp").resize((100, 100), Image.LANCZOS))
         self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.jpg").resize((50, 35), Image.LANCZOS))
         self.projectile_image = ImageTk.PhotoImage(Image.open("visuel/projectile.png").rotate(90).resize((150, 70), Image.LANCZOS))
-        self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((50, 50), Image.LANCZOS))
+        self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((15, 15), Image.LANCZOS))
         self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
         self.button_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")

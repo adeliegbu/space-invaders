@@ -48,6 +48,15 @@ class Projectiles_shot():
                         self.remove_projectile(projectile)
                         aliens.got_hit(alien)
 
+    def wall_hit(self, wall):
+        for projectile in self.by_players_list:
+            for row in wall.matrix:
+                for brick in row:
+                    if projectile.collide(brick):
+                        projectile.delete()
+                        self.remove_projectile(projectile)
+                        wall.got_hit(brick)
+
     def remove_projectile(self, projectile):
         if projectile in self.by_players_list:
             self.by_players_list.remove(projectile)

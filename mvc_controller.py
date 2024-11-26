@@ -1,6 +1,6 @@
 from random import choice
 
-from mvc_model import Players, Aliens, Projectiles_shot, Cooldown
+from mvc_model import Players, Aliens, Projectiles_shot, Cooldown, Wall
 from mvc_view import View
 
 class Controller:
@@ -16,9 +16,11 @@ class Controller:
         self.p1, self.p2 = None, None
         self.player_cooldown = Cooldown(400)
         
-        self.aliens = Aliens(self.view.canvas, line=5, column=9, number_alien_hit=1, image=self.view.alien_image, cooldown=Cooldown(200))
+        self.aliens = Aliens(self.view.canvas, line=4, column=7, number_alien_hit=1, image=self.view.alien_image, cooldown=Cooldown(200))
 
         self.projectiles_shot = Projectiles_shot(self.view.canvas)
+
+        self.wall = Wall(self.view.canvas, self.view.wall_image)
 
         self.view.canvas.bind("<KeyPress>", self.key_press)
         self.view.canvas.bind("<KeyRelease>", self.key_release)
@@ -28,7 +30,9 @@ class Controller:
         self.players.create_player(self.view.x0, 17 * self.view.y0 // 10, self.player_cooldown)
         self.p1 = self.players.define_player(1)[1]
         self.p2 = self.players.define_player(2)[1]
-        self.aliens.create_matrix(self.view.x0, self.view.y0 // 3) 
+        self.aliens.create_matrix(self.view.x0, self.view.y0 // 3)
+        for i in range(3):
+            self.wall.create_wall((i + 1) * self.view.screen_width // 4)
 
         self.updating = True
         self.update()
@@ -65,13 +69,14 @@ class Controller:
 
             self.projectiles_shot.players_hit(self.players)
             self.projectiles_shot.aliens_hit(self.aliens)
+            self.projectiles_shot.wall_hit(self.wall)
 
             self.player_cooldown.update()
             # print()
             if "Escape" in self.keys_pressed:
                 self.view.menu()
             
-            self.view.canvas.after(33, self.update)  # Appeler cette méthode à nouveau après 33 ms (environ 30fois par seconde)
+            self.view.canvas.after(25, self.update)  # Appeler cette méthode à nouveau après 33 ms (environ 30fois par seconde)
 
     def run(self):
         self.view.menu()
