@@ -58,7 +58,7 @@ class View:
 
         self.controller.stop_update()
         self.controller.players.delete()
-        self.controller.aliens.delete()
+        self.controller.aliens.reset()
         self.controller.projectiles_shot.delete()
 
     def leave(self):

@@ -40,12 +40,15 @@ class Aliens():
             bonus.update()
         
         self.y_direction = 0
-        self.shoot(self.cooldown, projectile, projectile_image)
+        self.shoot(projectile, projectile_image)
         self.cooldown.update()
         if self.should_increase_speed():
-            self.increase_speed
+            self.increase_speed()
+            self.number_alien_hit += 1
         if self.should_add_bonus():
             self.add_bonus(self.image)
+            self.number_alien_hit += 1
+
     
     def should_increase_speed(self):
         return self.number_alien_hit % 10 == 0
@@ -56,7 +59,7 @@ class Aliens():
                 alien.x_speed += 1
     
     def should_add_bonus(self):
-        return self.number_alien_hit % 20 == 0
+        return self.number_alien_hit % 5 == 0
     
     def add_bonus(self, image):
         bonus_direction = choice([-1, 1])

@@ -6,8 +6,8 @@ class Players():
         self.image = image
         self.list = []
 
-    def create_player(self, x, y):
-        self.list.append(Player_ship(self.canvas, x, y, self.image))
+    def create_player(self, x, y, cooldown):
+        self.list.append(Player_ship(self.canvas, x, y, self.image, cooldown))
     
     def define_player(self, number):
         if number <= len(self.list):
@@ -25,7 +25,7 @@ class Players():
     
     def delete(self):
         for player in self.list:
-            player.dead()
+            player.delete()
         self.list = []
     
     def update(self):
