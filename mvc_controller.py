@@ -1,6 +1,6 @@
 from random import choice
 
-from mvc_model import Players, Aliens, Projectiles_shot, Cooldown, Wall
+from mvc_model import Players, Aliens, Projectiles, Cooldown, Wall
 from mvc_view import View
 
 class Controller:
@@ -18,7 +18,7 @@ class Controller:
         
         self.aliens = Aliens(self.view.canvas, line=4, column=7, number_alien_hit=1, image=self.view.alien_image, cooldown=Cooldown(200))
 
-        self.projectiles_shot = Projectiles_shot(self.view.canvas)
+        self.projectiles_shot = Projectiles(self.view.canvas)
 
         self.wall = Wall(self.view.canvas, self.view.wall_image)
 
@@ -72,7 +72,7 @@ class Controller:
             self.projectiles_shot.wall_hit(self.wall)
 
             self.player_cooldown.update()
-            # print()
+
             if "Escape" in self.keys_pressed:
                 self.view.menu()
             
