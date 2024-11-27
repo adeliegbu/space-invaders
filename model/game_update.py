@@ -1,4 +1,4 @@
-class Game_update():
+class Logic_update():
     def __init__(self, players, aliens, projectiles, wall):
         self.players = players
         self.aliens = aliens

@@ -12,8 +12,11 @@ class Ship(Object):
     
     def got_hit(self):
         self.life -= 1
-        if self.life == 0:
-            self.delete()
+    
+    def dead(self):
+        return self.life == 0
+    
+
 
     
 

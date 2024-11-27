@@ -7,7 +7,7 @@ class Players():
         self.list = []
 
     def create_object(self, x, y, cooldown):
-        self.list.append(Player_ship(self.canvas, x, y, self.image, cooldown))
+        super().create_object(Player_ship, x, y, line=1, colum=1, pad_x=0, pad_y=0, image=self.image, cooldown=cooldown)
     
     def define_player(self, number):
         if number <= len(self.list):

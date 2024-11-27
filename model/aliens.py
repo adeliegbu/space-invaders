@@ -10,6 +10,7 @@ class Aliens(Group_object):
         super().__init__(canvas)
         self.cooldown = cooldown
         self.number_alien_hit = 0
+        self.updating = False
         self.x_direction = 1
         self.y_direction = 0
 
@@ -22,6 +23,10 @@ class Aliens(Group_object):
         super().move(self.x_direction, self.y_direction)
         self.y_direction = 0
     
+    def increase_number_hit(self):
+        self.number_alien_hit += 1
+        self.updating = True
+
     def should_change_direction(self):
         for row in self.matrix:
             for alien in row:
@@ -37,7 +42,10 @@ class Aliens(Group_object):
             self.y_direction = 1
 
     def should_increase_speed(self):
-        return self.number_alien_hit % 10 == 0
+        if self.updating and self.number_alien_hit % 10 == 0:
+                self.updating = False
+                return True
+        return False
     
     def increase_speed(self):
         for row in self.matrix:
@@ -62,12 +70,12 @@ class Aliens(Group_object):
         return bonus.will_hit_border(x_future, y_future)
     
     def got_hit(self, alien):
-        alien.got_hit()
-        self.remove_alien(alien)
+        super().got_hit(alien)
         self.number_alien_hit += 1
+        self.updating = True
 
     def alien_shooting(self):
-        shooting_row = choice(self.matrix[1:])
+        shooting_row = choice(self.matrix)
         if shooting_row:
             return shooting_row[-1]
         return None

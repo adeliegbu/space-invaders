@@ -1,6 +1,7 @@
 from model.brick import Brick
+from model.group_object import Group_object
 
-class Wall():
+class Wall(Group_object):
     def __init__(self, canvas, image):
         super().__init__(canvas)
         self.canvas = canvas
@@ -10,27 +11,12 @@ class Wall():
     def create_wall(self, x,line, column, pad_x, pad_y):
         for j in range(-1, 2):
             for i in range(-2, 3):
-                super().create_objects(Brick, x, 7 * self.canvas.winfo_height(), line, column, pad_x, pad_y)
-                Brick.self.heigth 
+                super().create_objects(Brick, x, 7 * self.canvas.winfo_height() // 10, line, column, pad_x, pad_y)
+        brick_left = Brick(self.canvas, x - 3 * (Brick.width + pad_x), 7 * self.canvas.winfo_height() // 10, self.image)
+        brick_rigth = Brick(self.canvas, x + 3 * (Brick.width + pad_x), 7 * self.canvas.winfo_height() // 10, self.image)
+        self.matrix.append(brick_left)
+        self.matrix.append(brick_rigth)
 
-
-
-
-
-
-        # for j in range(- 1, 2):
-        #     row = []
-        #     for i in range(- 2, 3):
-        #         brick = Brick(self.canvas, x + i * 20, 7 * self.canvas.winfo_height() // 10 + j * 20, image=self.image)
-        #         row.append(brick)
-        #     if not j:
-        #         brick_left = Brick(self.canvas, x - 3 * 20, 7 * self.canvas.winfo_height() // 10, self.image)
-        #         brick_right = Brick(self.canvas, x + 3 * 20, 7 * self.canvas.winfo_height() // 10, self.image)
-        #         row.append(brick_left)
-        #         row.append(brick_right)
-
-            self.matrix.append(row)
-    
     def got_hit(self, brick):
         brick.delete()
         self.remove_brick(brick)
