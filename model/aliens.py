@@ -3,53 +3,39 @@ from random import choice
 from model.alien_ship import Alien_ship
 from model.bonus_ship import Bonus_ship
 from model.cooldown import Cooldown
+from model.group_object import Group_object
 
-class Aliens():
-    def __init__(self, canvas, line, column, number_alien_hit, image, cooldown):
-        self.canvas = canvas
-        self.line = line
-        self.column = column
-        self.number_alien_hit = number_alien_hit
-        self.image = image
+class Aliens(Group_object):
+    def __init__(self, canvas, cooldown):
+        super().__init__(canvas)
         self.cooldown = cooldown
+        self.number_alien_hit = 0
         self.x_direction = 1
         self.y_direction = 0
-        self.matrix = [[]]    # matrice des aliens en vies, la première ligne sera réservée aux aliens bonus
 
-    def create_matrix(self, x, y):
-        for i in range(- self.column // 2 + 1, self.column // 2 + 1):
-            row = []
-            for j in range(- self.line // 2 + 1, self.line // 2 + 1):
-                alien = Alien_ship(self.canvas, x + i * 100, y + j * 60, self.image)
-                row.append(alien)
-            self.matrix.append(row)
+    def create_objects(self, x, line, column):
+        super().create_objects(Alien_ship, x, self.canvas.winfo_screenheight() // 3, line, column, pad_x=20, pad_y=10)
     
-    def update(self, projectile, projectile_image):
-        if self.border_hit():
+    def move(self):
+        if self.should_change_direction():
+            self.change_direction()
+        super().move(self.x_direction, self.y_direction)
+        self.y_direction = 0
+    
+    def should_change_direction(self):
+        for row in self.matrix:
+            for alien in row:
+                x_alien, y_alien = alien.get_position()
+                x_future = x_alien + self.x_direction * alien.x_speed
+                y_future = y_alien + self.y_direction * alien.y_speed
+                if alien.will_hit_border(x_future, y_future):
+                    return True
+        return False
+
+    def change_direction(self):
             self.x_direction *= -1
             self.y_direction = 1
-        for bonus in self.matrix[0]:
-            if self.bonus_border_hit(bonus):
-                bonus.delete()
-                self.remove_alien(bonus)
 
-        for row in self.matrix[1:]:
-            for alien in row:
-                alien.move(self.x_direction, self.y_direction)
-        for bonus in self.matrix[0]:
-            bonus.update()
-        
-        self.y_direction = 0
-        self.shoot(projectile, projectile_image)
-        self.cooldown.update()
-        if self.should_increase_speed():
-            self.increase_speed()
-            self.number_alien_hit += 1
-        if self.should_add_bonus():
-            self.add_bonus(self.image)
-            self.number_alien_hit += 1
-
-    
     def should_increase_speed(self):
         return self.number_alien_hit % 10 == 0
     
@@ -69,16 +55,6 @@ class Aliens():
             x_bonus = self.canvas.winfo_width() - 50
         self.matrix[0].append(Bonus_ship(self.canvas, x_bonus, 80, image, Cooldown(50), bonus_direction))
 
-    def border_hit(self):
-        for row in self.matrix[1:]:
-            for alien in row:
-                x_alien, y_alien = alien.get_position()
-                x_future = x_alien + self.x_direction * alien.x_speed
-                y_future = y_alien + self.y_direction * alien.y_speed
-                if alien.will_hit_border(x_future, y_future):
-                    return True
-        return False
-    
     def bonus_border_hit(self, bonus):
         x_bonus, y_bonus = bonus.get_position()
         x_future = x_bonus + bonus.direction * bonus.x_speed
@@ -91,27 +67,19 @@ class Aliens():
         self.number_alien_hit += 1
 
     def alien_shooting(self):
-        non_empty_row = [row for row in self.matrix[1:] if row]
-        if non_empty_row:
-            shooting_row = choice(non_empty_row)
+        shooting_row = choice(self.matrix[1:])
+        if shooting_row:
             return shooting_row[-1]
+        return None
     
     def shoot(self, projectile, projectile_image):
         alien_shooting = self.alien_shooting()
         if alien_shooting:
             alien_shooting.shoot(self.cooldown, projectile, projectile_image)
-        for bonus in self.matrix[0]:
-            bonus.shoot(projectile, projectile_image)
 
-    def remove_alien(self, alien):
-        for row in self.matrix:
-            if alien in row:
-                row.remove(alien)
-                break   
- 
     def reset(self):
-        for row in self.matrix:
-            for alien in row:
-                alien.delete()
+        super().reset()
         self.x_direction = 1
-        self.matrix = [[]]
+        self.y_direction = 0
+        self.number_alien_hit = 0
+

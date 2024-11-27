@@ -6,7 +6,7 @@ class Players():
         self.image = image
         self.list = []
 
-    def create_player(self, x, y, cooldown):
+    def create_object(self, x, y, cooldown):
         self.list.append(Player_ship(self.canvas, x, y, self.image, cooldown))
     
     def define_player(self, number):
