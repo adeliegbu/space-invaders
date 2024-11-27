@@ -1,18 +1,19 @@
 from model.projectile import Projectile
+from model.group_object import Group_object
 
-class Projectiles():
+class Projectiles(Group_object):
     def __init__(self, canvas):
         self.canvas = canvas
         self.list = [[], []]
 
     def shot(self, x, y, type, height, image):
-            """alien projectiles go to 1st row and player projectiles go to 2nd row"""
-            self.list[abs(type + 1) // 2].append(Projectile(self.canvas, x, y - type * height, image, type))
+            super().create_objects(Projectile, x, y - type * height, 1, 1, 0, 0)
+            self.objects_matrix.append(Projectile(self.canvas, x, y - type * height, image, type))
     
     def move(self):
+        super().move()
         for row in self.list:
             for projectile in row:
-                projectile.move()
                 _, y_projectile = projectile.get_position()
                 if y_projectile - projectile.height <= 0 or y_projectile + projectile.height >= self.canvas.winfo_height():
                     self.remove_projectile(projectile)
@@ -44,15 +45,3 @@ class Projectiles():
                             projectile.delete()
                             self.remove_projectile(projectile)
                             wall.got_hit(brick)
-
-    def remove_projectile(self, projectile):
-        for row in self.list:
-            if projectile in row:
-                row.remove(projectile)
-                break
-    
-    def delete(self):
-        for row in self.list:
-            for projectile in row:
-                projectile.delete()
-        self.list = [[], []]

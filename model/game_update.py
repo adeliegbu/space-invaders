@@ -8,3 +8,4 @@ class Game_update():
     def update(self):
         self.aliens.move()
         self.projectiles.move()
+        
