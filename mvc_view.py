@@ -2,6 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 from visuel.rules import rules_text
+from visuel.options import Options
 
 class View:
     def __init__(self, controller):
@@ -24,12 +25,10 @@ class View:
         self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
         self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((90, 90), Image.LANCZOS))
 
-
-
-
-
         self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((20, 20), Image.LANCZOS))
         self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
+
+        self.options = Options()
 
         self.button_new_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.new_game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_rules = tk.Button(self.canvas, text="Règles", command=self.rules, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
@@ -79,7 +78,3 @@ class View:
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_options.place_forget()
-
-
-
-
