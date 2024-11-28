@@ -17,6 +17,12 @@ class Game_logic():
         self.stage_number = 1
     
     def game_update(self):
+        if self.lost():
+            self.should_game_update = False
+            self.should_menu_update = True
+            self.view.menu()
+            self.menu_update()
+
         if self.should_game_update:
             for active_bind in self.bind.active_binds:
                 active_bind()
@@ -61,7 +67,7 @@ class Game_logic():
             self.stage_number += 1
             
     def lost(self):     # à modifier pour afficher écran de fin de game
-        self.reset()
+        return self.players.objects_dead()
     
     def reset(self):
         self.stage_number = 1

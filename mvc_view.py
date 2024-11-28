@@ -2,7 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 from visuel.rules import rules_text
-from visuel.options import Options
+from model.options import Options
 
 class View:
     def __init__(self, controller):
@@ -41,13 +41,13 @@ class View:
         self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((20, 20), Image.LANCZOS))
         self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
-        self.options = Options()
+        self.options = Options(self)
 
         self.button_new_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.new_game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_rules = tk.Button(self.canvas, text="Règles", command=self.rules, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_leave = tk.Button(self.canvas, text="Quitter", command=self.leave, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_menu = tk.Button(self.canvas, text="Menu", command=self.menu, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
-        self.button_options = tk.Button(self.canvas, text="Options", command=self.options, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
+        self.button_options = tk.Button(self.canvas, text="Options", command=self.show_options, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
 
     def new_game(self):
         self.button_new_game.place_forget()
@@ -56,7 +56,8 @@ class View:
         self.button_menu.place_forget()
         self.button_options.place_forget()
         self.canvas.delete(self.logo_id)
-        self.controller.start_stage()
+
+        self.controller.new_game()
 
     def rules(self):
         self.button_new_game.place_forget()
@@ -74,19 +75,13 @@ class View:
         self.rules_label.place_forget()
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
 
-        self.controller.stop_update()
-        self.controller.players.reset()
-        self.controller.aliens.reset()
-        self.controller.players_projectiles.reset()
-        self.controller.aliens_projectiles.reset()
-        self.controller.walls.reset()
+        self.controller.in_menu()
 
     def leave(self):
         self.fenetre.quit()
 
-    def options(self):
+    def show_options(self):
         self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
-
         self.button_new_game.place_forget()
         self.button_rules.place_forget()
         self.button_leave.place_forget()

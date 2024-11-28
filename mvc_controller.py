@@ -1,6 +1,6 @@
 from random import choice
 
-from mvc_model import Players, Aliens, Cooldown, Walls, Players_projectiles, Aliens_projectiles, Binds, Game_logic
+from mvc_model import Players, Aliens, Cooldown, Walls, Players_projectiles, Aliens_projectiles, Binds, Game_logic, Options
 from mvc_view import View
 
 class Controller:
@@ -23,43 +23,22 @@ class Controller:
         self.walls = Walls(self.view.canvas, self.view.wall_image)
 
         self.binds = Binds(self.view.canvas)
-        self.game_logic = Game_logic(self.view, self.binds, self.players, self.aliens, self.players_projectiles, self.walls, 33)
+
+        self.refresh_rate = 25
+        self.game_logic = Game_logic(self.view, self.binds, self.players, self.aliens, self.players_projectiles, self.walls, self.refresh_rate)
+
     
     def new_game(self):
         self.game_logic.stage_number = 1
         self.game_logic.stage_update()
         self.game_logic.should_game_update = True
+        self.game_logic.game_update()
 
-    def key_press(self, event):
-        self.keys_pressed.add(event.keysym)  # Ajouter la touche enfoncée à l'ensemble
-
-    def key_release(self, event):
-        self.keys_pressed.discard(event.keysym)  # Retirer la touche relâchée de l'ensemble
-    
-    def stop_update(self):
-        self.updating = False
-
-    def update(self):
-        if self.updating:
-            if self.players.is_player_dead(self.p1):
-                if "Left" in self.keys_pressed:
-                    self.p1.move(-1, 0)
-                if "Right" in self.keys_pressed:
-                    self.p1.move(1, 0)
-                if "space" in self.keys_pressed:
-                    self.p1.shoot(self.players_projectiles)
-
-            if self.players.is_player_dead(self.p2):     
-                if "q" in self.keys_pressed:
-                    self.p2.move(-1, 0)
-                if "d" in self.keys_pressed:
-                    self.p2.move(1, 0)
-                if "Return" in self.keys_pressed:
-                    self.p2.shoot(self.players_projectiles)
-
-            if "Escape" in self.keys_pressed:
-                self.view.menu()
-            
+    def in_menu(self):
+        self.game_logic.should_game_update = False
+        self.game_logic.should_menu_update = True
+        self.game_logic.reset()
+        self.game_logic.menu_update()
   # Appeler cette méthode à nouveau après 33 ms (environ 30fois par seconde)
 
     def run(self):
