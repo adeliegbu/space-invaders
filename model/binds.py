@@ -36,6 +36,18 @@ class Binds:
                 return command
         return None
     
+    def preset_binds(self):
+        p1 = self.players.define_player(1)
+        p2 = self.players.define_player(2)
+        self.game_binds_dico = {
+            self.p1.move(-1, 0): "Left",
+            self.p1.move(1, 0): "Right",
+            self.p1.shoot(): "space",
+        }
+
+    def reset_active_binds(self):
+        self.active_binds = set()
+    
     def reset_binds(self):
         self.binds_dico = {}
         self.active_binds = set()
