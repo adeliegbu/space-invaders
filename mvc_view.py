@@ -26,7 +26,8 @@ class View:
         self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((90, 90), Image.LANCZOS))
         self.alien_bonus_image = ImageTk.PhotoImage(Image.open("visuel/alien_bonus.png").rotate(90).resize((90, 90), Image.LANCZOS))
 
-        self.projectile_alien = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((200, 200), Image.LANCZOS))
+        self.projectile_alien_bonus_image = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((200, 200), Image.LANCZOS))
+        self.projectile_alien_image = ImageTk.PhotoImage(Image.open("visuel/projectile_green.png").resize((200, 200), Image.LANCZOS))
         self.player_image_green = ImageTk.PhotoImage(Image.open("visuel/players_green.png").resize((200, 200), Image.LANCZOS))
         self.projectile_player_image_green = ImageTk.PhotoImage(Image.open("visuel/projectile_green.png").rotate(90).resize((250, 250), Image.LANCZOS))
         self.player_image_blue = ImageTk.PhotoImage(Image.open("visuel/players_blue.png").resize((200, 200), Image.LANCZOS))
