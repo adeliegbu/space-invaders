@@ -31,7 +31,7 @@ class Controller:
         self.p1 = self.players.define_player(1)
         self.p2 = self.players.define_player(2)
         self.aliens.create_objects_matrix(line=4, column=7)
-        self.walls.add_object(self.view.screen_height * 5 // 6, 5)
+        self.walls.add_object(self.view.screen_height * 4 // 5, 4)
 
         self.updating = True
         self.update()
