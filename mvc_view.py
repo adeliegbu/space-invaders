@@ -22,9 +22,12 @@ class View:
         self.canvas.create_image(0, 0, image=self.bg_image, anchor="nw")
 
         self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
-        self.player_image = ImageTk.PhotoImage(Image.open("visuel/invaders.webp").resize((100, 100), Image.LANCZOS))
-        self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.jpg").resize((50, 35), Image.LANCZOS))
-        self.projectile_image = ImageTk.PhotoImage(Image.open("visuel/projectile.png").rotate(90).resize((150, 70), Image.LANCZOS))
+        self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((90, 90), Image.LANCZOS))
+
+
+
+
+
         self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((20, 20), Image.LANCZOS))
         self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
@@ -32,12 +35,14 @@ class View:
         self.button_rules = tk.Button(self.canvas, text="Règles", command=self.rules, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_leave = tk.Button(self.canvas, text="Quitter", command=self.leave, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_menu = tk.Button(self.canvas, text="Menu", command=self.menu, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
+        self.button_options = tk.Button(self.canvas, text="Options", command=self.options, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
 
     def new_game(self):
         self.button_new_game.place_forget()
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_menu.place_forget()
+        self.button_options.place_forget()
         self.canvas.delete(self.logo_id)
         self.controller.start_stage()
 
@@ -51,7 +56,8 @@ class View:
     def menu(self):
         self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
         self.button_rules.place(x=self.x0, y=self.y0 + 100, anchor="center")
-        self.button_leave.place(x=self.x0, y=self.y0 + 200, anchor="center")
+        self.button_options.place(x=self.x0, y=self.y0 + 200, anchor="center")
+        self.button_leave.place(x=self.x0, y=self.y0 + 300, anchor="center")
         self.button_menu.place_forget()
         self.rules_label.place_forget()
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
@@ -65,3 +71,15 @@ class View:
 
     def leave(self):
         self.fenetre.quit()
+
+    def options(self):
+        self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
+
+        self.button_new_game.place_forget()
+        self.button_rules.place_forget()
+        self.button_leave.place_forget()
+        self.button_options.place_forget()
+
+
+
+
