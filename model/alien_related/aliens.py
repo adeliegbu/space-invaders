@@ -6,9 +6,10 @@ from model.cooldown import Cooldown
 from model.parents_class.group_object import Group_object
 
 class Aliens(Group_object):
-    def __init__(self, canvas, image, cooldown):
+    def __init__(self, canvas, image, image_bonus, cooldown):
         super().__init__(canvas)
         self.image = image
+        self.image_bonus = image_bonus
         self.cooldown = cooldown
         self.x_direction = 1
         self.y_direction = 0
@@ -76,13 +77,13 @@ class Aliens(Group_object):
                  return True
         return False
     
-    def add_bonus(self, image):
+    def add_bonus(self):
         bonus_direction = choice([-1, 1])
         if bonus_direction == 1:
             x_bonus = 50
         else:
             x_bonus = self.canvas.winfo_width() - 50
-        super().add_object(Bonus_ship(self.canvas, x_bonus, 80, image, Cooldown(126), bonus_direction))
+        super().add_object(Bonus_ship(self.canvas, x_bonus, 80, self.image_bonus, Cooldown(126), bonus_direction))
 
     def bonus_out_of_bounds(self, bonus):
         if bonus.bonus_will_be_out_of_bounds():
@@ -95,7 +96,7 @@ class Aliens(Group_object):
                 self.increase_speed()
                 var += 1
             if self.should_add_bonus():
-                self.add_bonus(bonus_image)
+                self.add_bonus()
                 var += 1
             if var > 0:
                 self.updating = False
