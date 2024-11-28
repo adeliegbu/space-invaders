@@ -17,8 +17,8 @@ class Controller:
         
         self.aliens = Aliens(self.view.canvas, image=self.view.alien_image, cooldown=Cooldown(600))
 
-        self.players_projectiles = Players_projectiles(self.view.canvas, self.view.projectile_image)
-        self.aliens_projectiles = Aliens_projectiles(self.view.canvas, self.view.projectile_image)
+        self.players_projectiles = Players_projectiles(self.view.canvas, self.view.projectile_player_image)
+        self.aliens_projectiles = Aliens_projectiles(self.view.canvas, self.view.projectile_alien_image)
 
         self.walls = Walls(self.view.canvas, self.view.wall_image)
 

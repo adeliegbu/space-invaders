@@ -6,7 +6,7 @@ class Player_ship(Ship):
         self.cooldown = cooldown
                 
     def shoot(self, projectile_class):
-            super().shoot(self.cooldown, projectile_class, type=0.5)
+            super().shoot(self.cooldown, projectile_class, height=0.5)
     
     def update_cooldown(self):
         self.cooldown.update()
