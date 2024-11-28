@@ -16,7 +16,9 @@ class Aliens(Group_object):
         self.updating = False
 
     def create_objects_matrix(self, line, column):
-        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 50, line=line, column=column, pad_x=20, pad_y=10, image=self.image)
+        temporary = Alien_ship(self.canvas, 0, 0, self.image)
+        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 2,5 * temporary.height, line=line, column=column, pad_x=20, pad_y=10, image=self.image)
+        temporary.delete()
 
     def move(self):
         if self.should_change_direction():
@@ -64,10 +66,10 @@ class Aliens(Group_object):
     def should_increase_speed(self):
         return self.number_alien_hit % 10 == 0
     
-    def increase_speed(self):
+    def increase_speed(self, stage_number):
         for row in self.objects_matrix:
             for alien in row:
-                alien.x_speed += 1
+                alien.x_speed += stage_number
     
     def should_add_bonus(self):
         if self.number_alien_hit % 5 == 0:

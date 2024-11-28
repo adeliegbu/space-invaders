@@ -1,0 +1,60 @@
+from model.cooldown import Cooldown
+
+class Game_logic():
+    def __init__(self, view, binds, options, players, aliens, players_projectiles, aliens_projectiles, walls, refresh_rate):
+        self.view = view
+        self.binds = binds
+        self.options = options
+        self.players = players
+        self.aliens = aliens
+        self.players_projectiles = players_projectiles
+        self.aliens_projectiles = aliens_projectiles
+        self.wall = walls
+        self.refresh_rate = refresh_rate
+        self.should_game_update = False
+        self.stage_number = 1
+    
+    def game_update(self, should_game_update):
+        if should_game_update:
+            for active_bind in self.bind.active_binds:
+                active_bind()
+            
+            self.aliens.move()
+            self.aliens.shoot(self.aliens_projectiles)
+
+            self.players_projectiles.move()
+            self.aliens_projectiles.move()
+
+            self.players_projectiles.collision(self.aliens, self.walls)
+            self.aliens_projectiles.collision(self.players, self.walls)
+
+            self.players.update_cooldown()
+            self.aliens.var_update(self.view.alien_image)
+            self.stage_update()
+        
+            if self.players.objects_dead():
+                self.lost()
+
+            self.view.canvas.after(self.refresh_rate, self.game_update)
+    
+    def stage_update(self, stage_number):
+        if self.aliens.objects_dead():
+            self.aliens.reset()
+            self.aliens_projectiles.reset()
+            self.players_projectiles.reset()
+            self.walls.reset()
+
+            if stage_number:        # pour juste reset le jeu on appelera stage_update(0)
+                self.aliens.create_objects_matrix(line=4, column=7)
+                self.aliens.increase_speed(stage_number - 1)
+                self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 4 // 5, self.options.current_player_image, Cooldown(300))  
+                self.walls.add_object(self.view.screen_height * 4 // 5, 4)
+                self.aliens.cooldown.reset()
+                self.players.reset_cooldown()
+
+                self.stage_number += 1
+            
+    def lost(self):
+        self.stage_update(0)
+        self.view.menu()       # à modifier pour afficher écran de fin de game
+        

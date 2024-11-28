@@ -33,6 +33,9 @@ class Group_object:
         if object.dead():
             self.remove_object(object)
 
+    def objects_dead(self):
+        return not self.objects_list and all(not row for row in self.objects_matrix)
+
     def remove_object(self, object):
         if object in self.objects_list:
             self.objects_list.remove(object)

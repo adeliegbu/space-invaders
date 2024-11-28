@@ -17,3 +17,5 @@ from model.projectile_related.projectiles import Projectiles
 from model.projectile_related.players_projectiles import Players_projectiles
 from model.projectile_related.aliens_projectiles import Aliens_projectiles
 from model.wall_related.walls import Walls
+from model.game_logic import Game_logic
+from model.binds import Binds

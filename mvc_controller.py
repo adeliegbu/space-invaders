@@ -1,6 +1,6 @@
 from random import choice
 
-from mvc_model import Players, Aliens, Projectiles, Cooldown, Walls, Players_projectiles, Aliens_projectiles
+from mvc_model import Players, Aliens, Cooldown, Walls, Players_projectiles, Aliens_projectiles, Binds, Game_logic
 from mvc_view import View
 
 class Controller:
@@ -22,19 +22,12 @@ class Controller:
 
         self.walls = Walls(self.view.canvas, self.view.wall_image)
 
-        self.view.canvas.bind("<KeyPress>", self.key_press)
-        self.view.canvas.bind("<KeyRelease>", self.key_release)
-        self.view.canvas.focus_set()
+        self.binds = Binds(self.view.canvas)
+        self.game_logic = Game_logic(self.view, self.binds, self.players, self.aliens, self.players_projectiles, self.walls, 33)
     
-    def start_stage(self):
-        self.players.add_object(self.view.x0, self.view.screen_height * 19 // 20, self.view.player_image, Cooldown(400))
-        self.p1 = self.players.define_player(1)
-        self.p2 = self.players.define_player(2)
-        self.aliens.create_objects_matrix(line=4, column=7)
-        self.walls.add_object(self.view.screen_height * 4 // 5, 4)
-
-        self.updating = True
-        self.update()
+    def new_game(self):
+        self.game_logic.stage_update(1)
+        self.game_logic.should_game_update = True
 
     def key_press(self, event):
         self.keys_pressed.add(event.keysym)  # Ajouter la touche enfoncée à l'ensemble
@@ -47,7 +40,7 @@ class Controller:
 
     def update(self):
         if self.updating:
-            if self.p1:
+            if self.players.is_player_dead(self.p1):
                 if "Left" in self.keys_pressed:
                     self.p1.move(-1, 0)
                 if "Right" in self.keys_pressed:
@@ -55,7 +48,7 @@ class Controller:
                 if "space" in self.keys_pressed:
                     self.p1.shoot(self.players_projectiles)
 
-            if self.p2:              
+            if self.players.is_player_dead(self.p2):     
                 if "q" in self.keys_pressed:
                     self.p2.move(-1, 0)
                 if "d" in self.keys_pressed:
@@ -63,22 +56,12 @@ class Controller:
                 if "Return" in self.keys_pressed:
                     self.p2.shoot(self.players_projectiles)
 
-            self.aliens.move()
-            self.aliens.shoot(self.aliens_projectiles)
 
-            self.players_projectiles.move()
-            self.aliens_projectiles.move()
-
-            self.players_projectiles.collision(self.aliens, self.walls)
-            self.aliens_projectiles.collision(self.players, self.walls)
-
-            self.players.update_cooldown()
-            self.aliens.var_update(self.view.alien_image)
 
             if "Escape" in self.keys_pressed:
                 self.view.menu()
             
-            self.view.canvas.after(25, self.update)  # Appeler cette méthode à nouveau après 33 ms (environ 30fois par seconde)
+  # Appeler cette méthode à nouveau après 33 ms (environ 30fois par seconde)
 
     def run(self):
         self.view.menu()

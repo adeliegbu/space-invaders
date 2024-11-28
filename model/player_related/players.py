@@ -13,10 +13,13 @@ class Players(Group_object):
             return self.objects_list[player_number - 1]
         return None
     
-    def remove_object(self, player_number):
-        self.objects_list[player_number - 1].delete()
-        self.objects_list[player_number - 1] = None
-        
+    def is_player_dead(self, player):
+        return player in self.objects_list
+
     def update_cooldown(self):
         for player in self.objects_list:
             player.update_cooldown()
+    
+    def reset_cooldown(self):
+        for player in self.objects_list:
+            player.cooldown.reset()
