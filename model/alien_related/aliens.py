@@ -108,4 +108,3 @@ class Aliens(Group_object):
         self.y_direction = 0
         self.number_alien_hit = 0
         self.updating = False
-
