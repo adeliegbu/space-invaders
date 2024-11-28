@@ -15,7 +15,7 @@ class Controller:
         self.players_number = 1
         self.p1, self.p2 = None, None
         
-        self.aliens = Aliens(self.view.canvas, image=self.view.alien_image, cooldown=Cooldown(600))
+        self.aliens = Aliens(self.view.canvas, image=self.view.alien_image, bonus_image=self.view.alien_bonus_image, cooldown=Cooldown(600))
 
         self.players_projectiles = Players_projectiles(self.view.canvas, self.view.projectile_player_image)
         self.aliens_projectiles = Aliens_projectiles(self.view.canvas, self.view.projectile_alien_image)
@@ -26,7 +26,8 @@ class Controller:
         self.game_logic = Game_logic(self.view, self.binds, self.players, self.aliens, self.players_projectiles, self.walls, 33)
     
     def new_game(self):
-        self.game_logic.stage_update(1)
+        self.game_logic.stage_number = 1
+        self.game_logic.stage_update()
         self.game_logic.should_game_update = True
 
     def key_press(self, event):
@@ -55,8 +56,6 @@ class Controller:
                     self.p2.move(1, 0)
                 if "Return" in self.keys_pressed:
                     self.p2.shoot(self.players_projectiles)
-
-
 
             if "Escape" in self.keys_pressed:
                 self.view.menu()
