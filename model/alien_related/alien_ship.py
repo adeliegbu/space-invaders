@@ -1,4 +1,4 @@
-from model.ship import Ship
+from model.parents_class.ship import Ship
 
 class Alien_ship(Ship):
     def __init__(self, canvas, x, y, image):

@@ -1,5 +1,5 @@
-from model.player_ship import Player_ship
-from model.group_object import Group_object
+from model.player_related.player_ship import Player_ship
+from model.parents_class.group_object import Group_object
 
 class Players(Group_object):
     def __init__(self, canvas):

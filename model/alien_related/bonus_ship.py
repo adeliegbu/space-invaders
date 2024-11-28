@@ -1,4 +1,4 @@
-from model.ship import Ship
+from model.parents_class.ship import Ship
 from model.cooldown import Cooldown
 
 class Bonus_ship(Ship):

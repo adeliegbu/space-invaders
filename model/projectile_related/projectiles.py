@@ -1,5 +1,5 @@
-from model.projectile import Projectile
-from model.group_object import Group_object
+from model.projectile_related.projectile import Projectile
+from model.parents_class.group_object import Group_object
 
 class Projectiles(Group_object):
     def __init__(self, canvas):

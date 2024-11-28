@@ -1,5 +1,5 @@
-from model.brick import Brick
-from model.group_object import Group_object
+from model.wall_related.brick import Brick
+from model.parents_class.group_object import Group_object
 
 class Walls(Group_object):
     def __init__(self, canvas, image):

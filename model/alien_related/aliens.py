@@ -1,9 +1,9 @@
 from random import choice
 
-from model.alien_ship import Alien_ship
-from model.bonus_ship import Bonus_ship
+from model.alien_related.alien_ship import Alien_ship
+from model.alien_related.bonus_ship import Bonus_ship
 from model.cooldown import Cooldown
-from model.group_object import Group_object
+from model.parents_class.group_object import Group_object
 
 class Aliens(Group_object):
     def __init__(self, canvas, image, cooldown):

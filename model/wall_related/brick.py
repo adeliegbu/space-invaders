@@ -1,4 +1,4 @@
-from model.object import Object
+from model.parents_class.object import Object
 
 class Brick(Object):
     def __init__(self, canvas, x, y, image):

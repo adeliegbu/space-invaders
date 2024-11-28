@@ -1,5 +1,5 @@
-from model.projectiles import Projectiles
-from model.projectile import Projectile
+from model.projectile_related.projectiles import Projectiles
+from model.projectile_related.projectile import Projectile
 
 class Players_projectiles(Projectiles):
     def __init__(self, canvas, image):

@@ -1,4 +1,4 @@
-from model.object import Object
+from model.parents_class.object import Object
 
 class Ship(Object):
     def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, image):
