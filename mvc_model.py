@@ -13,5 +13,7 @@ from model.alien_ship import Alien_ship
 from model.cooldown import Cooldown
 from model.aliens import Aliens
 from model.players import Players
-from model.projectiles_shot import Projectiles
-from model.wall import Wall
+from model.projectiles import Projectiles
+from model.players_projectiles import Players_projectiles
+from model.aliens_projectiles import Aliens_projectiles
+from model.walls import Walls

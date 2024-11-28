@@ -1,22 +1,10 @@
 from model.object import Object
 
 class Ship(Object):
-    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, image, life):
-        super().__init__(canvas, x, y, x_speed, y_speed, width, height, image)
-        self.life = life
+    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, image):
+        super().__init__(canvas, x, y, x_speed, y_speed, width, height, life, image)
 
-    def shoot(self, cooldown, projectile, type, projectile_image):
+    def shoot(self, cooldown, projectile_class, type):
         if cooldown.ended():
-            projectile.shot(self.x, self.y, type, self.height, projectile_image)
+            projectile_class.add_object(self.x, self.y - type * self.height)
             cooldown.reset()
-    
-    def got_hit(self):
-        self.life -= 1
-    
-    def dead(self):
-        return self.life == 0
-    
-
-
-    
-

@@ -1,33 +1,22 @@
 from model.player_ship import Player_ship
+from model.group_object import Group_object
 
-class Players():
-    def __init__(self, canvas, image):
-        self.canvas = canvas
-        self.image = image
-        self.list = []
+class Players(Group_object):
+    def __init__(self, canvas):
+        super().__init__(canvas)
 
-    def create_object(self, x, y, cooldown):
-        super().create_object(Player_ship, x, y, line=1, colum=1, pad_x=0, pad_y=0, image=self.image, cooldown=cooldown)
+    def add_object(self, x, y, image, cooldown):
+        super().add_object(Player_ship(self.canvas, x, y, image, cooldown))
     
-    def define_player(self, number):
-        if number <= len(self.list):
-            return True, self.list[number - 1]
-        return False, None
+    def define_player(self, player_number):
+        if player_number <= len(self.objects_list):
+            return self.objects_list[player_number - 1]
+        return None
     
-    def got_hit(self, player):
-        player.got_hit()
-        if player.life == 0:
-            self.remove_player(player)
-
-    def remove_player(self, player):
-        if player in self.list:
-            self.list.remove(player)
-    
-    def delete(self):
-        for player in self.list:
-            player.delete()
-        self.list = []
-    
-    def update(self):
-        for player in self.list:
-            player.update()
+    def remove_object(self, player_number):
+        self.objects_list[player_number - 1].delete()
+        self.objects_list[player_number - 1] = None
+        
+    def update_cooldown(self):
+        for player in self.objects_list:
+            player.update_cooldown()

@@ -1,6 +1,6 @@
 from random import choice
 
-from mvc_model import Players, Aliens, Projectiles, Cooldown, Wall
+from mvc_model import Players, Aliens, Projectiles, Cooldown, Walls, Players_projectiles, Aliens_projectiles
 from mvc_view import View
 
 class Controller:
@@ -11,28 +11,27 @@ class Controller:
         self.keys_pressed = set()
         self.updating = False
 
-        self.players = Players(self.view.canvas, image=self.view.player_image)
+        self.players = Players(self.view.canvas)
         self.players_number = 1
         self.p1, self.p2 = None, None
-        self.player_cooldown = Cooldown(400)
         
-        self.aliens = Aliens(self.view.canvas, line=4, column=7, image=self.view.alien_image, cooldown=Cooldown(200))
+        self.aliens = Aliens(self.view.canvas, image=self.view.alien_image, cooldown=Cooldown(600))
 
-        self.projectiles_shot = Projectiles(self.view.canvas)
+        self.players_projectiles = Players_projectiles(self.view.canvas, self.view.projectile_image)
+        self.aliens_projectiles = Aliens_projectiles(self.view.canvas, self.view.projectile_image)
 
-        self.wall = Wall(self.view.canvas, self.view.wall_image)
+        self.walls = Walls(self.view.canvas, self.view.wall_image)
 
         self.view.canvas.bind("<KeyPress>", self.key_press)
         self.view.canvas.bind("<KeyRelease>", self.key_release)
         self.view.canvas.focus_set()
     
-    def new_game(self):
-        self.players.create_player(self.view.x0, 17 * self.view.y0 // 10, self.player_cooldown)
-        self.p1 = self.players.define_player(1)[1]
-        self.p2 = self.players.define_player(2)[1]
-        self.aliens.create_matrix(self.view.x0, self.view.y0 // 3)
-        for i in range(3):
-            self.wall.create_wall((i + 1) * self.view.screen_width // 4)
+    def start_stage(self):
+        self.players.add_object(self.view.x0, self.view.screen_height * 19 // 20, self.view.player_image, Cooldown(400))
+        self.p1 = self.players.define_player(1)
+        self.p2 = self.players.define_player(2)
+        self.aliens.create_objects_matrix(line=4, column=7)
+        self.walls.add_object(self.view.screen_height * 5 // 6, 5)
 
         self.updating = True
         self.update()
@@ -48,30 +47,33 @@ class Controller:
 
     def update(self):
         if self.updating:
-            if self.players.define_player(1)[0]:
+            if self.p1:
                 if "Left" in self.keys_pressed:
                     self.p1.move(-1, 0)
                 if "Right" in self.keys_pressed:
                     self.p1.move(1, 0)
                 if "space" in self.keys_pressed:
-                    self.p1.shoot(self.projectiles_shot, self.view.projectile_image)
+                    self.p1.shoot(self.players_projectiles)
 
-            if self.players.define_player(2)[0]:              
+            if self.p2:              
                 if "q" in self.keys_pressed:
                     self.p2.move(-1, 0)
                 if "d" in self.keys_pressed:
                     self.p2.move(1, 0)
                 if "Return" in self.keys_pressed:
-                    self.p2.shoot(self.projectiles_shot, self.view.projectile_image)
+                    self.p2.shoot(self.players_projectiles)
 
-            self.aliens.update(self.projectiles_shot, self.view.projectile_image)
-            self.projectiles_shot.move()
+            self.aliens.move()
+            self.aliens.shoot(self.aliens_projectiles)
 
-            self.projectiles_shot.players_hit(self.players)
-            self.projectiles_shot.aliens_hit(self.aliens)
-            self.projectiles_shot.wall_hit(self.wall)
+            self.players_projectiles.move()
+            self.aliens_projectiles.move()
 
-            self.player_cooldown.update()
+            self.players_projectiles.collision(self.aliens, self.walls)
+            self.aliens_projectiles.collision(self.players, self.walls)
+
+            self.players.update_cooldown()
+            self.aliens.var_update(self.view.alien_image)
 
             if "Escape" in self.keys_pressed:
                 self.view.menu()

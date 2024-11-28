@@ -10,4 +10,4 @@ class Cooldown:
         self.var = 0
     
     def update(self):
-        self.var += 16  # Incrémenter la variable de cooldown à chaque mise à jour
+        self.var += 25  # Incrémenter la variable de cooldown à chaque mise à jour
