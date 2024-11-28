@@ -19,3 +19,4 @@ from model.projectile_related.aliens_projectiles import Aliens_projectiles
 from model.wall_related.walls import Walls
 from model.game_logic import Game_logic
 from model.binds import Binds
+from model.options import Options
