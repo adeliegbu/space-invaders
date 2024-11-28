@@ -5,8 +5,8 @@ class Players(Group_object):
     def __init__(self, canvas):
         super().__init__(canvas)
 
-    def add_object(self, x, y, image, cooldown):
-        super().add_object(Player_ship(self.canvas, x, y, image, cooldown))
+    def add_object(self, x, y, image, cooldown, player_projectile_class):
+        super().add_object(Player_ship(self.canvas, x, y, image, cooldown, player_projectile_class))
     
     def define_player(self, player_number):
         if player_number <= len(self.objects_list):

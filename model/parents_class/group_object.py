@@ -19,7 +19,7 @@ class Group_object:
     def add_object(self, object):
         self.objects_list.append(object)
     
-    def move_objects_matrix(self,x_direction, y_direction):
+    def move_objects_matrix(self, x_direction, y_direction):
         for row in self.objects_matrix:
             for object in row:
                 object.move(x_direction, y_direction)

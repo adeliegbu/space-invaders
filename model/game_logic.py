@@ -1,17 +1,18 @@
 from model.cooldown import Cooldown
 
 class Game_logic():
-    def __init__(self, view, binds, options, players, aliens, players_projectiles, aliens_projectiles, walls, refresh_rate):
+    def __init__(self, view, p1_settings, binds, players, aliens, players_projectiles, aliens_projectiles, walls, refresh_rate):
         self.view = view
+        self.canvas = view.canvas
+        self.p1_settings = p1_settings
         self.binds = binds
-        self.options = options
         self.players = players
         self.aliens = aliens
         self.players_projectiles = players_projectiles
         self.aliens_projectiles = aliens_projectiles
         self.wall = walls
         self.game_refresh_rate = refresh_rate
-        self.menu_refresh_rate = 100
+        self.menu_refresh_rate = 200
         self.should_game_update = False
         self.should_menu_update = True
         self.stage_number = 1
@@ -54,12 +55,15 @@ class Game_logic():
     
     def stage_update(self):
         if self.aliens.objects_dead():
+            temporary = self.stage_number
             self.reset()
+            self.stage_number = temporary
             self.should_game_update = True
+            self.should_menu_update = False
 
             self.aliens.create_objects_matrix(line=4, column=7)
             self.aliens.increase_speed(self.stage_number - 1)
-            self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 4 // 5, self.options.current_player_image, Cooldown(300))  
+            self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 4 // 5, self.p1_settings.get_choiced_player1_image(), Cooldown(300))  
             self.walls.add_object(self.view.screen_height * 4 // 5, 4)
             self.aliens.cooldown.reset()
             self.players.reset_cooldown()
@@ -70,8 +74,9 @@ class Game_logic():
         return self.players.objects_dead()
     
     def reset(self):
-        self.stage_number = 1
         self.should_game_update = False
+        self.should_menu_update = True
+        self.stage_number = 1
         self.aliens.reset()
         self.players.reset()
         self.players_projectiles.reset()

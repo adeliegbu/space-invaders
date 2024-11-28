@@ -2,7 +2,6 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 from visuel.rules import rules_text
-from model.options import Options
 
 class View:
     def __init__(self, controller):
@@ -23,10 +22,11 @@ class View:
         self.canvas.create_image(0, 0, image=self.bg_image, anchor="nw")
 
         self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
-        self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((90, 90), Image.LANCZOS))
-        self.alien_bonus_image = ImageTk.PhotoImage(Image.open("visuel/alien_bonus.png").rotate(90).resize((90, 90), Image.LANCZOS))
 
-        self.projectile_alien = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((200, 200), Image.LANCZOS))
+        self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((90, 90), Image.LANCZOS))
+        self.alien_bonus_image = ImageTk.PhotoImage(Image.open("visuel/alien_bonus.png").resize((90, 90), Image.LANCZOS))
+        self.projectile_alien = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((30, 50), Image.LANCZOS))
+
         self.player_image_green = ImageTk.PhotoImage(Image.open("visuel/players_green.png").resize((200, 200), Image.LANCZOS))
         self.projectile_player_image_green = ImageTk.PhotoImage(Image.open("visuel/projectile_green.png").rotate(90).resize((250, 250), Image.LANCZOS))
         self.player_image_blue = ImageTk.PhotoImage(Image.open("visuel/players_blue.png").resize((200, 200), Image.LANCZOS))
@@ -38,10 +38,11 @@ class View:
         self.player_image_yellow = ImageTk.PhotoImage(Image.open("visuel/players_yellow.png").resize((200, 200), Image.LANCZOS))
         self.projectile_player_image_yellow = ImageTk.PhotoImage(Image.open("visuel/projectile_yellow.png").rotate(90).resize((250, 250), Image.LANCZOS))
 
+        self.player_images = [self.player_image_green, self.player_image_blue, self.player_image_red, self.player_image_yellow, self.player_image_purple]
+        self.projectile_player_images = [self.projectile_player_image_green, self.projectile_player_image_blue, self.projectile_player_image_red, self.projectile_player_image_yellow, self.projectile_player_image_purple]
+
         self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((20, 20), Image.LANCZOS))
         self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
-
-        self.options = Options(self)
 
         self.button_new_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.new_game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_rules = tk.Button(self.canvas, text="Règles", command=self.rules, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
@@ -75,7 +76,7 @@ class View:
         self.rules_label.place_forget()
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
 
-        self.controller.in_menu()
+        self.controller.menu_update()
 
     def leave(self):
         self.fenetre.quit()

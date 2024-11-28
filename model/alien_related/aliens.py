@@ -6,10 +6,10 @@ from model.cooldown import Cooldown
 from model.parents_class.group_object import Group_object
 
 class Aliens(Group_object):
-    def __init__(self, canvas, image, image_bonus, cooldown):
+    def __init__(self, canvas, image, bonus_image, cooldown):
         super().__init__(canvas)
         self.image = image
-        self.image_bonus = image_bonus
+        self.image_bonus = bonus_image
         self.cooldown = cooldown
         self.x_direction = 1
         self.y_direction = 0
@@ -18,7 +18,7 @@ class Aliens(Group_object):
 
     def create_objects_matrix(self, line, column):
         temporary = Alien_ship(self.canvas, 0, 0, self.image)
-        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 2,5 * temporary.height, line=line, column=column, pad_x=20, pad_y=10, image=self.image)
+        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 2.5 * temporary.height, line=line, column=column, pad_x=20, pad_y=10, image=self.image)
         temporary.delete()
 
     def move(self):
@@ -93,7 +93,7 @@ class Aliens(Group_object):
         if self.updating:
             var = 0
             if self.should_increase_speed():
-                self.increase_speed()
+                self.increase_speed(1)
                 var += 1
             if self.should_add_bonus():
                 self.add_bonus()
