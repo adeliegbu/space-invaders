@@ -3,7 +3,7 @@ from model.cooldown import Cooldown
 
 class Bonus_ship(Ship):
     def __init__(self, canvas, x, y, image, cooldown, direction):
-        super().__init__(canvas, x, y, x_speed=15, y_speed=0, width=50, height=35, image=image, life=1)
+        super().__init__(canvas, x, y, x_speed=15, y_speed=0, width=60, height=35, image=image, life=1)
         self.cooldown = cooldown
         self.direction = direction
 

@@ -11,7 +11,3 @@ class Players_projectiles(Projectiles):
     
     def move(self):
         super().move(y_direction=-1)
-    
-    def collision(self, aliens, walls):
-        super().collision(aliens)
-        super().collision(walls)

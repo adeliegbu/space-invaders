@@ -32,6 +32,35 @@ class Group_object:
         object.got_hit()
         if object.dead():
             self.remove_object(object)
+    
+    def collision(self, targets):
+        for object in self.objects_list:
+            for target in targets.objects_list:
+                if object.collide(target):
+                    self.got_hit(object)
+                    targets.got_hit(target)
+                    return True
+            for row in targets.objects_matrix:
+                for target in row:
+                    if object.collide(target):
+                        self.got_hit(object)
+                        targets.got_hit(target)
+                        return True
+        
+        for row in self.objects_matrix:
+            for object in row:
+                for target in targets.objects_list:
+                    if object.collide(target):
+                        self.got_hit(object)
+                        targets.got_hit(target)
+                        return True
+                for row_target in targets.objects_matrix:
+                    for target in row_target:
+                        if object.collide(target):
+                            self.got_hit(object)
+                            targets.got_hit(target)
+                            return True
+        return False
 
     def objects_dead(self):
         return not self.objects_list and all(not row for row in self.objects_matrix)

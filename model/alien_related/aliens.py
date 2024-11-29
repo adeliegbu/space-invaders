@@ -74,7 +74,7 @@ class Aliens(Group_object):
                 alien.x_speed += stage_number
     
     def should_add_bonus(self):
-        if self.number_alien_hit % 5 == 0:
+        if self.number_alien_hit % 15 == 0:
                  return True
         return False
     

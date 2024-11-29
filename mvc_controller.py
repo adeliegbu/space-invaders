@@ -39,8 +39,12 @@ class Controller:
             self.players_projectiles.move()
             self.aliens_projectiles.move()
 
-            self.players_projectiles.collision(self.aliens, self.walls)
-            self.aliens_projectiles.collision(self.players, self.walls)
+            self.players_projectiles.collision(self.aliens)
+            self.players_projectiles.collision(self.walls)
+            self.aliens_projectiles.collision(self.players)
+            self.aliens_projectiles.collision(self.walls)
+            self.aliens.collision(self.players)
+            self.aliens.collision(self.walls)
 
             self.players.update_cooldown()
             self.aliens.var_update()
@@ -55,17 +59,18 @@ class Controller:
             self.view.canvas.after(self.refresh_rate, self.game_update)
 
     def stage_update(self):
-        self.aliens.reset()
-        self.players_projectiles.reset()
-        self.aliens_projectiles.reset()
-        self.walls.reset()
-        self.aliens.create_objects_matrix(line=3, column=5)
-        self.aliens.increase_speed(self.stage_number - 1)
-        self.walls.add_object(self.view.screen_height * 4 // 5, 4)
-        self.aliens.cooldown.reset()
-        self.players.reset_cooldown()
+        if self.aliens_projectiles.objects_dead():  # Transition entre les stages
+            self.aliens.reset()
+            self.players_projectiles.reset()
+            self.aliens_projectiles.reset()
+            self.walls.reset()
+            self.aliens.create_objects_matrix(line=3, column=5)
+            self.aliens.increase_speed(self.stage_number - 1)
+            self.walls.add_object(self.view.screen_height * 4 // 5, 1)
+            self.aliens.cooldown.reset()
+            self.players.reset_cooldown()
 
-        self.stage_number += 1
+            self.stage_number += 1
 
     def menu_update(self):
         if self.should_menu_update:
