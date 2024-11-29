@@ -23,7 +23,11 @@ class View:
 
         self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
 
-        self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((90, 90), Image.LANCZOS))
+        self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((80, 80), Image.LANCZOS))
+        self.alien_type0_image = ImageTk.PhotoImage(Image.open("visuel/alien_type0.png").resize((70, 40), Image.LANCZOS))
+        self.alien_type2_image = ImageTk.PhotoImage(Image.open("visuel/alien_type2.png").resize((50, 40), Image.LANCZOS))
+        self.alien_images = [self.alien_type0_image, self.alien_image, self.alien_type2_image]
+
         self.alien_bonus_image = ImageTk.PhotoImage(Image.open("visuel/alien_bonus.png").resize((80, 50), Image.LANCZOS))
         self.projectile_alien = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((30, 50), Image.LANCZOS))
 

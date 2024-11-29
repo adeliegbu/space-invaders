@@ -103,6 +103,16 @@ class Aliens(Group_object):
                 self.updating = False
         self.cooldown.update()
 
+    def increase_aliens_level(self, stage_number, alien_images):
+        if not self.objects_dead():
+            increasing_aliens = []
+            for _ in range(stage_number * 3):
+                increasing_aliens.append(choice(choice(self.objects_matrix)))
+            for alien in increasing_aliens:
+                alien.increase_level()
+                if alien.level < len(alien_images):
+                    alien.change_image(alien_images[alien.level])
+
     def reset(self):
         super().reset()
         self.x_direction = 1

@@ -1,3 +1,5 @@
+from random import choice
+
 from mvc_model import Players, Aliens, Cooldown, Walls, Players_projectiles, Aliens_projectiles, Binds, Game_logic, P1_settings
 from mvc_view import View
 
@@ -28,7 +30,7 @@ class Controller:
 
         self.should_game_update = False
         self.should_menu_update = True
-        self.stage_number = 1
+        self.stage_number = 0
     
     def game_update(self):
         if self.should_game_update:
@@ -64,14 +66,16 @@ class Controller:
             self.players_projectiles.reset()
             self.aliens_projectiles.reset()
             self.walls.reset()
+
+            self.stage_number += 1
+
             self.aliens.create_objects_matrix(line=3, column=5)
+            self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
             self.aliens.increase_speed(self.stage_number - 1)
             self.walls.add_object(self.view.screen_height * 4 // 5, 1)
             self.aliens.cooldown.reset()
             self.players.reset_cooldown()
-
-            self.stage_number += 1
-
+            
     def menu_update(self):
         if self.should_menu_update:
             self.binds.execute_active_binds()
@@ -85,7 +89,7 @@ class Controller:
         self.p1 = self.players.define_player(1)
         self.p2 = self.players.define_player(2)
 
-        self.stage_number = 1
+        self.stage_number = 0
         self.stage_update()
 
         self.default_game_binds()
@@ -94,7 +98,7 @@ class Controller:
     def go_to_menu(self):
         self.should_game_update = False
         self.should_menu_update = True
-        self.stage_number = 1
+        self.stage_number = 0
         self.reset()
         self.binds.reset_binds()
         self.view.menu()

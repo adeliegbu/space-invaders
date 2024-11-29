@@ -16,6 +16,10 @@ class Object:
     
     def get_dimensions(self):
         return self.width, self.height
+
+    def change_image(self, image):
+        self.delete()
+        self.id = self.canvas.create_image(self.x, self.y, image=image, anchor="center")
     
     def collide(self, object):
         x1, y1 = self.get_position()
