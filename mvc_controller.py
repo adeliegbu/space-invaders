@@ -72,7 +72,7 @@ class Controller:
             self.aliens.create_objects_matrix(line=3, column=5)
             self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
             self.aliens.increase_speed(self.stage_number - 1)
-            self.walls.add_object(self.view.screen_height * 4 // 5, 1)
+            self.walls.add_object(self.view.screen_height * 4 // 5, 2)
             self.aliens.cooldown.reset()
             self.players.reset_cooldown()
             
@@ -100,6 +100,7 @@ class Controller:
         self.should_menu_update = True
         self.stage_number = 0
         self.reset()
+        self.aliens.reset_number_alien_hit()
         self.binds.reset_binds()
         self.view.menu()
         self.menu_update()

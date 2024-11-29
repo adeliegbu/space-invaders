@@ -14,11 +14,11 @@ class Aliens(Group_object):
         self.x_direction = 1
         self.y_direction = 0
         self.number_alien_hit = 0
-        self.updating = False
+        self.should_var_update_update = False
 
     def create_objects_matrix(self, line, column):
         temporary = Alien_ship(self.canvas, 0, 0, self.image)
-        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 2.5 * temporary.height, line=line, column=column, pad_x=20, pad_y=10, image=self.image)
+        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 2.5 * temporary.height, line=line, column=column, pad_x=30, pad_y=20, image=self.image)
         temporary.delete()
 
     def move(self):
@@ -52,7 +52,7 @@ class Aliens(Group_object):
     
     def increase_number_hit(self):
         self.number_alien_hit += 1
-        self.updating = True
+        self.should_var_update_update = True
 
     def should_change_direction(self):
         for row in self.objects_matrix:
@@ -91,7 +91,7 @@ class Aliens(Group_object):
             super().remove_object(bonus)
 
     def var_update(self):
-        if self.updating:
+        if self.should_var_update_update:
             var = 0
             if self.should_increase_speed():
                 self.increase_speed(1)
@@ -100,7 +100,7 @@ class Aliens(Group_object):
                 self.add_bonus()
                 var += 1
             if var > 0:
-                self.updating = False
+                self.should_var_update_update = False
         self.cooldown.update()
 
     def increase_aliens_level(self, stage_number, alien_images):
@@ -112,10 +112,12 @@ class Aliens(Group_object):
                 alien.increase_level()
                 if alien.level < len(alien_images):
                     alien.change_image(alien_images[alien.level])
+                    
+    def reset_number_alien_hit(self):
+        self.number_alien_hit = 0
 
     def reset(self):
         super().reset()
         self.x_direction = 1
         self.y_direction = 0
-        self.number_alien_hit = 0
-        self.updating = False
+        self.should_var_update_update = False
