@@ -76,8 +76,6 @@ class View:
         self.rules_label.place_forget()
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
 
-        self.controller.menu_update()
-
     def leave(self):
         self.fenetre.quit()
 

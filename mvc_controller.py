@@ -4,6 +4,7 @@ from mvc_view import View
 class Controller:
     def __init__(self):
         self.view = View(self)
+        self.canvas = self.view.canvas
 
         self.score = 0
         self.keys_pressed = set()
@@ -24,25 +25,14 @@ class Controller:
         self.p1_settings = P1_settings(self.view)
 
         self.refresh_rate = 25
- 
-        self.canvas = self.view.canvas
-        self.game_refresh_rate = 25
-        self.menu_refresh_rate = 200
+
         self.should_game_update = False
         self.should_menu_update = True
         self.stage_number = 1
     
-    
     def game_update(self):
-        if self.lost():
-            self.should_game_update = False
-            self.should_menu_update = True
-            self.view.menu()
-
         if self.should_game_update:
-            for active_bind in self.binds.active_binds:
-                active_bind()
-            
+
             self.aliens.move()
             self.aliens.shoot(self.aliens_projectiles)
 
@@ -53,20 +43,35 @@ class Controller:
             self.aliens_projectiles.collision(self.players, self.walls)
 
             self.players.update_cooldown()
-            self.aliens.var_update(self.view.alien_image)
-            self.stage_update()
-        
-            if self.players.objects_dead():
-                self.lost()
+            self.aliens.var_update()
 
+            if self.aliens.objects_dead():
+                self.stage_update()
+
+            if self.players.objects_dead():
+                self.go_to_menu()
+                    
+            self.binds.execute_active_binds()
             self.view.canvas.after(self.refresh_rate, self.game_update)
-    
+
+    def stage_update(self):
+        self.aliens.reset()
+        self.players_projectiles.reset()
+        self.aliens_projectiles.reset()
+        self.walls.reset()
+        self.aliens.create_objects_matrix(line=3, column=5)
+        self.aliens.increase_speed(self.stage_number - 1)
+        self.walls.add_object(self.view.screen_height * 4 // 5, 4)
+        self.aliens.cooldown.reset()
+        self.players.reset_cooldown()
+
+        self.stage_number += 1
+
     def menu_update(self):
         if self.should_menu_update:
-            for active_bind in self.binds.active_binds:
-                active_bind()
+            self.binds.execute_active_binds()
             
-            self.view.canvas.after(self.menu_refresh_rate, self.menu_update)
+            self.view.canvas.after(self.refresh_rate, self.menu_update)
     
     def new_game(self):
         self.should_game_update = True
@@ -74,52 +79,38 @@ class Controller:
         self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 19 // 20, self.p1_settings.get_choiced_player1_image(), Cooldown(300), self.players_projectiles)
         self.p1 = self.players.define_player(1)
         self.p2 = self.players.define_player(2)
-        self.aliens.create_objects_matrix(line=4, column=7)
-        self.walls.add_object(self.view.screen_height * 4 // 5, 4)
 
         self.stage_number = 1
+        self.stage_update()
+
         self.default_game_binds()
         self.game_update()
-
-    def stage_update(self):
-        if self.aliens.objects_dead():
-            temporary = self.stage_number
-            self.reset()
-            self.stage_number = temporary
-            self.should_game_update = True
-            self.should_menu_update = False
-
-            self.aliens.create_objects_matrix(line=4, column=7)
-            self.aliens.increase_speed(self.stage_number - 1)
-            self.walls.add_object(self.view.screen_height * 4 // 5, 4)
-            self.aliens.cooldown.reset()
-            self.players.reset_cooldown()
-
-            self.stage_number += 1
-            
-    def lost(self):     # à modifier pour afficher écran de fin de game
-        return self.players.objects_dead()
     
-    def reset(self):
+    def go_to_menu(self):
         self.should_game_update = False
         self.should_menu_update = True
         self.stage_number = 1
+        self.reset()
+        self.binds.reset_binds()
+        self.view.menu()
+        self.menu_update()
+
+    def default_game_binds(self):
+        self.binds.add_bind((self.p1.move_left, True), "Left")
+        self.binds.add_bind((self.p1.move_right, True), "Right")
+        self.binds.add_bind((self.p1.shoot, True), "space")
+        self.binds.add_bind((self.go_to_menu, False), "Escape")
+
+    def reset(self):
         self.aliens.reset()
         self.players.reset()
         self.players_projectiles.reset()
         self.aliens_projectiles.reset()
         self.walls.reset()
     
-    def default_game_binds(self):
-        self.binds.game_binds_dico = {
-            self.p1.move_left: "Left",
-            self.p1.move_right: "Right",
-            self.p1.shoot: "space",
-            self.reset: "Escape"
-        }
-    
     def run(self):
-        self.view.menu()
+        self.menu_update()
+        self.go_to_menu()
         self.view.fenetre.mainloop()
 
 if __name__ == "__main__":

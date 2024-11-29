@@ -32,9 +32,10 @@ class Aliens(Group_object):
                 bonus.move()
 
     def alien_shooting(self):
-        shooting_row = choice(self.objects_matrix)
-        if shooting_row:
-            return shooting_row[-1]
+        if not super().objects_dead():
+            shooting_row = choice(self.objects_matrix)
+            if shooting_row:
+                return shooting_row[-1]
         return None
     
     def shoot(self, projectile_class):
@@ -89,7 +90,7 @@ class Aliens(Group_object):
         if bonus.bonus_will_be_out_of_bounds():
             super().remove_object(bonus)
 
-    def var_update(self, bonus_image):
+    def var_update(self):
         if self.updating:
             var = 0
             if self.should_increase_speed():
