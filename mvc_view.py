@@ -91,3 +91,5 @@ class View:
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_options.place_forget()
+
+

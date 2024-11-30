@@ -1,5 +1,5 @@
 class Object:
-    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, damage, image):
+    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, damage, image, refresh_rate):
         self.canvas = canvas
         self.x = x
         self.y = y
@@ -10,6 +10,7 @@ class Object:
         self.life = life
         self.damage = damage
         self.image = image
+        self.refresh_rate = refresh_rate
         self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
     
     def get_position(self):

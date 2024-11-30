@@ -6,20 +6,21 @@ from model.weapon_related.weapons import Weapons
 from model.parents_class.group_object import Group_object
 
 class Aliens(Group_object):
-    def __init__(self, canvas, image, bonus_image, aliens_projectile_image):
-        super().__init__(canvas)
+    def __init__(self, canvas, refresh_rate, image, bonus_image, projectile_class, aliens_projectile_image):
+        super().__init__(canvas, refresh_rate)
         self.image = image
         self.image_bonus = bonus_image
+        self.projectile_class = projectile_class
         self.aliens_projectile_image = aliens_projectile_image
         self.x_direction = 1
         self.y_direction = 0
-        self.number_alien_hit = 0
+        self.number_alien_killed = 0
         self.should_var_update_update = False
 
     def create_objects_matrix(self, line, column):
-        temporary = Alien_ship(self.canvas, 0, 0, self.image)
-        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 2.5 * temporary.height, line=line, column=column, pad_x=30, pad_y=20, image=self.image, weapon=Weapons(self.refresh_rate, ("assault", "alien"), self.aliens_projectile_image))
+        temporary = Alien_ship(self.canvas, 0, 0, self.image, self.refresh_rate, self.projectile_class, self.aliens_projectile_image)
         temporary.delete()
+        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 3 * temporary.height, line=line, column=column, pad_x=60, pad_y= 20, image=self.image, projectile_class=self.projectile_class, projectile_image=self.aliens_projectile_image)
 
     def move(self):
         if self.should_change_direction():
@@ -28,31 +29,26 @@ class Aliens(Group_object):
         self.y_direction = 0
 
         for bonus in self.objects_list:
-            if not self.bonus_out_of_bounds(bonus):
-                bonus.move()
+            bonus.move()
+            self.bonus_out_of_bounds(bonus)
 
-    def alien_shooting(self):
-        if not super().objects_dead():
-            shooting_row = choice(self.objects_matrix)
-            if shooting_row:
-                return shooting_row[-1]
-        return None
-    
-    def shoot(self, projectile_class):
+    def shoot(self):
         for bonus in self.objects_list:
-            bonus.shoot(projectile_class)
+            bonus.shoot()
             bonus.weapon.update()
         for row in self.objects_matrix:
-            for alien in row:
-                alien.shoot(projectile_class)
-                alien.weapon.update()
+            for alien in row :
+                if alien.level >= 2:
+                    alien.shoot()
+                    alien.weapon.update()
     
-    def got_hit(self, alien):
-        super().got_hit(alien)
-        self.increase_number_hit()
+    def got_hit(self, alien, damage):
+        super().got_hit(alien, damage)
+        if alien.dead():
+            self.increase_number_hit()
     
     def increase_number_hit(self):
-        self.number_alien_hit += 1
+        self.number_alien_killed += 1
         self.should_var_update_update = True
 
     def should_change_direction(self):
@@ -67,7 +63,7 @@ class Aliens(Group_object):
             self.y_direction = 1
 
     def should_increase_speed(self):
-        return self.number_alien_hit % 10 == 0
+        return self.number_alien_killed % 5 == 0
     
     def increase_speed(self, stage_number):
         for row in self.objects_matrix:
@@ -75,7 +71,7 @@ class Aliens(Group_object):
                 alien.x_speed += stage_number
     
     def should_add_bonus(self):
-        if self.number_alien_hit % 15 == 0:
+        if self.number_alien_killed % 10 == 0:
                  return True
         return False
     
@@ -85,7 +81,7 @@ class Aliens(Group_object):
             x_bonus = 50
         else:
             x_bonus = self.canvas.winfo_width() - 50
-        super().add_object(Bonus_ship(self.canvas, x_bonus, 80, self.image_bonus, bonus_direction, self.aliens_projectile_image, self.refresh_rate))
+        super().add_object(Bonus_ship(self.canvas, x_bonus, 80, self.image_bonus, bonus_direction, self.projectile_class, self.aliens_projectile_image, self.refresh_rate))
 
     def bonus_out_of_bounds(self, bonus):
         if bonus.bonus_will_be_out_of_bounds():
@@ -102,7 +98,6 @@ class Aliens(Group_object):
                 var += 1
             if var > 0:
                 self.should_var_update_update = False
-        self.cooldown.update()
 
     def increase_aliens_level(self, stage_number, alien_images):
         if not self.objects_dead():
@@ -114,8 +109,8 @@ class Aliens(Group_object):
                 if alien.level < len(alien_images):
                     alien.change_image(alien_images[alien.level])
                     
-    def reset_number_alien_hit(self):
-        self.number_alien_hit = 0
+    def reset_number_alien_killed(self):
+        self.number_alien_killed = 0
 
     def reset(self):
         super().reset()

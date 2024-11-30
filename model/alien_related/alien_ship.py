@@ -1,13 +1,28 @@
+from random import choice
+
 from model.parents_class.ship import Ship
 
+
 class Alien_ship(Ship):
-    def __init__(self, canvas, x, y, image, weapon, refresh_rate):
-        super().__init__(canvas, x, y, x_speed=5, y_speed=25, width=40, height=35, life=1, damage=1, image=image, weapon=weapon, refresh_rate=refresh_rate)
-        self.damage = 1
+    def __init__(self, canvas, x, y, image, refresh_rate, projectile_class, projectile_image):
+        super().__init__(canvas, x, y, x_speed=5, y_speed=25, width=40, height=25, life=1, damage=1, image=image, refresh_rate=refresh_rate)
+        self.projectile_class = projectile_class
+        self.projectile_image = projectile_image
         self.level = 1
+    
+    def change_weapon(self, wepon_type):
+        super().change_weapon(wepon_type, "alien")
     
     def increase_level(self):
         self.level += 1
-        if self.level == 2:
-            self.life = 2
+
+        if self.level == 2:     # Initialise l'arme de l'alien à partir du niveau 2
+            self.change_weapon(choice(["assault", "rafale", "machine_gun", "sniper", "tank"]))
+
+        if self.level % 3 == 0:
+            self.life += 1
+
+        upgrade_choiced = choice(["cooldown", "cooldown_reload", "cooldown_rafale", "damage", "power", "imprecision", "rafale", "munitions"])
+        self.weapon.upgrade_one_caracteristic(upgrade_choiced)
+
 

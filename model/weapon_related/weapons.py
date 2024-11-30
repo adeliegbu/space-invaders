@@ -1,9 +1,11 @@
-from random import randint
+from random import randint, choice
 
 from model.weapon_related.cooldown import Cooldown
 
 class Weapons():
-    def __init__(self, refresh_rate, type, projectile_image):
+    def __init__(self, shooter, type, projectle_class, projectile_image):
+        self.shooter = shooter
+        refresh_rate = shooter.refresh_rate
 
         if type[0] == "assault":
             self.cooldown = Cooldown(300, refresh_rate, 0)
@@ -11,6 +13,7 @@ class Weapons():
             self.cooldown_rafale = Cooldown(100, refresh_rate, 0)
             self.damage = 1
             self.power = 25
+            self.imprecision = 1
             self.rafale = 1
             self.munitions = 10
             self.projectile_width = 8
@@ -20,8 +23,9 @@ class Weapons():
             self.cooldown = Cooldown(1000, refresh_rate, 0)
             self.cooldown_reload = Cooldown(4000, refresh_rate, 0)
             self.cooldown_rafale = Cooldown(100, refresh_rate, 0)
-            self.damage = 3
+            self.damage = 2
             self.power = 35
+            self.imprecision = 0
             self.rafale = 1
             self.munitions = 5
             self.projectile_width = 6
@@ -33,6 +37,7 @@ class Weapons():
             self.cooldown_rafale = Cooldown(75, refresh_rate, 0)
             self.damage = 2
             self.power = 13
+            self.imprecision = 2
             self.rafale = 2
             self.munitions = 10
             self.projectile_width = 10
@@ -40,21 +45,23 @@ class Weapons():
         
         elif type[0] == "machine_gun":
             self.cooldown = Cooldown(150, refresh_rate, 0)
-            self.cooldown_reload = Cooldown(4000, refresh_rate, 0, 0)
-            self.cooldown_rafale = Cooldown(75, refresh_rate, 0)
+            self.cooldown_reload = Cooldown(4000, refresh_rate, 0)
+            self.cooldown_rafale = Cooldown(25, refresh_rate, 0)
             self.damage = 0.5
             self.power = 18
+            self.imprecision = 3
             self.rafale = 1
             self.munitions = 30
             self.projectile_width = 6
             self.projectile_height = 20
         
         elif type[0] == "rafale":
-            self.cooldown = Cooldown(500, refresh_rate, 0)
+            self.cooldown = Cooldown(700, refresh_rate, 0)
             self.cooldown_reload = Cooldown(3000, refresh_rate, 0)
             self.cooldown_rafale = Cooldown(75, refresh_rate, 0)
             self.damage = 1
             self.power = 25
+            self.imprecision = 2
             self.rafale = 3
             self.munitions = 12
             self.projectile_width = 8
@@ -62,29 +69,38 @@ class Weapons():
         
         if type[1] == "alien":
             self.cooldown.offset = randint(0, 1500)
-            self.cooldown.change_time(1500)
+            self.cooldown.change(2000)
+            self.imprecision += 2
             self.munitions = 1000   # Munitions illimitées pour les aliens
+            if type[0] == "machine_gun":       # Les aliens ont une mitraillette modifiée à rafale
+                self.rafale = 6
 
         elif type[1] == "bonus":
             self.cooldown = Cooldown(126, refresh_rate, 0)
             self.munitions = 1000
 
+        self.projectile_class = projectle_class
         self.projectile_image = projectile_image
         self.current_rafale = 0
         self.current_munitions = self.munitions
         self.reloading = False
 
-    def shoot(self, projectile_class, x, y, height):
-        if self.rafale > 1 and self.current_rafale < self.rafale and self.cooldown_rafale.ended() and self.current_munitions > 0 and not self.reloading:
+    def shoot(self):
+        x, y = self.shooter.get_position()
+        _, height = self.shooter.get_dimensions()
+        imprecision = choice([x * 0.1 for x in range(int(- 10 * self.imprecision), int(10 * self.imprecision + 1))])
+        if self.rafale > 1:
+            if self.current_rafale < self.rafale and self.cooldown_rafale.ended() and self.current_munitions > 0 and not self.reloading:
                 self.current_rafale += 1
-                projectile_class.add_object(x, y, height, self.power, self.projectile_width, self.projectile_height, self.damage, self.projectile_image)
+                self.projectile_class.add_object(x, y, height, imprecision, self.power, self.projectile_width, self.projectile_height, self.damage, self.projectile_image)
                 self.current_munitions -= 1
                 self.cooldown_rafale.reset()
-
-        elif self.cooldown.ended() and self.current_munitions > 0 and not self.reloading:
-            projectile_class.add_object(x, y, height, self.power, self.projectile_width, self.projectile_height, self.damage, self.projectile_image)
-            self.current_munitions -= 1
-            self.cooldown.reset()
+ 
+        elif self.rafale == 1:
+            if self.cooldown.ended() and self.current_munitions > 0 and not self.reloading:
+                self.projectile_class.add_object(x, y, height, imprecision, self.power, self.projectile_width, self.projectile_height, self.damage, self.projectile_image)
+                self.current_munitions -= 1
+                self.cooldown.reset()
     
     def reload(self):
         self.reloading = True
@@ -93,31 +109,63 @@ class Weapons():
             self.reloading = False
             self.cooldown_reload.reset()
     
-    def upgrade_cooldown(self, value):
-        self.cooldown.change(self.cooldown.time - value)
+    def upgrade_cooldown(self):
+        if self.cooldown.time > 30:
+            self.cooldown.change(self.cooldown.time - 30)
     
-    def upgrade_cooldown_reload(self, value):
-        self.cooldown_reload.change(self.cooldown_reload.time - value)
+    def upgrade_cooldown_reload(self):
+        if self.cooldown_reload.time > 50:
+            self.cooldown_reload.change(self.cooldown_reload.time - 50)
     
-    def upgrade_cooldown_rafale(self, value):
-        self.cooldown_rafale.change(self.cooldown_rafale.time - value)
+    def upgrade_cooldown_rafale(self):
+        if self.cooldown_rafale.time > 15:
+            self.cooldown_rafale.change(self.cooldown_rafale.time - 15)
     
-    def upgrade_damage(self, value):
-        self.damage += value
+    def upgrade_damage(self):
+        self.damage += 1
     
-    def upgrade_power(self, value):
-        self.power += value
+    def upgrade_power(self):
+        self.power += 3
     
-    def upgrade_rafale(self, value):
-        self.rafale += value
+    def upgrade_imprecision(self):
+        if self.imprecision >= 0.3:
+            self.imprecision -= 0.3
     
-    def upgrade_munitions(self, value):
-        self.munitions += value
+    def upgrade_rafale(self):
+        self.rafale += 1
     
+    def upgrade_munitions(self):
+        self.munitions += 3
+    
+    def upgrade_one_caracteristic(self, caracteristic):
+        if caracteristic == "cooldown":
+            self.upgrade_cooldown()
+        elif caracteristic == "cooldown_reload":
+            self.upgrade_cooldown_reload()
+        elif caracteristic == "cooldown_rafale":
+            self.upgrade_cooldown_rafale()
+        elif caracteristic == "damage":
+            self.upgrade_damage()
+        elif caracteristic == "power":
+            self.upgrade_power()
+        elif caracteristic == "imprecision":
+            self.upgrade_imprecision()
+        elif caracteristic == "rafale":
+            self.upgrade_rafale()
+        elif caracteristic == "munitions":
+            self.upgrade_munitions()
+
     def update(self):
+        self.cooldown_rafale.update()
         if self.rafale == 1 or self.current_rafale == self.rafale:
             self.cooldown.update()
-        self.cooldown_rafale.update()
+            if self.cooldown.ended() and self.current_rafale == self.rafale:
+                self.current_rafale = 0
+                self.cooldown.reset()
+
+        if 0 < self.current_rafale:     # Si le joueur commence une rafale
+            self.shoot()
+
         if self.reloading:
             self.cooldown_reload.update()
             if self.cooldown_reload.ended():
@@ -125,9 +173,6 @@ class Weapons():
                 self.current_munitions = self.munitions
                 self.current_rafale = 0
                 self.cooldown_reload.reset()
-
-        if self.current_rafale == self.rafale and self.cooldown.ended():
-            self.current_rafale = 0
     
     def reset(self):
         self.current_rafale = 0

@@ -22,6 +22,6 @@ class Cooldown:
         if not self.ended():
             self.var += self.refresh_rate
     
-    def change_time(self, time):
+    def change(self, time):
         self.time = time + self.offset
     

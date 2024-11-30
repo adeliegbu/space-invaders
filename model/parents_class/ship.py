@@ -1,13 +1,18 @@
 from model.parents_class.object import Object
+from model.weapon_related.weapons import Weapons
 
 class Ship(Object):
-    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, damage, image, weapon, refresh_rate):
-        super().__init__(canvas, x, y, x_speed, y_speed, width, height, life, damage, image)
-        self.weapon = weapon
+    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, damage, image, refresh_rate):
+        super().__init__(canvas, x, y, x_speed, y_speed, width, height, life, damage, image, refresh_rate)
+        self.weapon = None
         self.refresh_rate = refresh_rate
 
-    def shoot(self, projectile_class):
-        self.weapon.shoot(projectile_class, self.x, self.y, self.height)
+    def shoot(self):
+        if self.weapon is not None:
+            self.weapon.shoot()
+    
+    def change_weapon(self, wepon_type, shooter_type):
+        self.weapon = Weapons(self, (wepon_type, shooter_type), self.projectile_class, self.projectile_image)
 
     def update_weapon(self):
         self.weapon.update()

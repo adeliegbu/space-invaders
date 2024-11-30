@@ -7,12 +7,12 @@ class Group_object:
         self.objects_list = []
         self.objects_matrix = []
 
-    def create_objects_matrix(self, object_class, x, y, line, column, pad_x, pad_y, damage, image, **kwargs):
+    def create_objects_matrix(self, object_class, x, y, line, column, pad_x, pad_y, image, **kwargs):
         for j in range(- column // 2 + 1, column // 2 + 1):
             row = []
             for i in range(line):
-                temporary = object_class(self.canvas, 0, 0, image, **kwargs)
-                new_object = object_class(self.canvas, x + j * (temporary.width + pad_x), y + i * (temporary.height + pad_y), image, **kwargs) 
+                temporary = object_class(self.canvas, 0, 0, image, refresh_rate=self.refresh_rate, **kwargs)
+                new_object = object_class(self.canvas, x + j * (temporary.width + pad_x), y + i * (temporary.height + pad_y), image, refresh_rate=self.refresh_rate, **kwargs) 
                 temporary.delete()
                 row.append(new_object)
             self.objects_matrix.append(row)

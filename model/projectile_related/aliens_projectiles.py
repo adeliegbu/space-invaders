@@ -5,8 +5,8 @@ class Aliens_projectiles(Projectiles):
         super().__init__(canvas, refresh_rate)
         self.image = image
     
-    def add_object(self, x, y, height, power, projectile_width, projectile_height, damage, projectile_image):
-        super().add_object(x, y + height, power, projectile_width, projectile_height, damage, projectile_image)
+    def add_object(self, x, y, height, imprecision, power, projectile_width, projectile_height, damage, projectile_image):
+        super().add_object(x, y + height, imprecision, power, projectile_width, projectile_height, damage, projectile_image)
     
     def move(self):
         super().move(y_direction=1)
