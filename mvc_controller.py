@@ -1,6 +1,6 @@
 from random import choice
 
-from mvc_model import Players, Aliens, Cooldown, Walls, Players_projectiles, Aliens_projectiles, Binds, Game_logic, P1_settings
+from mvc_model import Players, Aliens, Cooldown, Walls, Players_projectiles, Aliens_projectiles, Binds, P1_settings, Weapons
 from mvc_view import View
 
 class Controller:
@@ -8,9 +8,8 @@ class Controller:
         self.view = View(self)
         self.canvas = self.view.canvas
 
+        self.refresh_rate = 25
         self.score = 0
-        self.keys_pressed = set()
-        self.updating = False
 
         self.players_projectiles = Players_projectiles(self.view.canvas, self.view.projectile_player_image_green)
         self.aliens_projectiles = Aliens_projectiles(self.view.canvas, self.view.projectile_alien)
@@ -19,14 +18,12 @@ class Controller:
         self.players_number = 1
         self.p1, self.p2 = None, None
         
-        self.aliens = Aliens(self.view.canvas, image=self.view.alien_image, bonus_image=self.view.alien_bonus_image, cooldown=Cooldown(600))
+        self.aliens = Aliens(self.view.canvas, image=self.view.alien_image, bonus_image=self.view.alien_bonus_image, cooldown=Cooldown(600, self.refresh_rate))
 
         self.walls = Walls(self.view.canvas, self.view.wall_image)
 
         self.binds = Binds(self.view.canvas)
         self.p1_settings = P1_settings(self.view)
-
-        self.refresh_rate = 25
 
         self.should_game_update = False
         self.should_menu_update = True
@@ -48,7 +45,7 @@ class Controller:
             self.aliens.collision(self.players)
             self.aliens.collision(self.walls)
 
-            self.players.update_cooldown()
+            self.players.update_weapons()
             self.aliens.var_update()
 
             if self.aliens.objects_dead():
@@ -73,8 +70,7 @@ class Controller:
             self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
             self.aliens.increase_speed(self.stage_number - 1)
             self.walls.add_object(self.view.screen_height * 4 // 5, 2)
-            self.aliens.cooldown.reset()
-            self.players.reset_cooldown()
+            self.players.reset_weapons()
             
     def menu_update(self):
         if self.should_menu_update:
@@ -85,7 +81,7 @@ class Controller:
     def new_game(self):
         self.should_game_update = True
         self.should_menu_update = False
-        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 19 // 20, self.p1_settings.get_choiced_player1_image(), Cooldown(300), self.players_projectiles)
+        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 19 // 20, self.view.player_machinegun_image_red, Weapons(self.refresh_rate, ("machine_gun", "player"), self.view.projectile_player_image_red)) 
         self.p1 = self.players.define_player(1)
         self.p2 = self.players.define_player(2)
 
@@ -109,6 +105,7 @@ class Controller:
         self.binds.add_bind((self.p1.move_left, True), "Left")
         self.binds.add_bind((self.p1.move_right, True), "Right")
         self.binds.add_bind((self.p1.shoot, True), "space")
+        self.binds.add_bind((self.p1.weapon.reload, False), "r")
         self.binds.add_bind((self.go_to_menu, False), "Escape")
 
     def reset(self):

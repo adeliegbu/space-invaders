@@ -2,15 +2,15 @@ from random import choice
 
 from model.alien_related.alien_ship import Alien_ship
 from model.alien_related.bonus_ship import Bonus_ship
-from model.cooldown import Cooldown
+from model.weapon_related.weapons import Weapons
 from model.parents_class.group_object import Group_object
 
 class Aliens(Group_object):
-    def __init__(self, canvas, image, bonus_image, cooldown):
+    def __init__(self, canvas, image, bonus_image, aliens_projectile_image):
         super().__init__(canvas)
         self.image = image
         self.image_bonus = bonus_image
-        self.cooldown = cooldown
+        self.aliens_projectile_image = aliens_projectile_image
         self.x_direction = 1
         self.y_direction = 0
         self.number_alien_hit = 0
@@ -18,7 +18,7 @@ class Aliens(Group_object):
 
     def create_objects_matrix(self, line, column):
         temporary = Alien_ship(self.canvas, 0, 0, self.image)
-        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 2.5 * temporary.height, line=line, column=column, pad_x=30, pad_y=20, image=self.image)
+        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 2.5 * temporary.height, line=line, column=column, pad_x=30, pad_y=20, image=self.image, weapon=Weapons(self.refresh_rate, ("assault", "alien"), self.aliens_projectile_image))
         temporary.delete()
 
     def move(self):
@@ -39,12 +39,13 @@ class Aliens(Group_object):
         return None
     
     def shoot(self, projectile_class):
-        alien_shooting = self.alien_shooting()
-        if alien_shooting:
-            alien_shooting.shoot(self.cooldown, projectile_class)
         for bonus in self.objects_list:
             bonus.shoot(projectile_class)
-            bonus.update_cooldown()
+            bonus.weapon.update()
+        for row in self.objects_matrix:
+            for alien in row:
+                alien.shoot(projectile_class)
+                alien.weapon.update()
     
     def got_hit(self, alien):
         super().got_hit(alien)
@@ -84,7 +85,7 @@ class Aliens(Group_object):
             x_bonus = 50
         else:
             x_bonus = self.canvas.winfo_width() - 50
-        super().add_object(Bonus_ship(self.canvas, x_bonus, 80, self.image_bonus, Cooldown(126), bonus_direction))
+        super().add_object(Bonus_ship(self.canvas, x_bonus, 80, self.image_bonus, bonus_direction, self.aliens_projectile_image, self.refresh_rate))
 
     def bonus_out_of_bounds(self, bonus):
         if bonus.bonus_will_be_out_of_bounds():

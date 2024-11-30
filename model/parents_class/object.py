@@ -1,5 +1,5 @@
 class Object:
-    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, image):
+    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, damage, image):
         self.canvas = canvas
         self.x = x
         self.y = y
@@ -8,6 +8,7 @@ class Object:
         self.width = width
         self.height = height
         self.life = life
+        self.damage = damage
         self.image = image
         self.id = self.canvas.create_image(self.x, self.y, image=self.image, anchor="center")
     
@@ -39,11 +40,11 @@ class Object:
             self.y += y_direction * self.y_speed
             self.canvas.move(self.id, x_direction * self.x_speed, y_direction * self.y_speed)
     
-    def got_hit(self):
-        self.life -= 1
+    def got_hit(self, damage):
+        self.life -= damage
         
     def dead(self):
-        return self.life == 0
+        return self.life <= 0
     
     def delete(self):
         self.canvas.delete(self.id)

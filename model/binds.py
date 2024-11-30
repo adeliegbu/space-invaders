@@ -9,7 +9,7 @@ class Binds:
         self.canvas.bind("<KeyRelease>", self.desactive_bind)
         self.canvas.focus_set()
 
-        # Les commandes sont des tuples (fonction, maintable=booléen)
+        # Les commandes sont des tuples (command, maintainable=booléen)
     
     def add_bind(self, command, key):
         if not command in self.game_binds_dico:
