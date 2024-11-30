@@ -2,7 +2,7 @@ from model.parents_class.ship import Ship
 
 class Player_ship(Ship):
     def __init__(self, canvas, x, y, image, refresh_rate, projectile_class, projectile_image):
-        super().__init__(canvas, x, y, x_speed=10, y_speed=0, width=60, height=50, life=3, damage=1, image=image, refresh_rate=refresh_rate)
+        super().__init__(canvas, x, y, x_speed=10, y_speed=0, width=60, height=40, life=3, damage=1, image=image, refresh_rate=refresh_rate)
         self.projectile_class = projectile_class
         self.projectile_image = projectile_image
     

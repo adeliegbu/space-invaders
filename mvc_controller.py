@@ -55,6 +55,10 @@ class Controller:
                 self.go_to_menu()
                     
             self.binds.execute_active_binds()
+            
+            if self.p1 is not None:
+                self.view.update(should_update_lives=True, should_update_score=False)
+
             self.view.canvas.after(self.refresh_rate, self.game_update)
 
     def stage_update(self):
@@ -81,7 +85,7 @@ class Controller:
     def new_game(self):
         self.should_game_update = True
         self.should_menu_update = False
-        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 19 // 20, self.view.player_image_green, self.view.projectile_player_image_red, weapon_type="assault") 
+        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_image_green, self.view.projectile_player_image_red, weapon_type="assault") 
         self.p1 = self.players.define_player(1)
         self.p2 = self.players.define_player(2)
 
@@ -99,6 +103,7 @@ class Controller:
         self.aliens.reset_number_alien_killed()
         self.binds.reset_binds() 
         self.view.menu()
+        self.view.overlay_reset()
         self.menu_update()
 
     def default_game_binds(self):

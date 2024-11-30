@@ -47,6 +47,9 @@ class View:
         self.player_images = [self.player_image_green, self.player_image_blue, self.player_image_red, self.player_image_yellow, self.player_image_purple]
         self.projectile_player_images = [self.projectile_player_image_green, self.projectile_player_image_blue, self.projectile_player_image_red, self.projectile_player_image_yellow, self.projectile_player_image_purple]
 
+        self.heart_live_image = ImageTk.PhotoImage(Image.open("visuel/heart_live.png").resize((15, 15), Image.LANCZOS))
+        self.heart_dead_image = ImageTk.PhotoImage(Image.open("visuel/heart_dead.png").resize((15, 15), Image.LANCZOS))
+
         self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((20, 20), Image.LANCZOS))
         self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
@@ -56,15 +59,19 @@ class View:
         self.button_menu = tk.Button(self.canvas, text="Menu", command=self.menu, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_options = tk.Button(self.canvas, text="Options", command=self.show_options, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
 
+        self.lives_images_list = [None] * 3
+
     def new_game(self):
+        self.controller.new_game()
+
         self.button_new_game.place_forget()
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_menu.place_forget()
         self.button_options.place_forget()
+
         self.canvas.delete(self.logo_id)
 
-        self.controller.new_game()
 
     def rules(self):
         self.button_new_game.place_forget()
@@ -91,5 +98,31 @@ class View:
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_options.place_forget()
+    
+    def hide_image_list(self, image_list):
+        for image_id in image_list:
+            self.canvas.itemconfigure(image_id, state="hidden")
+    
+    def show_image_list(self, image_list):
+        for image_id in image_list:
+            self.canvas.itemconfigure(image_id, state="normal")
+    
+    def overlay_reset(self):
+        self.hide_image_list(self.lives_images_list)
+
+
+    def lives(self, lives, x, y, difficulty):
+        self.hide_image_list(self.lives_images_list)
+        j = 0
+        for i in range(- difficulty // 2 + 1, difficulty // 2 + 1):
+            if j < lives:
+                self.lives_images_list[j] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_live_image, anchor="center")
+            else:
+                self.canvas.create_image(x + i * 20, y + 45, image=self.heart_dead_image, anchor="center")
+            j += 1
+    
+    def update(self, should_update_lives, should_update_score):
+        if should_update_lives:
+            self.lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=3)
 
 
