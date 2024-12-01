@@ -5,7 +5,20 @@ from model.weapon_related.cooldown import Cooldown
 class Weapons():
     def __init__(self, shooter, type, projectle_class, projectile_image):
         self.shooter = shooter
+        self.type = type
         refresh_rate = shooter.refresh_rate
+
+        if type[0] == "weapon_less":
+            self.cooldown = Cooldown(100 , refresh_rate, 0)
+            self.cooldown_reload = Cooldown(100 , refresh_rate, 0)
+            self.cooldown_rafale = Cooldown(100 , refresh_rate, 0)
+            self.damage = 0
+            self.power = 0
+            self.imprecision = 0
+            self.rafale = 0
+            self.munitions = 0
+            self.projectile_width = 0
+            self.projectile_height = 0
 
         if type[0] == "assault":
             self.cooldown = Cooldown(300, refresh_rate, 0)
@@ -51,7 +64,7 @@ class Weapons():
             self.power = 18
             self.imprecision = 3
             self.rafale = 1
-            self.munitions = 30
+            self.munitions = 40
             self.projectile_width = 6
             self.projectile_height = 20
         
@@ -68,12 +81,15 @@ class Weapons():
             self.projectile_height = 40
         
         if type[1] == "alien":
-            self.cooldown.offset = randint(0, 1500)
-            self.cooldown.change(2000)
+            self.cooldown.offset = randint(0, 5000)
+            self.cooldown.change(5000)
             self.imprecision += 2
+            self.damage = 1
+            if self.type[0] == "machine_gun":
+                self.damage = 0.5
             self.munitions = 1000   # Munitions illimitées pour les aliens
             if type[0] == "machine_gun":       # Les aliens ont une mitraillette modifiée à rafale
-                self.rafale = 6
+                self.rafale = 5
 
         elif type[1] == "bonus":
             self.cooldown = Cooldown(126, refresh_rate, 0)
@@ -110,6 +126,9 @@ class Weapons():
             self.cooldown_reload.reset()
     
     def upgrade_cooldown(self):
+        if self.type[1] == "alien" and self.cooldown_reload.time > 200:
+            self.cooldown_reload.change(self.cooldown_reload.time - 200)
+
         if self.cooldown.time > 30:
             self.cooldown.change(self.cooldown.time - 30)
     
@@ -122,10 +141,12 @@ class Weapons():
             self.cooldown_rafale.change(self.cooldown_rafale.time - 15)
     
     def upgrade_damage(self):
+        if self.type[1] == "alien" or self.type[0] == "machine_gun":
+            self.damage += 0.5
         self.damage += 1
     
     def upgrade_power(self):
-        self.power += 3
+        self.power += 2
     
     def upgrade_imprecision(self):
         if self.imprecision >= 0.3:

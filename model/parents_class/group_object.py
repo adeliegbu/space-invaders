@@ -40,13 +40,13 @@ class Group_object:
                 if object.collide(target):
                     self.got_hit(object, target.damage)
                     targets.got_hit(target, object.damage)
-                    return True
+                    return True, target, object
             for row in targets.objects_matrix:
                 for target in row:
                     if object.collide(target):
                         self.got_hit(object, target.damage)
                         targets.got_hit(target, object.damage)
-                        return True
+                        return True, target, object
         
         for row in self.objects_matrix:
             for object in row:
@@ -54,14 +54,14 @@ class Group_object:
                     if object.collide(target):
                         self.got_hit(object, target.damage)
                         targets.got_hit(target, object.damage)
-                        return True
+                        return True, target, object
                 for row_target in targets.objects_matrix:
                     for target in row_target:
                         if object.collide(target):
                             self.got_hit(object, target.damage)
                             targets.got_hit(target, object.damage)
-                            return True
-        return False
+                            return True, target, object
+        return False, None, None
 
     def objects_dead(self):
         return not self.objects_list and all(not row for row in self.objects_matrix)

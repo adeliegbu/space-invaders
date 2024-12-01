@@ -1,4 +1,4 @@
-from random import choice
+from random import choice, choices
 
 from model.parents_class.ship import Ship
 
@@ -9,6 +9,9 @@ class Alien_ship(Ship):
         self.projectile_class = projectile_class
         self.projectile_image = projectile_image
         self.level = 1
+        self.doctor = False
+        self.upgrade_choices = ["cooldown", "cooldown_rafale", "damage", "power", "rafale"]
+        self.upgrade_weights = [0.4, 0.15, 0.05, 0.5, 0.15]
     
     def change_weapon(self, wepon_type):
         super().change_weapon(wepon_type, "alien")
@@ -22,7 +25,16 @@ class Alien_ship(Ship):
         if self.level % 3 == 0:
             self.life += 1
 
-        upgrade_choiced = choice(["cooldown", "cooldown_reload", "cooldown_rafale", "damage", "power", "imprecision", "rafale", "munitions"])
+        upgrade_choiced = choices(self.upgrade_choices, self.upgrade_weights, k=1)[0]
         self.weapon.upgrade_one_caracteristic(upgrade_choiced)
+    
+    def become_doctor(self):
+        self.change_weapon("weapon_less")
+        self.doctor = True
+    
+    def dead(self):
+        if super().dead():
+            return True
+
 
 

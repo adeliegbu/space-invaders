@@ -32,13 +32,21 @@ class Controller:
     def game_update(self):
         if self.should_game_update:
 
+            self.binds.execute_active_binds()
+
             self.aliens.move()
             self.aliens.shoot()
 
             self.players_projectiles.move()
             self.aliens_projectiles.move()
 
-            self.players_projectiles.collision(self.aliens)
+            collision, alien, _ = self.players_projectiles.collision(self.aliens)
+            if collision and alien.dead(): # Evite qu'un alien donne du score  si il meurt à cause d'un mur
+                self.score += 10 * alien.level
+                if alien.doctor:
+                    for players in self.players.objects_list:
+                        players.new_life()
+
             self.players_projectiles.collision(self.walls)
             self.aliens_projectiles.collision(self.players)
             self.aliens_projectiles.collision(self.walls)
@@ -48,17 +56,15 @@ class Controller:
             self.players.update_weapons()
             self.aliens.var_update()
 
+            if self.p1 is not None:
+                self.view.update(should_update_lives=True, should_update_score=False)
+
             if self.aliens.objects_dead():
                 self.stage_update()
 
             if self.players.objects_dead():
                 self.go_to_menu()
                     
-            self.binds.execute_active_binds()
-            
-            if self.p1 is not None:
-                self.view.update(should_update_lives=True, should_update_score=False)
-
             self.view.canvas.after(self.refresh_rate, self.game_update)
 
     def stage_update(self):
@@ -85,7 +91,7 @@ class Controller:
     def new_game(self):
         self.should_game_update = True
         self.should_menu_update = False
-        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_image_green, self.view.projectile_player_image_red, weapon_type="assault") 
+        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_machinegun_image_red, self.view.projectile_player_image_red, weapon_type="machine_gun") 
         self.p1 = self.players.define_player(1)
         self.p2 = self.players.define_player(2)
 
@@ -99,11 +105,11 @@ class Controller:
         self.should_game_update = False
         self.should_menu_update = True
         self.stage_number = 0
+        self.score = 0
         self.reset()
         self.aliens.reset_number_alien_killed()
         self.binds.reset_binds() 
         self.view.menu()
-        self.view.overlay_reset()
         self.menu_update()
 
     def default_game_binds(self):

@@ -14,17 +14,22 @@ class View:
         self.screen_height = self.fenetre.winfo_screenheight()
         self.x0, self.y0 = self.screen_width // 2, self.screen_height // 2
 
-        self.bg_image = Image.open("visuel/background_invader.jpg")
-        self.bg_image = ImageTk.PhotoImage(self.bg_image.resize((self.screen_width, self.screen_height), Image.LANCZOS))
+        self.bg_game_image = Image.open("visuel/background_invader.jpg")
+        self.bg_game_image = ImageTk.PhotoImage(self.bg_game_image.resize((self.screen_width, self.screen_height), Image.LANCZOS))
+
+        self.bg_menu_image = Image.open("visuel/bg_menu.jpg")
+        self.bg_menu_image = ImageTk.PhotoImage(self.bg_menu_image.resize((self.screen_width, self.screen_height), Image.LANCZOS))
 
         self.canvas = tk.Canvas(self.fenetre, width=self.screen_width, height=self.screen_height, highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
-        self.canvas.create_image(0, 0, image=self.bg_image, anchor="nw")
+
+        self.bg_game_id = self.canvas.create_image(0, 0, image=self.bg_game_image, anchor="nw")
+        self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
 
         self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
 
         self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((80, 80), Image.LANCZOS))
-        self.alien_type0_image = ImageTk.PhotoImage(Image.open("visuel/alien_type0.png").resize((70, 40), Image.LANCZOS))
+        self.alien_type0_image = ImageTk.PhotoImage(Image.open("visuel/alien_type0.png").resize((100, 60), Image.LANCZOS))
         self.alien_type2_image = ImageTk.PhotoImage(Image.open("visuel/alien_type2.png").resize((50, 40), Image.LANCZOS))
         self.alien_images = [self.alien_type0_image, self.alien_image, self.alien_type2_image]
 
@@ -47,10 +52,11 @@ class View:
         self.player_images = [self.player_image_green, self.player_image_blue, self.player_image_red, self.player_image_yellow, self.player_image_purple]
         self.projectile_player_images = [self.projectile_player_image_green, self.projectile_player_image_blue, self.projectile_player_image_red, self.projectile_player_image_yellow, self.projectile_player_image_purple]
 
-        self.heart_live_image = ImageTk.PhotoImage(Image.open("visuel/heart_live.png").resize((15, 15), Image.LANCZOS))
-        self.heart_dead_image = ImageTk.PhotoImage(Image.open("visuel/heart_dead.png").resize((15, 15), Image.LANCZOS))
+        self.heart_full_image = ImageTk.PhotoImage(Image.open("visuel/full_life.png").resize((30, 30), Image.LANCZOS))
+        self.heart_semi_image = ImageTk.PhotoImage(Image.open("visuel/semi_life.png").resize((30, 30), Image.LANCZOS))
+        self.heart_dead_image = ImageTk.PhotoImage(Image.open("visuel/no_life.png").resize((30, 30), Image.LANCZOS))
 
-        self.wall_image = ImageTk.PhotoImage(Image.open("visuel/wall.jpg").resize((20, 20), Image.LANCZOS))
+        self.wall_image = ImageTk.PhotoImage(Image.open("visuel/n_wall.webp").resize((20, 20), Image.LANCZOS))
         self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
         self.button_new_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.new_game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
@@ -59,10 +65,10 @@ class View:
         self.button_menu = tk.Button(self.canvas, text="Menu", command=self.menu, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_options = tk.Button(self.canvas, text="Options", command=self.show_options, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
 
-        self.lives_images_list = [None] * 3
+        self.lives_images_list = [None] * 5
 
     def new_game(self):
-        self.controller.new_game()
+        self.overlay_reset()
 
         self.button_new_game.place_forget()
         self.button_rules.place_forget()
@@ -70,8 +76,7 @@ class View:
         self.button_menu.place_forget()
         self.button_options.place_forget()
 
-        self.canvas.delete(self.logo_id)
-
+        self.controller.new_game()
 
     def rules(self):
         self.button_new_game.place_forget()
@@ -87,6 +92,8 @@ class View:
         self.button_leave.place(x=self.x0, y=self.y0 + 300, anchor="center")
         self.button_menu.place_forget()
         self.rules_label.place_forget()
+        self.hide_image_list(self.lives_images_list)
+        self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
 
     def leave(self):
@@ -101,28 +108,32 @@ class View:
     
     def hide_image_list(self, image_list):
         for image_id in image_list:
-            self.canvas.itemconfigure(image_id, state="hidden")
+            self.canvas.delete(image_id)
     
     def show_image_list(self, image_list):
         for image_id in image_list:
             self.canvas.itemconfigure(image_id, state="normal")
     
     def overlay_reset(self):
-        self.hide_image_list(self.lives_images_list)
-
+        # Supprimer tous les items sauf l'arrière-plan
+        for item in self.canvas.find_all():
+            if item != self.bg_game_id:
+                self.canvas.delete(item)
 
     def lives(self, lives, x, y, difficulty):
         self.hide_image_list(self.lives_images_list)
         j = 0
         for i in range(- difficulty // 2 + 1, difficulty // 2 + 1):
-            if j < lives:
-                self.lives_images_list[j] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_live_image, anchor="center")
-            else:
-                self.canvas.create_image(x + i * 20, y + 45, image=self.heart_dead_image, anchor="center")
             j += 1
+            if j <= lives:
+                self.lives_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_full_image, anchor="center")
+            elif j - 0.5 == lives:
+                self.lives_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_semi_image, anchor="center")
+            else:
+                self.lives_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_dead_image, anchor="center")
     
     def update(self, should_update_lives, should_update_score):
         if should_update_lives:
-            self.lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=3)
+            self.lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
 
 

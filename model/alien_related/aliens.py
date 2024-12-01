@@ -108,6 +108,9 @@ class Aliens(Group_object):
                 alien.increase_level()
                 if alien.level < len(alien_images):
                     alien.change_image(alien_images[alien.level])
+            if choice([i for i in range(5)]) == 1:
+                increasing_aliens[0].become_doctor()
+                increasing_aliens[0].change_image(alien_images[0])
                     
     def reset_number_alien_killed(self):
         self.number_alien_killed = 0
