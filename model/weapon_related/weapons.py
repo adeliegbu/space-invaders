@@ -70,7 +70,7 @@ class Weapons():
         
         elif type[0] == "rafale":
             self.cooldown = Cooldown(700, refresh_rate, 0)
-            self.cooldown_reload = Cooldown(3000, refresh_rate, 0)
+            self.cooldown_reload = Cooldown(2500, refresh_rate, 0)
             self.cooldown_rafale = Cooldown(75, refresh_rate, 0)
             self.damage = 1
             self.power = 25
@@ -81,18 +81,20 @@ class Weapons():
             self.projectile_height = 40
         
         if type[1] == "alien":
-            self.cooldown.offset = randint(0, 5000)
-            self.cooldown.change(5000)
             self.imprecision += 2
             self.damage = 1
-            if self.type[0] == "machine_gun":
-                self.damage = 0.5
             self.munitions = 1000   # Munitions illimitées pour les aliens
             if type[0] == "machine_gun":       # Les aliens ont une mitraillette modifiée à rafale
                 self.rafale = 5
+                self.damage = 0.5
+            self.cooldown.change(4000)
+            if self.rafale > 1:
+                self.cooldown_rafale.add_offset(randint(0, 4000))
+            else:
+                self.cooldown.add_offset(randint(0, 4000))
 
         elif type[1] == "bonus":
-            self.cooldown = Cooldown(126, refresh_rate, 0)
+            self.cooldown = Cooldown(125, refresh_rate, 0)
             self.munitions = 1000
 
         self.projectile_class = projectle_class
@@ -119,11 +121,12 @@ class Weapons():
                 self.cooldown.reset()
     
     def reload(self):
-        self.reloading = True
-        if self.reloading and self.cooldown_reload.ended():
-            self.current_munitions = self.munitions
-            self.reloading = False
-            self.cooldown_reload.reset()
+        if self.current_munitions < self.munitions:
+            self.reloading = True
+            if self.reloading and self.cooldown_reload.ended():
+                self.current_munitions = self.munitions
+                self.reloading = False
+                self.cooldown_reload.reset()
     
     def upgrade_cooldown(self):
         if self.type[1] == "alien" and self.cooldown_reload.time > 200:

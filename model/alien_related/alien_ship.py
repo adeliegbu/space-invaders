@@ -11,7 +11,7 @@ class Alien_ship(Ship):
         self.level = 1
         self.doctor = False
         self.upgrade_choices = ["cooldown", "cooldown_rafale", "damage", "power", "rafale"]
-        self.upgrade_weights = [0.4, 0.15, 0.05, 0.5, 0.15]
+        self.upgrade_weights = [0.4, 0.15, 0.05, 0.3, 0.1]
     
     def change_weapon(self, wepon_type):
         super().change_weapon(wepon_type, "alien")

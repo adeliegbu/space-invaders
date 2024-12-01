@@ -42,7 +42,7 @@ class Controller:
 
             collision, alien, _ = self.players_projectiles.collision(self.aliens)
             if collision and alien.dead(): # Evite qu'un alien donne du score  si il meurt à cause d'un mur
-                self.score += 10 * alien.level
+                self.score += 15 * alien.level
                 if alien.doctor:
                     for players in self.players.objects_list:
                         players.new_life()
@@ -91,7 +91,7 @@ class Controller:
     def new_game(self):
         self.should_game_update = True
         self.should_menu_update = False
-        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_machinegun_image_red, self.view.projectile_player_image_red, weapon_type="machine_gun") 
+        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_image_green, self.view.projectile_player_image_red, weapon_type="rafale") 
         self.p1 = self.players.define_player(1)
         self.p2 = self.players.define_player(2)
 

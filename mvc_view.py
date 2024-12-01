@@ -65,7 +65,18 @@ class View:
         self.button_menu = tk.Button(self.canvas, text="Menu", command=self.menu, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_options = tk.Button(self.canvas, text="Options", command=self.show_options, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
 
+        # Chargement des images de la police
+        self.font_images = {}
+        characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-"
+        for char in characters:
+            self.font_images[char] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-{char}.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
+        self.font_images["doublepoint"] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-doublepoint.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
+
         self.lives_images_list = [None] * 5
+        self.score_image_list = [None] * 5
+
+        self.image_score = [] # cache pour stocker les références aux images et éviter qu'elles ne soient supprimées par le garbage collector
+
 
     def new_game(self):
         self.overlay_reset()
@@ -83,7 +94,7 @@ class View:
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
-        self.rules_label.place(x=self.x0, y=self.y0 + 50, anchor="center")
+        self.display_font_text(rules_text, size=15, pad_x=0, pad_y=10, x=0, y=self.y0)
 
     def menu(self):
         self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
@@ -94,10 +105,12 @@ class View:
         self.rules_label.place_forget()
         self.hide_image_list(self.lives_images_list)
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
-        self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
+        # self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
+        self.logo_id = self.display_font_text("space invaders", size=75, pad_x=3, pad_y=10, x=self.x0 // 2, y=self.y0 // 2.5)
 
     def leave(self):
         self.fenetre.quit()
+        self.image_score.clear()
 
     def show_options(self):
         self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
@@ -120,7 +133,7 @@ class View:
             if item != self.bg_game_id:
                 self.canvas.delete(item)
 
-    def lives(self, lives, x, y, difficulty):
+    def display_lives(self, lives, x, y, difficulty):
         self.hide_image_list(self.lives_images_list)
         j = 0
         for i in range(- difficulty // 2 + 1, difficulty // 2 + 1):
@@ -134,6 +147,30 @@ class View:
     
     def update(self, should_update_lives, should_update_score):
         if should_update_lives:
-            self.lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
+            self.display_lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
+        if should_update_score:
+            for image in self.image_score:
+                self.canvas.delete(image)
+            self.display_font_text(f"Score : {self.controller.score}", size=40, pad_x=2, pad_y=0, x= 20, y=20)
 
+    def display_font_text(self, text, size, pad_x, pad_y, x, y):
+        text_ids = [[]]
+        i = 0
+        for c in text:
+            if c == " ":
+                text_ids[i].append(None)
+            elif c == "\n":
+                text_ids.append([])
+                i += 1
+            elif c == ":":
+                text_ids[i].append(self.font_images["doublepoint"][size // 15 - 1])     
+            else:
+                c = c.upper()
+                text_ids[i].append(self.font_images[c][size // 15 - 1])
 
+        for i in range(len(text_ids)):
+            for j in range(len(text_ids[i])):
+                if text_ids[i][j] is not None:
+                    text_ids[i][j] = self.canvas.create_image(x + ((size + pad_x) * j), y + ((size + pad_y) * i), image=text_ids[i][j], anchor="center")
+
+        return text_ids

@@ -9,7 +9,7 @@ class Cooldown:
         self.var = offset
 
     def get_progression(self):
-        if self.time - self.offset != 0:
+        if self.time - self.offset > 0:
             return (self.var - self.offset) / (self.time - self.offset)
         
     def ended(self):
@@ -24,4 +24,8 @@ class Cooldown:
     
     def change(self, time):
         self.time = time + self.offset
+    
+    def add_offset(self, offset):
+        self.offset += offset
+        self.time += offset
     
