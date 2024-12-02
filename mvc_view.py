@@ -86,7 +86,7 @@ class View:
         self.button_options.place_forget()
 
         self.controller.new_game()
-        self.update(should_update_lives=True, should_update_score=True)
+        self.update(should_update_lives=True, should_update_score=True, should_update_stage=True)
 
     def rules(self):
         self.button_new_game.place_forget()
@@ -144,13 +144,17 @@ class View:
             else:
                 self.lives_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_dead_image, anchor="center")
     
-    def update(self, should_update_lives, should_update_score):
+    def update(self, should_update_lives, should_update_score, should_update_stage):
         if should_update_lives:
             self.display_lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
         if should_update_score:
             if self.image_score:
                 self.hide_image_list(self.image_score[0])
             self.image_score = self.display_font_text(f"Score : {self.controller.score}", size=30, pad_x=2, pad_y=0, x= 20, y=20)
+        if should_update_stage:
+            if self.image_stage:
+                self.hide_image_list(self.image_stage[0])
+            self.image_stage = self.display_font_text(f"Stage : {self.controller.stage_number}", size=30, pad_x=2, pad_y=0, x= self.x0 - 50, y=20)
 
     def display_font_text(self, text, size, pad_x, pad_y, x, y):
         text_ids = [[]]

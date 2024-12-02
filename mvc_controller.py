@@ -60,7 +60,7 @@ class Controller:
             self.aliens.var_update()
 
             if self.p1 is not None:
-                self.view.update(should_update_lives=True, should_update_score=should_update_score)
+                self.view.update(should_update_lives=True, should_update_score=should_update_score, should_update_stage=False)
 
             if self.aliens.objects_dead():
                 self.stage_update()
@@ -79,6 +79,7 @@ class Controller:
 
             self.stage_number += 1
             self.upgrade_points += 1
+            self.view.update(None, None, should_update_stage=True)
 
             self.aliens.create_objects_matrix(line=3, column=5)
             self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
