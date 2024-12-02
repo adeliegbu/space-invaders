@@ -1,5 +1,3 @@
-from random import choice
-
 from mvc_model import Players, Aliens, Cooldown, Walls, Players_projectiles, Aliens_projectiles, Binds, P1_settings, Weapons
 from mvc_view import View
 
@@ -28,6 +26,7 @@ class Controller:
         self.should_game_update = False
         self.should_menu_update = True
         self.stage_number = 0
+        self.upgrade_points = 0
     
     def game_update(self):
         if self.should_game_update:
@@ -39,13 +38,17 @@ class Controller:
 
             self.players_projectiles.move()
             self.aliens_projectiles.move()
-
+            
+            should_update_score = False
             collision, alien, _ = self.players_projectiles.collision(self.aliens)
             if collision and alien.dead(): # Evite qu'un alien donne du score  si il meurt à cause d'un mur
                 self.score += 15 * alien.level
+                should_update_score = True
                 if alien.doctor:
                     for players in self.players.objects_list:
                         players.new_life()
+                if alien.bonus:
+                    self.upgrade_points += 1
 
             self.players_projectiles.collision(self.walls)
             self.aliens_projectiles.collision(self.players)
@@ -57,7 +60,7 @@ class Controller:
             self.aliens.var_update()
 
             if self.p1 is not None:
-                self.view.update(should_update_lives=True, should_update_score=False)
+                self.view.update(should_update_lives=True, should_update_score=should_update_score)
 
             if self.aliens.objects_dead():
                 self.stage_update()
@@ -75,6 +78,7 @@ class Controller:
             self.walls.reset()
 
             self.stage_number += 1
+            self.upgrade_points += 1
 
             self.aliens.create_objects_matrix(line=3, column=5)
             self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)

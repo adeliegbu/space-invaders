@@ -10,6 +10,7 @@ class Alien_ship(Ship):
         self.projectile_image = projectile_image
         self.level = 1
         self.doctor = False
+        self.bonus = False
         self.upgrade_choices = ["cooldown", "cooldown_rafale", "damage", "power", "rafale"]
         self.upgrade_weights = [0.4, 0.15, 0.05, 0.3, 0.1]
     
@@ -23,10 +24,10 @@ class Alien_ship(Ship):
             self.change_weapon(choice(["assault", "rafale", "machine_gun", "sniper", "tank"]))
 
         if self.level % 3 == 0:
-            self.life += 1
+            super().upgrade_one_caracteristic("life")
 
         upgrade_choiced = choices(self.upgrade_choices, self.upgrade_weights, k=1)[0]
-        self.weapon.upgrade_one_caracteristic(upgrade_choiced)
+        super().upgrade_one_caracteristic(upgrade_choiced)
     
     def become_doctor(self):
         self.change_weapon("weapon_less")

@@ -7,6 +7,7 @@ class Bonus_ship(Ship):
         self.projectile_class = projectile_class
         self.projectile_image = projectile_image
         self.doctor = False
+        self.bonus = True
         self.level = 20
         self.change_weapon()
     

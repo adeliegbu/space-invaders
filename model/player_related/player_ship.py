@@ -14,12 +14,7 @@ class Player_ship(Ship):
     
     def change_weapon(self, wepon_type):
         super().change_weapon(wepon_type, "player")
-    
-    def new_life(self):
-        self.life += 1
-        if self.life > 5:
-            self.life = 5
-    
+
     def become_doctor(self):
         return None
 

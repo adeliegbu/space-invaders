@@ -16,3 +16,11 @@ class Ship(Object):
 
     def update_weapon(self):
         self.weapon.update()
+    
+    def upgrade_one_caracteristic(self, caracteristic):
+        if caracteristic == "life":
+            self.life += 1
+        elif caracteristic == "speed":
+            self.x_speed += 1
+        else:
+            self.weapon.upgrade_one_caracteristic(caracteristic)

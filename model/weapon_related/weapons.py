@@ -102,6 +102,7 @@ class Weapons():
         self.current_rafale = 0
         self.current_munitions = self.munitions
         self.reloading = False
+        self.auto_reload = False
 
     def shoot(self):
         x, y = self.shooter.get_position()
@@ -129,19 +130,12 @@ class Weapons():
                 self.cooldown_reload.reset()
     
     def upgrade_cooldown(self):
-        if self.type[1] == "alien" and self.cooldown_reload.time > 200:
-            self.cooldown_reload.change(self.cooldown_reload.time - 200)
-
         if self.cooldown.time > 30:
             self.cooldown.change(self.cooldown.time - 30)
     
     def upgrade_cooldown_reload(self):
         if self.cooldown_reload.time > 50:
             self.cooldown_reload.change(self.cooldown_reload.time - 50)
-    
-    def upgrade_cooldown_rafale(self):
-        if self.cooldown_rafale.time > 15:
-            self.cooldown_rafale.change(self.cooldown_rafale.time - 15)
     
     def upgrade_damage(self):
         if self.type[1] == "alien" or self.type[0] == "machine_gun":
@@ -166,8 +160,6 @@ class Weapons():
             self.upgrade_cooldown()
         elif caracteristic == "cooldown_reload":
             self.upgrade_cooldown_reload()
-        elif caracteristic == "cooldown_rafale":
-            self.upgrade_cooldown_rafale()
         elif caracteristic == "damage":
             self.upgrade_damage()
         elif caracteristic == "power":
@@ -178,16 +170,21 @@ class Weapons():
             self.upgrade_rafale()
         elif caracteristic == "munitions":
             self.upgrade_munitions()
+        elif caracteristic == "auto_reload":
+            self.auto_reload = True
 
     def update(self):
         self.cooldown_rafale.update()
         if self.rafale == 1 or self.current_rafale == self.rafale:
             self.cooldown.update()
             if self.cooldown.ended() and self.current_rafale == self.rafale:
-                self.current_rafale = 0
-                self.cooldown.reset()
+                    self.current_rafale = 0
+                    self.cooldown.reset()
 
-        if 0 < self.current_rafale:     # Si le joueur commence une rafale
+        if self.current_munitions == 0 and self.auto_reload:
+            self.reload()
+
+        if 0 < self.current_rafale:     # Si le joueur commence une rafale elle se termine automatiquement
             self.shoot()
 
         if self.reloading:

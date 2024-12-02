@@ -70,12 +70,10 @@ class View:
         characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-"
         for char in characters:
             self.font_images[char] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-{char}.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
-        self.font_images["doublepoint"] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-doublepoint.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
+        self.font_images[":"] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-doublepoint.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
 
         self.lives_images_list = [None] * 5
-        self.score_image_list = [None] * 5
-
-        self.image_score = [] # cache pour stocker les références aux images et éviter qu'elles ne soient supprimées par le garbage collector
+        self.image_score = []
 
 
     def new_game(self):
@@ -88,6 +86,7 @@ class View:
         self.button_options.place_forget()
 
         self.controller.new_game()
+        self.update(should_update_lives=True, should_update_score=True)
 
     def rules(self):
         self.button_new_game.place_forget()
@@ -149,9 +148,9 @@ class View:
         if should_update_lives:
             self.display_lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
         if should_update_score:
-            for image in self.image_score:
-                self.canvas.delete(image)
-            self.display_font_text(f"Score : {self.controller.score}", size=40, pad_x=2, pad_y=0, x= 20, y=20)
+            if self.image_score:
+                self.hide_image_list(self.image_score[0])
+            self.image_score = self.display_font_text(f"Score : {self.controller.score}", size=30, pad_x=2, pad_y=0, x= 20, y=20)
 
     def display_font_text(self, text, size, pad_x, pad_y, x, y):
         text_ids = [[]]
@@ -161,9 +160,7 @@ class View:
                 text_ids[i].append(None)
             elif c == "\n":
                 text_ids.append([])
-                i += 1
-            elif c == ":":
-                text_ids[i].append(self.font_images["doublepoint"][size // 15 - 1])     
+                i += 1   
             else:
                 c = c.upper()
                 text_ids[i].append(self.font_images[c][size // 15 - 1])
