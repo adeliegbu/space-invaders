@@ -106,7 +106,7 @@ class View:
         self.hide_image_list(self.lives_images_list)
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
         # self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
-        self.logo_id = self.display_font_text("space invaders", size=75, pad_x=3, pad_y=10, x=self.x0 // 2, y=self.y0 // 2.5)
+        self.logo_id = self.display_font_text("space invaders", size=75, pad_x=3, pad_y=10, x=self.x0 // 3 + 50, y=self.y0 // 2.5)
 
     def leave(self):
         self.fenetre.quit()
