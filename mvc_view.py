@@ -74,6 +74,7 @@ class View:
 
         self.lives_images_list = [None] * 5
         self.image_score = []
+        self.image_stage = []
 
 
     def new_game(self):
@@ -154,7 +155,7 @@ class View:
         if should_update_stage:
             if self.image_stage:
                 self.hide_image_list(self.image_stage[0])
-            self.image_stage = self.display_font_text(f"Stage : {self.controller.stage_number}", size=30, pad_x=2, pad_y=0, x= self.x0 - 50, y=20)
+            self.image_stage = self.display_font_text(f"Stage : {self.controller.stage_number}", size=30, pad_x=2, pad_y=0, x=self.x0 - 100, y=20)
 
     def display_font_text(self, text, size, pad_x, pad_y, x, y):
         text_ids = [[]]
