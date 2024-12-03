@@ -21,3 +21,4 @@ from model.binds import Binds
 from model.settings_related.settings import Settings
 from model.settings_related.p1_settings import P1_settings
 from model.weapon_related.weapons import Weapons
+from model.settings_related.upgrade_settings import Upgrade_settings

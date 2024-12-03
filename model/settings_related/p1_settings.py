@@ -10,3 +10,6 @@ class P1_settings(Settings):
     def get_choiced_player1_projectile_image(self):
         return self.view.projectile_player_images[self.choiced_index]
 
+    def next_upgrade(self):
+        return self.controller.upgrade_points
+

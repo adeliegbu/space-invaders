@@ -94,7 +94,7 @@ class View:
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
-        self.display_font_text(rules_text, size=15, pad_x=0, pad_y=10, x=0, y=self.y0)
+        self.display_font_text(rules_text, alignment="left", size=15, pad_x=0, pad_y=10, x=0, y=self.y0)
 
     def menu(self):
         self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
@@ -106,7 +106,7 @@ class View:
         self.hide_image_list(self.lives_images_list)
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
         # self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
-        self.logo_id = self.display_font_text("space invaders", size=75, pad_x=3, pad_y=10, x=self.x0 // 3 + 50, y=self.y0 // 2.5)
+        self.logo_id = self.display_font_text("space invaders", alignment="center", size=75, pad_x=0, pad_y=10, x=self.x0, y=self.y0 // 2.5)
 
     def leave(self):
         self.fenetre.quit()
@@ -151,13 +151,13 @@ class View:
         if should_update_score:
             if self.image_score:
                 self.hide_image_list(self.image_score[0])
-            self.image_score = self.display_font_text(f"Score : {self.controller.score}", size=30, pad_x=2, pad_y=0, x= 20, y=20)
+            self.image_score = self.display_font_text(f"Score : {self.controller.score}", alignment="left", size=30, pad_x=2, pad_y=0, x= 20, y=20)
         if should_update_stage:
             if self.image_stage:
                 self.hide_image_list(self.image_stage[0])
-            self.image_stage = self.display_font_text(f"Stage : {self.controller.stage_number}", size=30, pad_x=2, pad_y=0, x=self.x0 - 100, y=20)
+            self.image_stage = self.display_font_text(f"Stage : {self.controller.stage_number}", alignment="center",size=30, pad_x=2, pad_y=0, x=self.x0, y=20)
 
-    def display_font_text(self, text, size, pad_x, pad_y, x, y):
+    def display_font_text(self, text, alignment, size, pad_x, pad_y, x, y):
         text_ids = [[]]
         i = 0
         for c in text:
@@ -166,13 +166,23 @@ class View:
             elif c == "\n":
                 text_ids.append([])
                 i += 1   
-            else:
+            elif c in self.font_images or c.upper() in self.font_images:
                 c = c.upper()
                 text_ids[i].append(self.font_images[c][size // 15 - 1])
+            else:
+                raise ValueError(f"Caractère {c} non reconnu")
+
+            line_width = (size + pad_x) * (len(text_ids[i]) - 1)
+            if alignment == "center":
+                offset_x = x - line_width // 2
+            elif alignment == "right":
+                offset_x = x - line_width
+            else:  # default to left alignment
+                offset_x = x
 
         for i in range(len(text_ids)):
             for j in range(len(text_ids[i])):
                 if text_ids[i][j] is not None:
-                    text_ids[i][j] = self.canvas.create_image(x + ((size + pad_x) * j), y + ((size + pad_y) * i), image=text_ids[i][j], anchor="center")
+                    text_ids[i][j] = self.canvas.create_image(offset_x + ((size + pad_x) * j), y + ((size + pad_y) * i), image=text_ids[i][j], anchor="center")
 
         return text_ids
