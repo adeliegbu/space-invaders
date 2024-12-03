@@ -46,7 +46,7 @@ class Controller:
                 should_update_score = True
                 if alien.doctor:
                     for players in self.players.objects_list:
-                        players.new_life()
+                        players.upgrade_one_caracteristic("life")
                 if alien.bonus:
                     self.upgrade_points += 1
 
@@ -84,7 +84,7 @@ class Controller:
             self.aliens.create_objects_matrix(line=3, column=5)
             self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
             self.aliens.increase_speed(self.stage_number - 1)
-            self.walls.add_object(self.view.screen_height * 4 // 5, 2)
+            self.walls.add_object(self.view.screen_height * 15 // 20, 2)
             self.players.reset_weapons()
             
     def menu_update(self):
