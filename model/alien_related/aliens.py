@@ -20,7 +20,7 @@ class Aliens(Group_object):
     def create_objects_matrix(self, line, column):
         temporary = Alien_ship(self.canvas, 0, 0, self.image, self.refresh_rate, self.projectile_class, self.aliens_projectile_image)
         temporary.delete()
-        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 3 * temporary.height, line=line, column=column, pad_x=60, pad_y= 20, image=self.image, projectile_class=self.projectile_class, projectile_image=self.aliens_projectile_image)
+        super().create_objects_matrix(Alien_ship, self.canvas.winfo_screenwidth() // 2, 4 * temporary.height, line=line, column=column, pad_x=60, pad_y= 20, image=self.image, projectile_class=self.projectile_class, projectile_image=self.aliens_projectile_image)
 
     def move(self):
         if self.should_change_direction():

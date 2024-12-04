@@ -1,4 +1,4 @@
-from mvc_model import Players, Aliens, Cooldown, Walls, Players_projectiles, Aliens_projectiles, Binds, P1_settings, Weapons, Upgrade_settings
+from mvc_model import Players, Aliens, Walls, Players_projectiles, Aliens_projectiles, Binds, Upgrade_settings
 from mvc_view import View
 
 class Controller:
@@ -22,7 +22,6 @@ class Controller:
 
         self.binds = Binds(self.view.canvas)
 
-        self.p1_settings = P1_settings(self.view)
         self.upgrade_settings = Upgrade_settings()
 
         self.should_game_update = False
@@ -67,6 +66,7 @@ class Controller:
                 self.view.update(should_update_lives=True, should_update_score=should_update_score, should_update_stage=False, should_update_upgrade_points=False)
 
             if self.aliens.objects_dead():
+                self.should_stage_update = True
                 self.stage_update()
 
             if self.players.objects_dead():
@@ -85,37 +85,49 @@ class Controller:
                 self.players.reset_weapons()
 
                 self.stage_number += 1
-                self.upgrade_points += 1
 
-                self.binds.change_current_binds_dico(self.binds.upgrade_binds_dico) # Change les binds pour les binds de l'upgrade
-
-                self.view.update(None, None, should_update_stage=True, should_update_upgrade_points=True)
+                self.view.update(None, None, should_update_stage=True, should_update_upgrade_points=None)
 
                 if self.stage_number > 1:
-                    self.view.display_upgrade_cards()
+                    self.binds.change_current_binds_dico(self.binds.upgrade_binds_dico) # Change les binds pour les binds de l'upgrade
+                    self.upgrade_points += 1
+                    self.view.update(None, None, None, should_update_upgrade_points=True)
+                    self.view.display_upgrade_stage()
                     self.upgrade_settings.choosing = True
                 else:
                     self.next_stage()
-                
 
-            elif self.stage_number > 1:
+            if self.stage_number > 1:
                 self.binds.execute_active_binds()
+                self.view.display_choosing_card()
                 if self.upgrade_settings.choosing:
                     self.canvas.after(self.refresh_rate, self.stage_update)
                 else:
-                    self.next_stage()
-                    self.view.hide_image_list(self.view.image_upgrade_cards)
+                    if self.upgrade_points >= self.upgrade_settings.choiced_price():
+                        self.upgrade_points -= self.upgrade_settings.choiced_price()
+                        self.p1.upgrade_one_caracteristic(self.upgrade_settings.get_choiced_option())
+                        self.next_stage()
+                    else:
+                        self.upgrade_settings.choosing = True
+                        self.canvas.after(self.refresh_rate, self.stage_update)
 
     def next_stage(self):
-            self.aliens.create_objects_matrix(line=3, column=5)
-            self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
-            self.aliens.increase_speed(self.stage_number - 1)
-            self.walls.add_object(self.view.screen_height * 15 // 20, 2)
-            self.should_stage_update = False
-            self.should_game_update = True
-            self.binds.change_current_binds_dico(self.binds.game_binds_dico)
-            self.game_update()
-            
+        self.should_stage_update = False
+        self.upgrade_settings.choosing = False
+        self.upgrade_settings.reset_option()
+        self.view.cards_choosing_index = 0
+        self.view.hide_image_list(self.view.image_upgrade_cards)
+        self.view.hide_image_list(self.view.upgrade_text)
+        self.view.image_upgrade_cards = []
+        self.aliens.create_objects_matrix(line=3, column=5)
+        self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
+        self.aliens.increase_speed(self.stage_number - 1)
+        self.walls.add_object(self.view.screen_height * 15 // 20, 2)
+        self.should_game_update = True
+        self.binds.change_current_binds_dico(self.binds.game_binds_dico)
+        self.view.update(None, None, should_update_stage=True, should_update_upgrade_points=True)
+        self.game_update()
+        
     def menu_update(self):
         if self.should_menu_update:
             self.binds.execute_active_binds()
@@ -125,7 +137,7 @@ class Controller:
     def new_game(self):
         self.should_game_update = True
         self.should_menu_update = False
-        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_machinegun_image_red, self.view.projectile_player_image_red, weapon_type="machine_gun") 
+        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_image_green, self.view.projectile_player_image_red, weapon_type="rafale") 
         self.p1 = self.players.define_player(1)
         self.p2 = self.players.define_player(2)
 
@@ -136,10 +148,13 @@ class Controller:
     
     def go_to_menu(self):
         self.should_game_update = False
+        self.should_stage_update = False
         self.should_menu_update = True
         self.stage_number = 0
         self.score = 0
         self.reset()
+        self.binds.reset_binds()
+        self.binds.change_current_binds_dico(self.binds.menu_binds_dico)
         self.aliens.reset_number_alien_killed()
         self.view.menu()
         self.menu_update()
@@ -147,8 +162,10 @@ class Controller:
     def default_binds(self):
         self.binds.add_bind((self.upgrade_settings.next_option, False), "Right", self.binds.upgrade_binds_dico)
         self.binds.add_bind((self.upgrade_settings.prev_option, False), "Left", self.binds.upgrade_binds_dico)
-        self.binds.add_bind((self.upgrade_settings.get_choiced_upgrade, False), "Return", self.binds.upgrade_binds_dico)
-    
+        self.binds.add_bind((self.upgrade_settings.chose_option, False), "Up", self.binds.upgrade_binds_dico)
+        self.binds.add_bind((self.next_stage, False), "Down", self.binds.upgrade_binds_dico)
+        self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.game_binds_dico)
+
     def game_binds(self):
         self.binds.add_bind((self.p1.move_left, True), "q", self.binds.game_binds_dico)
         self.binds.add_bind((self.p1.move_right, True), "d", self.binds.game_binds_dico)

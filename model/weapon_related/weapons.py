@@ -89,7 +89,7 @@ class Weapons():
                 self.damage = 0.5
             self.cooldown.change(4000)
             if self.rafale > 1:
-                self.cooldown_rafale.add_offset(randint(0, 4000))
+                self.cooldown_rafale = Cooldown(75, refresh_rate, randint(0, 4000))
             else:
                 self.cooldown.add_offset(randint(0, 4000))
 
@@ -172,6 +172,7 @@ class Weapons():
             self.upgrade_munitions()
         elif caracteristic == "auto_reload":
             self.auto_reload = True
+        self.reset()
 
     def update(self):
         self.cooldown_rafale.update()

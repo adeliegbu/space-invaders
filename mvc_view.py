@@ -8,7 +8,7 @@ class View:
         self.controller = controller
 
         self.fenetre = tk.Tk()
-        self.fenetre.attributes("-fullscreen", False)
+        self.fenetre.attributes("-fullscreen", True)
 
         self.screen_width = self.fenetre.winfo_screenwidth()
         self.screen_height = self.fenetre.winfo_screenheight()
@@ -75,14 +75,16 @@ class View:
         self.upgrade_images = {}
         upgrades = ["cooldown", "cooldown_reload", "damage", "power", "rafale", "imprecision", "munitions", "speed", "life", "auto_reload"]
         for upgrade in upgrades:
-            self.upgrade_images[upgrade] = ImageTk.PhotoImage(Image.open(f"visuel/upgrade_cards/up_{upgrade}.png").resize((100, 200), Image.LANCZOS))
+            self.upgrade_images[upgrade] = ImageTk.PhotoImage(Image.open(f"visuel/upgrade_cards/up_{upgrade}.png").resize((125, 200), Image.LANCZOS))
 
         self.lives_images_list = [None] * 5
         self.image_score = []
         self.image_stage = []
         self.image_upgrade_points = []
         self.image_upgrade_cards = []
-
+        self.cards_choosing_index = 0
+        self.upgrade_text = []
+        self.binds_overlay = []
 
     def new_game(self):
         self.overlay_reset()
@@ -92,6 +94,7 @@ class View:
         self.button_leave.place_forget()
         self.button_menu.place_forget()
         self.button_options.place_forget()
+        self.binds_overlay = self.display_font_text("Echap : menu\nc : cheats", alignment="right", size=30, pad_x=2, pad_y=10, x=self.screen_width - 20, y= 20)
 
         self.controller.new_game()
         self.update(should_update_lives=True, should_update_score=True, should_update_stage=True, should_update_upgrade_points=False)
@@ -101,7 +104,7 @@ class View:
         self.button_rules.place_forget()
         self.button_leave.place_forget()
         self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
-        self.display_font_text(rules_text, alignment="left", size=15, pad_x=0, pad_y=10, x=0, y=self.y0)
+        self.display_font_text(rules_text, alignment="left", size=15, pad_x=0, pad_y=10, x=0, y=self.y0 // 2)
 
     def menu(self):
         self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
@@ -114,6 +117,7 @@ class View:
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
         # self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
         self.logo_id = self.display_font_text("space invaders", alignment="center", size=75, pad_x=0, pad_y=10, x=self.x0, y=self.y0 // 2.5)
+        self.hide_image_list(self.binds_overlay)
 
     def leave(self):
         self.fenetre.quit()
@@ -127,11 +131,17 @@ class View:
         self.button_options.place_forget()
     
     def hide_image_list(self, image_list):
-        for image_id in image_list:
-            self.canvas.delete(image_id)
+        if image_list:
+            if isinstance(image_list[0], list):
+                for sublists in image_list:
+                    for image_id in sublists:
+                        self.canvas.delete(image_id)
+            else:
+                for image_id in image_list:
+                    self.canvas.delete(image_id)
     
     def show_image_list(self, image_list):
-        for image_id in image_list:
+        for image_id in [item for sublist in image_list for item in sublist]:
             self.canvas.itemconfigure(image_id, state="normal")
     
     def overlay_reset(self):
@@ -157,16 +167,16 @@ class View:
             self.display_lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
         if should_update_score:
             if self.image_score:
-                self.hide_image_list(self.image_score[0])
+                self.hide_image_list(self.image_score)
             self.image_score = self.display_font_text(f"Score : {self.controller.score}", alignment="left", size=30, pad_x=2, pad_y=0, x= 20, y=20)
         if should_update_stage:
             if self.image_stage:
-                self.hide_image_list(self.image_stage[0])
+                self.hide_image_list(self.image_stage)
             self.image_stage = self.display_font_text(f"Stage : {self.controller.stage_number}", alignment="center",size=30, pad_x=2, pad_y=0, x=self.x0, y=20)
         if should_update_upgrade_points:
             if self.image_upgrade_points:
-                self.hide_image_list(self.image_upgrade_points[0])
-            self.image_upgrade_points = self.display_font_text(f"up : {self.controller.upgrade_points}", alignment="right", size=30, pad_x=2, pad_y=0, x=self.screen_width - 20, y=20)
+                self.hide_image_list(self.image_upgrade_points)
+            self.image_upgrade_points = self.display_font_text(f"sp : {self.controller.upgrade_points}", alignment="left", size=30, pad_x=2, pad_y=0, x=20, y=60)
 
     def display_font_text(self, text, alignment, size, pad_x, pad_y, x, y):
         text_ids = [[]]
@@ -183,6 +193,7 @@ class View:
             else:
                 raise ValueError(f"Caractère {c} non reconnu")
 
+        for i in range(len(text_ids)):
             line_width = (size + pad_x) * (len(text_ids[i]) - 1)
             if alignment == "center":
                 offset_x = x - line_width // 2
@@ -190,16 +201,22 @@ class View:
                 offset_x = x - line_width
             else:  # default to left alignment
                 offset_x = x
-
-        for i in range(len(text_ids)):
             for j in range(len(text_ids[i])):
                 if text_ids[i][j] is not None:
                     text_ids[i][j] = self.canvas.create_image(offset_x + ((size + pad_x) * j), y + ((size + pad_y) * i), image=text_ids[i][j], anchor="center")
 
         return text_ids
 
-    def display_upgrade_cards(self):
+    def display_upgrade_stage(self):
         i = 0
         for image in self.upgrade_images.values():
             self.image_upgrade_cards.append(self.canvas.create_image(self.screen_width // 2  + (i % 5 - 2) * 150, self.screen_height * (i // 5  + 2) // 5, image=image, anchor="center"))
             i += 1
+        self.canvas.move(self.image_upgrade_cards[0], 0, 30)
+        self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nup pour valider\ndown pour ne rien choisir", alignment="center", size=30, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
+    
+    def display_choosing_card(self):
+        if self.cards_choosing_index != self.controller.upgrade_settings.get_choiced_index():
+            self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index], 0, -30)
+            self.cards_choosing_index = self.controller.upgrade_settings.get_choiced_index()
+            self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index], 0, 30)

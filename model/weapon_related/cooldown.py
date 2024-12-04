@@ -6,7 +6,7 @@ class Cooldown:
         self.time = time + offset
         self.refresh_rate = refresh_rate
         self.offset = offset
-        self.var = offset
+        self.var = 0
 
     def get_progression(self):
         if self.time - self.offset > 0:
