@@ -1,10 +1,26 @@
 from model.parents_class.object import Object
+from model.weapon_related.weapons import Weapons
 
 class Ship(Object):
-    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, image):
-        super().__init__(canvas, x, y, x_speed, y_speed, width, height, life, image)
+    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, damage, image, refresh_rate):
+        super().__init__(canvas, x, y, x_speed, y_speed, width, height, life, damage, image, refresh_rate)
+        self.weapon = None
+        self.refresh_rate = refresh_rate
 
-    def shoot(self, cooldown, projectile_class, height):
-        if cooldown.ended():
-            projectile_class.add_object(self.x, self.y - height * self.height)
-            cooldown.reset()
+    def shoot(self):
+        if self.weapon is not None:
+            self.weapon.shoot()
+    
+    def change_weapon(self, wepon_type, shooter_type):
+        self.weapon = Weapons(self, (wepon_type, shooter_type), self.projectile_class, self.projectile_image)
+
+    def update_weapon(self):
+        self.weapon.update()
+    
+    def upgrade_one_caracteristic(self, caracteristic):
+        if caracteristic == "life":
+            self.life += 1
+        elif caracteristic == "speed":
+            self.x_speed += 1
+        else:
+            self.weapon.upgrade_one_caracteristic(caracteristic)
