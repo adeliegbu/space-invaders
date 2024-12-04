@@ -8,7 +8,7 @@ class View:
         self.controller = controller
 
         self.fenetre = tk.Tk()
-        self.fenetre.attributes("-fullscreen", True)
+        self.fenetre.attributes("-fullscreen", False)
 
         self.screen_width = self.fenetre.winfo_screenwidth()
         self.screen_height = self.fenetre.winfo_screenheight()
@@ -72,9 +72,16 @@ class View:
             self.font_images[char] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-{char}.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
         self.font_images[":"] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-doublepoint.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
 
+        self.upgrade_images = {}
+        upgrades = ["cooldown", "cooldown_reload", "damage", "power", "rafale", "imprecision", "munitions", "speed", "life", "auto_reload"]
+        for upgrade in upgrades:
+            self.upgrade_images[upgrade] = ImageTk.PhotoImage(Image.open(f"visuel/upgrade_cards/up_{upgrade}.png").resize((100, 200), Image.LANCZOS))
+
         self.lives_images_list = [None] * 5
         self.image_score = []
         self.image_stage = []
+        self.image_upgrade_points = []
+        self.image_upgrade_cards = []
 
 
     def new_game(self):
@@ -87,7 +94,7 @@ class View:
         self.button_options.place_forget()
 
         self.controller.new_game()
-        self.update(should_update_lives=True, should_update_score=True, should_update_stage=True)
+        self.update(should_update_lives=True, should_update_score=True, should_update_stage=True, should_update_upgrade_points=False)
 
     def rules(self):
         self.button_new_game.place_forget()
@@ -145,7 +152,7 @@ class View:
             else:
                 self.lives_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_dead_image, anchor="center")
     
-    def update(self, should_update_lives, should_update_score, should_update_stage):
+    def update(self, should_update_lives, should_update_score, should_update_stage, should_update_upgrade_points):
         if should_update_lives:
             self.display_lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
         if should_update_score:
@@ -156,6 +163,10 @@ class View:
             if self.image_stage:
                 self.hide_image_list(self.image_stage[0])
             self.image_stage = self.display_font_text(f"Stage : {self.controller.stage_number}", alignment="center",size=30, pad_x=2, pad_y=0, x=self.x0, y=20)
+        if should_update_upgrade_points:
+            if self.image_upgrade_points:
+                self.hide_image_list(self.image_upgrade_points[0])
+            self.image_upgrade_points = self.display_font_text(f"up : {self.controller.upgrade_points}", alignment="right", size=30, pad_x=2, pad_y=0, x=self.screen_width - 20, y=20)
 
     def display_font_text(self, text, alignment, size, pad_x, pad_y, x, y):
         text_ids = [[]]
@@ -186,3 +197,9 @@ class View:
                     text_ids[i][j] = self.canvas.create_image(offset_x + ((size + pad_x) * j), y + ((size + pad_y) * i), image=text_ids[i][j], anchor="center")
 
         return text_ids
+
+    def display_upgrade_cards(self):
+        i = 0
+        for image in self.upgrade_images.values():
+            self.image_upgrade_cards.append(self.canvas.create_image(self.screen_width // 2  + (i % 5 - 2) * 150, self.screen_height * (i // 5  + 2) // 5, image=image, anchor="center"))
+            i += 1
