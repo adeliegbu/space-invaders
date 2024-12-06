@@ -1,6 +1,3 @@
-from typing import Any
-
-
 class Cooldown:
     def __init__(self, time, refresh_rate, offset):
         self.time = time + offset

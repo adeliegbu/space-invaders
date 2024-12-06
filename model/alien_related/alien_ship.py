@@ -30,7 +30,6 @@ class Alien_ship(Ship):
         super().upgrade_one_caracteristic(upgrade_choiced)
     
     def become_doctor(self):
-        self.change_weapon("weapon_less")
         self.doctor = True
     
     def dead(self):

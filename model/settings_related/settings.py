@@ -26,3 +26,6 @@ class Settings:
     def chose_option(self):
         self.choosing = False
     
+    def chose_none(self):
+        self.choosing = None
+    

@@ -67,15 +67,19 @@ class View:
 
         # Chargement des images de la police
         self.font_images = {}
-        characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-"
+        characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-+"
         for char in characters:
             self.font_images[char] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-{char}.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
         self.font_images[":"] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-doublepoint.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
 
         self.upgrade_images = {}
         upgrades = ["cooldown", "cooldown_reload", "damage", "power", "rafale", "imprecision", "munitions", "speed", "life", "auto_reload"]
+        upgrade_prices = [2, 1, 4, 2, 5, 2, 3, 1, 7, 3]
+        upgrade_texts = ["-30 cooldown", "-50 cooldown\nreload", "+1 damage", "+2 power", "+1 rafale", "+3 precision", "+3 munitions", "+1 speed", "+1 life", "auto reload"]
+        i = 0
         for upgrade in upgrades:
-            self.upgrade_images[upgrade] = ImageTk.PhotoImage(Image.open(f"visuel/upgrade_cards/up_{upgrade}.png").resize((125, 200), Image.LANCZOS))
+            self.upgrade_images[upgrade] = [ImageTk.PhotoImage(Image.open(f"visuel/upgrade_cards/up_{upgrade}.png").resize((125, 200), Image.LANCZOS)), upgrade_prices[i], upgrade_texts[i]]
+            i += 1
 
         self.lives_images_list = [None] * 5
         self.image_score = []
@@ -94,10 +98,10 @@ class View:
         self.button_leave.place_forget()
         self.button_menu.place_forget()
         self.button_options.place_forget()
-        self.binds_overlay = self.display_font_text("Echap : menu\nc : cheats", alignment="right", size=30, pad_x=2, pad_y=10, x=self.screen_width - 20, y= 20)
+        self.binds_overlay = self.display_font_text("menu:Echap\ncheats:c", alignment="right", size=30, pad_x=2, pad_y=10, x=self.screen_width - 20, y= 20)
 
         self.controller.new_game()
-        self.update(should_update_lives=True, should_update_score=True, should_update_stage=True, should_update_upgrade_points=False)
+        self.update(should_update_lives=True, should_update_score=True, should_update_stage=True, should_update_skill_points=False)
 
     def rules(self):
         self.button_new_game.place_forget()
@@ -131,15 +135,12 @@ class View:
         self.button_options.place_forget()
     
     def hide_image_list(self, image_list):
-        if image_list:
-            if isinstance(image_list[0], list):
-                for sublists in image_list:
-                    for image_id in sublists:
-                        self.canvas.delete(image_id)
-            else:
-                for image_id in image_list:
-                    self.canvas.delete(image_id)
-    
+        for i in range (len(image_list)):
+            if isinstance(image_list[i], list):
+                self.hide_image_list(image_list[i])
+            elif image_list[i] is not None:
+                self.canvas.delete(image_list[i])
+
     def show_image_list(self, image_list):
         for image_id in [item for sublist in image_list for item in sublist]:
             self.canvas.itemconfigure(image_id, state="normal")
@@ -162,21 +163,21 @@ class View:
             else:
                 self.lives_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_dead_image, anchor="center")
     
-    def update(self, should_update_lives, should_update_score, should_update_stage, should_update_upgrade_points):
+    def update(self, should_update_lives, should_update_score, should_update_stage, should_update_skill_points):
         if should_update_lives:
             self.display_lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
         if should_update_score:
             if self.image_score:
                 self.hide_image_list(self.image_score)
-            self.image_score = self.display_font_text(f"Score : {self.controller.score}", alignment="left", size=30, pad_x=2, pad_y=0, x= 20, y=20)
+            self.image_score = self.display_font_text(f"Score:{self.controller.score}", alignment="left", size=30, pad_x=2, pad_y=0, x= 20, y=20)
         if should_update_stage:
             if self.image_stage:
                 self.hide_image_list(self.image_stage)
-            self.image_stage = self.display_font_text(f"Stage : {self.controller.stage_number}", alignment="center",size=30, pad_x=2, pad_y=0, x=self.x0, y=20)
-        if should_update_upgrade_points:
+            self.image_stage = self.display_font_text(f"Stage:{self.controller.stage_number}", alignment="center",size=30, pad_x=2, pad_y=0, x=self.x0, y=20)
+        if should_update_skill_points:
             if self.image_upgrade_points:
                 self.hide_image_list(self.image_upgrade_points)
-            self.image_upgrade_points = self.display_font_text(f"sp : {self.controller.upgrade_points}", alignment="left", size=30, pad_x=2, pad_y=0, x=20, y=60)
+            self.image_upgrade_points = self.display_font_text(f"sp:{self.controller.skill_points}", alignment="left", size=30, pad_x=2, pad_y=0, x=20, y=60)
 
     def display_font_text(self, text, alignment, size, pad_x, pad_y, x, y):
         text_ids = [[]]
@@ -209,14 +210,15 @@ class View:
 
     def display_upgrade_stage(self):
         i = 0
-        for image in self.upgrade_images.values():
-            self.image_upgrade_cards.append(self.canvas.create_image(self.screen_width // 2  + (i % 5 - 2) * 150, self.screen_height * (i // 5  + 2) // 5, image=image, anchor="center"))
+        for upgrade in self.upgrade_images.values():
+            self.image_upgrade_cards.append(self.canvas.create_image(self.screen_width * (i % 5 + 2) / 8, self.screen_height * (((i // 5 * 2) + 4) / 9) + 50, image=upgrade[0], anchor="center"))
+            self.image_upgrade_cards.append(self.display_font_text(f"prix:{upgrade[1]}sp", alignment="center", size=15, pad_x=2, pad_y=10, x=self.screen_width * (i % 5 + 2) / 8, y=self.screen_height * (((i // 5 * 2) + 4) / 9) - 50))
             i += 1
         self.canvas.move(self.image_upgrade_cards[0], 0, 30)
-        self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nup pour valider\ndown pour ne rien choisir", alignment="center", size=30, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
+        self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nup pour valider\ndown pour passer au next stage", alignment="center", size=30, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
     
     def display_choosing_card(self):
         if self.cards_choosing_index != self.controller.upgrade_settings.get_choiced_index():
-            self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index], 0, -30)
+            self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index * 2], 0, -30)
             self.cards_choosing_index = self.controller.upgrade_settings.get_choiced_index()
-            self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index], 0, 30)
+            self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index * 2], 0, 30)
