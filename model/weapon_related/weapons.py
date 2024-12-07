@@ -1,24 +1,22 @@
 from random import randint, choice
-
 from model.weapon_related.cooldown import Cooldown
 
-class Weapons():
-    def __init__(self, shooter, type, projectle_class, projectile_image):
+class Weapons:
+    def __init__(self, shooter, type, projectile_class, projectile_image):
         self.shooter = shooter
         self.type = type
         refresh_rate = shooter.refresh_rate
 
-        if type[0] == "weapon_less":
-            self.cooldown = Cooldown(100 , refresh_rate, 0)
-            self.cooldown_reload = Cooldown(100 , refresh_rate, 0)
-            self.cooldown_rafale = Cooldown(100 , refresh_rate, 0)
-            self.damage = 0
-            self.power = 0
-            self.imprecision = 0
-            self.rafale = 0
-            self.munitions = 0
-            self.projectile_width = 0
-            self.projectile_height = 0
+        self.cooldown = Cooldown(100, refresh_rate, 0)
+        self.cooldown_reload = Cooldown(100, refresh_rate, 0)
+        self.cooldown_rafale = Cooldown(100, refresh_rate, 0)
+        self.damage = 0
+        self.power = 0
+        self.imprecision = 0
+        self.rafale = 0
+        self.munitions = 0
+        self.projectile_width = 0
+        self.projectile_height = 0
 
         if type[0] == "assault":
             self.cooldown = Cooldown(300, refresh_rate, 0)
@@ -84,20 +82,17 @@ class Weapons():
             self.imprecision += 2
             self.damage = 1
             self.munitions = 1000   # Munitions illimitées pour les aliens
+            self.cooldown.change(4000)
+            self.cooldown_rafale.add_offset(randint(0, 4000))
+            self.cooldown.add_offset(randint(0, 4000))
             if type[0] == "machine_gun":       # Les aliens ont une mitraillette modifiée à rafale
                 self.rafale = 5
-                self.damage = 0.5
-            self.cooldown.change(4000)
-            if self.rafale > 1:
-                self.cooldown_rafale.add_offset(randint(0, 4000))
-            else:
-                self.cooldown.add_offset(randint(0, 4000))
 
         elif type[1] == "bonus":
             self.cooldown = Cooldown(125, refresh_rate, 0)
             self.munitions = 1000
 
-        self.projectile_class = projectle_class
+        self.projectile_class = projectile_class
         self.projectile_image = projectile_image
         self.current_rafale = 0
         self.current_munitions = self.munitions

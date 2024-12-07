@@ -1,12 +1,9 @@
-from typing import Any
-
-
 class Cooldown:
     def __init__(self, time, refresh_rate, offset):
         self.time = time + offset
         self.refresh_rate = refresh_rate
         self.offset = offset
-        self.var = offset
+        self.var = 0
 
     def get_progression(self):
         if self.time - self.offset > 0:

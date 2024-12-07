@@ -71,9 +71,6 @@ class Binds:
     
     def reset_binds(self):
         self.game_binds_dico = {}
-        self.menu_binds_dico = {}
-        self.upgrade_binds_dico = {}
-        self.current_binds_dico = self.menu_binds_dico
         self.reset_active_binds()
 
         

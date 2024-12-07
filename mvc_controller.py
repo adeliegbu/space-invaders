@@ -1,4 +1,4 @@
-from mvc_model import Players, Aliens, Cooldown, Walls, Players_projectiles, Aliens_projectiles, Binds, P1_settings, Weapons, Upgrade_settings
+from mvc_model import Players, Aliens, Walls, Players_projectiles, Aliens_projectiles, Binds, Upgrade_settings
 from mvc_view import View
 
 class Controller:
@@ -22,13 +22,13 @@ class Controller:
 
         self.binds = Binds(self.view.canvas)
 
-        self.p1_settings = P1_settings(self.view)
         self.upgrade_settings = Upgrade_settings()
 
         self.should_game_update = False
         self.should_menu_update = True
+        self.should_stage_update = False
         self.stage_number = 0
-        self.upgrade_points = 0
+        self.skill_points = 0
 
     def game_update(self):
         if self.should_game_update:
@@ -50,7 +50,8 @@ class Controller:
                     for players in self.players.objects_list:
                         players.upgrade_one_caracteristic("life")
                 if alien.bonus:
-                    self.upgrade_points += 1
+                    self.skill_points += 1
+                    self.view.update(None, None, None, should_update_skill_points=True)
 
             self.players_projectiles.collision(self.walls)
             self.aliens_projectiles.collision(self.players)
@@ -62,9 +63,10 @@ class Controller:
             self.aliens.var_update()
 
             if self.p1 is not None:
-                self.view.update(should_update_lives=True, should_update_score=should_update_score, should_update_stage=False)
+                self.view.update(should_update_lives=True, should_update_score=should_update_score, should_update_stage=False, should_update_skill_points=False)
 
             if self.aliens.objects_dead():
+                self.should_stage_update = True
                 self.stage_update()
 
             if self.players.objects_dead():
@@ -73,25 +75,65 @@ class Controller:
             self.view.canvas.after(self.refresh_rate, self.game_update)
 
     def stage_update(self):
-        if self.aliens_projectiles.objects_dead():  # Transition entre les stages
-            self.aliens.reset()
-            self.players_projectiles.reset()
-            self.aliens_projectiles.reset()
-            self.walls.reset()
+        if self.aliens_projectiles.objects_dead() and self.should_stage_update:  # Transition entre les stages
+            self.should_game_update = False
+            if self.upgrade_settings.choosing is False and self.upgrade_settings.choosing is not None:
+                self.aliens.reset()
+                self.players_projectiles.reset()
+                self.aliens_projectiles.reset()
+                self.walls.reset()
+                self.players.reset_weapons()
 
-            self.stage_number += 1
-            self.upgrade_points += 1
+                self.stage_number += 1
 
-            self.binds.change_current_binds_dico(self.binds.upgrade_binds_dico) # Change les binds pour les binds de l'upgrade
+                self.view.update(None, None, should_update_stage=True, should_update_skill_points=None)
 
-            self.view.update(None, None, should_update_stage=True)
+                if self.stage_number > 1:
+                    self.binds.change_current_binds_dico(self.binds.upgrade_binds_dico) # Change les binds pour les binds de l'upgrade
+                    self.skill_points += 1
+                    self.view.update(None, None, None, should_update_skill_points=True)
+                    self.view.display_upgrade_stage()
+                    self.upgrade_settings.choosing = True
+                else:
+                    self.next_stage()
 
-            self.aliens.create_objects_matrix(line=3, column=5)
-            self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
-            self.aliens.increase_speed(self.stage_number - 1)
-            self.walls.add_object(self.view.screen_height * 15 // 20, 2)
-            self.players.reset_weapons()
-            
+            if self.stage_number > 1:
+                self.binds.execute_active_binds()
+                self.view.display_choosing_card()
+
+                if self.upgrade_settings.choosing:
+                    self.canvas.after(self.refresh_rate, self.stage_update)
+                elif self.upgrade_settings.choosing is None:
+                    self.next_stage()
+                elif self.skill_points >= self.upgrade_settings.choiced_price():
+                    self.skill_points -= self.upgrade_settings.choiced_price()
+                    self.p1.upgrade_one_caracteristic(self.upgrade_settings.get_choiced_option())
+                    self.view.update(None, None, None, should_update_skill_points=True)
+                    self.upgrade_settings.choosing = True
+                    self.canvas.after(self.refresh_rate, self.stage_update)
+                else:
+                    self.upgrade_settings.choosing = True
+                    self.canvas.after(self.refresh_rate, self.stage_update)
+
+    def next_stage(self):
+        self.should_stage_update = False
+        self.upgrade_settings.choosing = False
+        self.upgrade_settings.reset_option()
+        self.view.cards_choosing_index = 0
+        self.view.hide_image_list(self.view.image_upgrade_cards)
+        self.view.hide_image_list(self.view.upgrade_text)
+        self.view.image_upgrade_cards = []
+        
+        self.p1.weapon.reset()
+        self.aliens.create_objects_matrix(line=3, column=5)
+        self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
+        self.aliens.increase_speed(self.stage_number // 2)
+        self.walls.add_object(self.view.screen_height * 15 // 20, 2)
+        self.should_game_update = True
+        self.binds.change_current_binds_dico(self.binds.game_binds_dico)
+        self.view.update(None, None, should_update_stage=True, should_update_skill_points=True)
+        self.game_update()
+        
     def menu_update(self):
         if self.should_menu_update:
             self.binds.execute_active_binds()
@@ -106,18 +148,20 @@ class Controller:
         self.p2 = self.players.define_player(2)
 
         self.stage_number = 0
-        self.stage_update()
-
+        self.should_stage_update = True
         self.game_binds()
-        self.binds.change_current_binds_dico(self.binds.game_binds_dico)
-        self.game_update()
+        self.stage_update()
     
     def go_to_menu(self):
         self.should_game_update = False
+        self.should_stage_update = False
         self.should_menu_update = True
         self.stage_number = 0
+        self.skill_points = 0
         self.score = 0
         self.reset()
+        self.binds.reset_binds()
+        self.binds.change_current_binds_dico(self.binds.menu_binds_dico)
         self.aliens.reset_number_alien_killed()
         self.view.menu()
         self.menu_update()
@@ -125,8 +169,10 @@ class Controller:
     def default_binds(self):
         self.binds.add_bind((self.upgrade_settings.next_option, False), "Right", self.binds.upgrade_binds_dico)
         self.binds.add_bind((self.upgrade_settings.prev_option, False), "Left", self.binds.upgrade_binds_dico)
-        self.binds.add_bind((self.upgrade_settings.get_choiced_upgrade, False), "Return", self.binds.upgrade_binds_dico)
-    
+        self.binds.add_bind((self.upgrade_settings.chose_option, False), "Up", self.binds.upgrade_binds_dico)
+        self.binds.add_bind((self.upgrade_settings.chose_none, False), "Down", self.binds.upgrade_binds_dico)
+        self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.game_binds_dico)
+
     def game_binds(self):
         self.binds.add_bind((self.p1.move_left, True), "q", self.binds.game_binds_dico)
         self.binds.add_bind((self.p1.move_right, True), "d", self.binds.game_binds_dico)
@@ -134,10 +180,6 @@ class Controller:
         self.binds.add_bind((self.p1.weapon.reload, False), "r", self.binds.game_binds_dico)
         self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.game_binds_dico)
     
-    def next_stage(self):
-        self.stage_number += 1
-        self.view.update(None, None, should_update_stage=True)
-
     def reset(self):
         self.aliens.reset()
         self.players.reset()
@@ -150,7 +192,3 @@ class Controller:
         self.go_to_menu()
         self.default_binds()
         self.view.fenetre.mainloop()
-
-if __name__ == "__main__":
-    space_invaders = Controller()
-    space_invaders.run()
