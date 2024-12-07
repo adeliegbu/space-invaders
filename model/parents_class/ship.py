@@ -2,10 +2,11 @@ from model.parents_class.object import Object
 from model.weapon_related.weapons import Weapons
 
 class Ship(Object):
-    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, damage, image, refresh_rate):
+    def __init__(self, canvas, x, y, x_speed, y_speed, width, height, life, damage, image, refresh_rate, projectile_class, projectile_image):
         super().__init__(canvas, x, y, x_speed, y_speed, width, height, life, damage, image, refresh_rate)
         self.weapon = None
-        self.refresh_rate = refresh_rate
+        self.projectile_class = projectile_class
+        self.projectile_image = projectile_image
 
     def shoot(self):
         if self.weapon is not None:

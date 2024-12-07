@@ -9,14 +9,14 @@ class Controller:
         self.refresh_rate = 25
         self.score = 0
 
-        self.players_projectiles = Players_projectiles(self.view.canvas, self.refresh_rate, self.view.projectile_player_image_green)
-        self.aliens_projectiles = Aliens_projectiles(self.view.canvas, self.refresh_rate, self.view.projectile_alien)
+        self.players_projectiles = Players_projectiles(self.view.canvas, self.refresh_rate)
+        self.aliens_projectiles = Aliens_projectiles(self.view.canvas, self.refresh_rate)
 
         self.players = Players(self.view.canvas, self.refresh_rate, self.players_projectiles)
         self.players_number = 1
         self.p1, self.p2 = None, None
         
-        self.aliens = Aliens(self.view.canvas, self.refresh_rate, image=self.view.alien_image, bonus_image=self.view.alien_bonus_image, projectile_class=self.aliens_projectiles, aliens_projectile_image=self.view.projectile_alien)
+        self.aliens = Aliens(self.view.canvas, self.refresh_rate, self.view.alien_skins, projectile_class=self.aliens_projectiles)
 
         self.walls = Walls(self.view.canvas, self.refresh_rate, self.view.wall_image)
 
@@ -46,10 +46,10 @@ class Controller:
             if collision and alien.dead(): # Evite qu'un alien donne du score si il meurt à cause d'un mur
                 self.score += 15 * alien.level
                 should_update_score = True
-                if alien.doctor:
+                if alien.type == "doctor":
                     for players in self.players.objects_list:
                         players.upgrade_one_caracteristic("life")
-                if alien.bonus:
+                if alien.type == "bonus":
                     self.skill_points += 1
                     self.view.update(None, None, None, should_update_skill_points=True)
 
@@ -126,7 +126,7 @@ class Controller:
         
         self.p1.weapon.reset()
         self.aliens.create_objects_matrix(line=3, column=5)
-        self.aliens.increase_aliens_level(self.stage_number, self.view.alien_images)
+        self.aliens.increase_aliens_level(self.stage_number)
         self.aliens.increase_speed(self.stage_number // 2)
         self.walls.add_object(self.view.screen_height * 15 // 20, 2)
         self.should_game_update = True
@@ -169,9 +169,8 @@ class Controller:
     def default_binds(self):
         self.binds.add_bind((self.upgrade_settings.next_option, False), "Right", self.binds.upgrade_binds_dico)
         self.binds.add_bind((self.upgrade_settings.prev_option, False), "Left", self.binds.upgrade_binds_dico)
-        self.binds.add_bind((self.upgrade_settings.chose_option, False), "Up", self.binds.upgrade_binds_dico)
-        self.binds.add_bind((self.upgrade_settings.chose_none, False), "Down", self.binds.upgrade_binds_dico)
-        self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.game_binds_dico)
+        self.binds.add_bind((self.upgrade_settings.chose_option, False), "Return", self.binds.upgrade_binds_dico)
+        self.binds.add_bind((self.upgrade_settings.chose_none, False), "Escape", self.binds.upgrade_binds_dico)
 
     def game_binds(self):
         self.binds.add_bind((self.p1.move_left, True), "q", self.binds.game_binds_dico)
@@ -179,6 +178,12 @@ class Controller:
         self.binds.add_bind((self.p1.shoot, True), "space", self.binds.game_binds_dico)
         self.binds.add_bind((self.p1.weapon.reload, False), "r", self.binds.game_binds_dico)
         self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.game_binds_dico)
+        self.binds.add_bind((self.cheat_next_stage, False), "n", self.binds.game_binds_dico)
+    
+    def cheat_next_stage(self):
+        self.players_projectiles.reset()
+        self.aliens_projectiles.reset()
+        self.aliens.reset()
     
     def reset(self):
         self.aliens.reset()
@@ -191,4 +196,4 @@ class Controller:
         self.menu_update()
         self.go_to_menu()
         self.default_binds()
-        self.view.fenetre.mainloop()
+        self.view.root.mainloop()

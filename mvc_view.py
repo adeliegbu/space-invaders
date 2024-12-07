@@ -7,14 +7,14 @@ class View:
     def __init__(self, controller):
         self.controller = controller
 
-        self.fenetre = tk.Tk()
-        self.fenetre.attributes("-fullscreen", True)
+        self.root = tk.Tk()
+        self.root.attributes("-fullscreen", True)
 
-        self.screen_width = self.fenetre.winfo_screenwidth()
-        self.screen_height = self.fenetre.winfo_screenheight()
+        self.screen_width = self.root.winfo_screenwidth()
+        self.screen_height = self.root.winfo_screenheight()
         self.x0, self.y0 = self.screen_width // 2, self.screen_height // 2
 
-        self.canvas = tk.Canvas(self.fenetre, width=self.screen_width, height=self.screen_height, highlightthickness=0)
+        self.canvas = tk.Canvas(self.root, width=self.screen_width, height=self.screen_height, highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
 
         self.bg_game_image = ImageTk.PhotoImage(Image.open("visuel/background_invader.jpg").resize((self.screen_width, self.screen_height), Image.LANCZOS))
@@ -23,25 +23,17 @@ class View:
         self.bg_game_id = self.canvas.create_image(0, 0, image=self.bg_game_image, anchor="nw")
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
 
-        self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
+        self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((self.screen_width // 3, self.screen_height // 6), Image.LANCZOS))
 
         # Chargement des images des aliens
         self.alien_skins = {}
         types = ["assault", "rafale", "machine_gun", "sniper", "tank"]
         for type in types:
-            self.alien_skins[type] = [ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien_{type}_{i}.png").resize((self.screen_height // 20, self.screen_height // 20), Image.LANCZOS)) for i in range (1, 6)]
-        self.alien_skins["basic"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__basic.png").resize((self.screen_height // 20, self.screen_height // 20), Image.LANCZOS))
-        self.alien_skins["doctor"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__doctor.png").resize((self.screen_height // 20, self.screen_height // 20), Image.LANCZOS))
-        self.alien_skins["bonus"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__bonus.png").resize((self.screen_height // 20, self.screen_height // 20), Image.LANCZOS))
-
-
-        # self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((80, 80), Image.LANCZOS))
-        # self.alien_type0_image = ImageTk.PhotoImage(Image.open("visuel/alien_type0.png").resize((100, 60), Image.LANCZOS))
-        # self.alien_type2_image = ImageTk.PhotoImage(Image.open("visuel/alien_type2.png").resize((50, 40), Image.LANCZOS))
-        # self.alien_images = [self.alien_type0_image, self.alien_image, self.alien_type2_image]
-
-        self.alien_bonus_image = ImageTk.PhotoImage(Image.open("visuel/alien_bonus.png").resize((80, 50), Image.LANCZOS))
-        self.projectile_alien = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((30, 50), Image.LANCZOS))
+            self.alien_skins[type] = [ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien_{type}_{i}.png").resize((self.screen_height // 20, self.screen_height // 22), Image.LANCZOS)) for i in range (1, 6)]
+        self.alien_skins["basic"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__basic.png").resize((self.screen_height // 13, self.screen_height // 13), Image.LANCZOS))
+        self.alien_skins["doctor"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__doctor.png").resize((self.screen_height // 19, self.screen_height // 22), Image.LANCZOS))
+        self.alien_skins["bonus"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__bonus.png").resize((self.screen_height // 11, self.screen_height // 18), Image.LANCZOS))
+        self.alien_skins["projectile"] = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((30, 50), Image.LANCZOS))
 
         self.player_image_green = ImageTk.PhotoImage(Image.open("visuel/player_rafale_green.png"), Image.LANCZOS)
         self.projectile_player_image_green = ImageTk.PhotoImage(Image.open("visuel/projectile_green.png").rotate(90).resize((250, 250), Image.LANCZOS))
@@ -82,7 +74,7 @@ class View:
         self.upgrade_images = {}
         upgrades = ["cooldown", "cooldown_reload", "damage", "power", "rafale", "imprecision", "munitions", "speed", "life", "auto_reload"]
         upgrade_prices = [2, 1, 4, 2, 5, 2, 3, 1, 7, 3]
-        upgrade_texts = ["-30 cooldown", "-50 cooldown\nreload", "+1 damage", "+2 power", "+1 rafale", "+3 precision", "+3 munitions", "+1 speed", "+1 life", "auto reload"]
+        upgrade_texts = ["-30 cooldown", "-50 cd recharge", "+1 degats", "+2 puissance", "+1 rafale", "+3 precision", "+3 munitions", "+1 vitesse", "+1 vie", "recharge auto"]
         i = 0
         for upgrade in upgrades:
             self.upgrade_images[upgrade] = [ImageTk.PhotoImage(Image.open(f"visuel/upgrade_cards/up_{upgrade}.png").resize((125, 200), Image.LANCZOS)), upgrade_prices[i], upgrade_texts[i]]
@@ -126,12 +118,11 @@ class View:
         self.rules_label.place_forget()
         self.hide_image_list(self.lives_images_list)
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
-        # self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
-        self.logo_id = self.display_font_text("space invaders", alignment="center", size=75, pad_x=0, pad_y=10, x=self.x0, y=self.y0 // 2.5)
+        self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
         self.hide_image_list(self.binds_overlay)
 
     def leave(self):
-        self.fenetre.quit()
+        self.root.quit()
         self.image_score.clear()
 
     def show_options(self):
@@ -219,10 +210,10 @@ class View:
         i = 0
         for upgrade in self.upgrade_images.values():
             self.image_upgrade_cards.append(self.canvas.create_image(self.screen_width * (i % 5 + 2) / 8, self.screen_height * (((i // 5 * 2) + 4) / 9) + 50, image=upgrade[0], anchor="center"))
-            self.image_upgrade_cards.append(self.display_font_text(f"prix:{upgrade[1]}sp", alignment="center", size=15, pad_x=2, pad_y=10, x=self.screen_width * (i % 5 + 2) / 8, y=self.screen_height * (((i // 5 * 2) + 4) / 9) - 50))
+            self.image_upgrade_cards.append(self.display_font_text(f"prix:{upgrade[1]}sp\n{upgrade[2]}", alignment="center", size=15, pad_x=2, pad_y=10, x=self.screen_width * (i % 5 + 2) / 8, y=self.screen_height * (((i // 5 * 2) + 4) / 9) - 80))
             i += 1
         self.canvas.move(self.image_upgrade_cards[0], 0, 30)
-        self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nup pour valider\ndown pour passer au next stage", alignment="center", size=30, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
+        self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nEntree pour valider\nEchap pour passer au next stage", alignment="center", size=30, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
     
     def display_choosing_card(self):
         if self.cards_choosing_index != self.controller.upgrade_settings.get_choiced_index():
