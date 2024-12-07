@@ -14,24 +14,31 @@ class View:
         self.screen_height = self.fenetre.winfo_screenheight()
         self.x0, self.y0 = self.screen_width // 2, self.screen_height // 2
 
-        self.bg_game_image = Image.open("visuel/background_invader.jpg")
-        self.bg_game_image = ImageTk.PhotoImage(self.bg_game_image.resize((self.screen_width, self.screen_height), Image.LANCZOS))
-
-        self.bg_menu_image = Image.open("visuel/bg_menu.jpg")
-        self.bg_menu_image = ImageTk.PhotoImage(self.bg_menu_image.resize((self.screen_width, self.screen_height), Image.LANCZOS))
-
         self.canvas = tk.Canvas(self.fenetre, width=self.screen_width, height=self.screen_height, highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
+
+        self.bg_game_image = ImageTk.PhotoImage(Image.open("visuel/background_invader.jpg").resize((self.screen_width, self.screen_height), Image.LANCZOS))
+        self.bg_menu_image = ImageTk.PhotoImage(Image.open("visuel/bg_menu.jpg").resize((self.screen_width, self.screen_height), Image.LANCZOS))
 
         self.bg_game_id = self.canvas.create_image(0, 0, image=self.bg_game_image, anchor="nw")
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
 
         self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
 
-        self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((80, 80), Image.LANCZOS))
-        self.alien_type0_image = ImageTk.PhotoImage(Image.open("visuel/alien_type0.png").resize((100, 60), Image.LANCZOS))
-        self.alien_type2_image = ImageTk.PhotoImage(Image.open("visuel/alien_type2.png").resize((50, 40), Image.LANCZOS))
-        self.alien_images = [self.alien_type0_image, self.alien_image, self.alien_type2_image]
+        # Chargement des images des aliens
+        self.alien_skins = {}
+        types = ["assault", "rafale", "machine_gun", "sniper", "tank"]
+        for type in types:
+            self.alien_skins[type] = [ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien_{type}_{i}.png").resize((self.screen_height // 20, self.screen_height // 20), Image.LANCZOS)) for i in range (1, 6)]
+        self.alien_skins["basic"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__basic.png").resize((self.screen_height // 20, self.screen_height // 20), Image.LANCZOS))
+        self.alien_skins["doctor"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__doctor.png").resize((self.screen_height // 20, self.screen_height // 20), Image.LANCZOS))
+        self.alien_skins["bonus"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__bonus.png").resize((self.screen_height // 20, self.screen_height // 20), Image.LANCZOS))
+
+
+        # self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((80, 80), Image.LANCZOS))
+        # self.alien_type0_image = ImageTk.PhotoImage(Image.open("visuel/alien_type0.png").resize((100, 60), Image.LANCZOS))
+        # self.alien_type2_image = ImageTk.PhotoImage(Image.open("visuel/alien_type2.png").resize((50, 40), Image.LANCZOS))
+        # self.alien_images = [self.alien_type0_image, self.alien_image, self.alien_type2_image]
 
         self.alien_bonus_image = ImageTk.PhotoImage(Image.open("visuel/alien_bonus.png").resize((80, 50), Image.LANCZOS))
         self.projectile_alien = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((30, 50), Image.LANCZOS))
