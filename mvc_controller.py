@@ -1,4 +1,4 @@
-from mvc_model import Players, Aliens, Walls, Players_projectiles, Aliens_projectiles, Binds, Upgrade_settings
+from mvc_model import Players, Aliens, Walls, Players_projectiles, Aliens_projectiles, Binds, Upgrade_settings, Menu_settings
 from mvc_view import View
 
 class Controller:
@@ -23,6 +23,7 @@ class Controller:
         self.binds = Binds(self.view.canvas)
 
         self.upgrade_settings = Upgrade_settings()
+        self.menu_settings = Menu_settings()
 
         self.should_game_update = False
         self.should_menu_update = True
@@ -137,6 +138,18 @@ class Controller:
     def menu_update(self):
         if self.should_menu_update:
             self.binds.execute_active_binds()
+            self.view.dynamic_menu()
+
+            if not self.menu_settings.choosing:
+                self.should_menu_update = False
+                if self.menu_settings.get_choiced_index() == 0:
+                    self.view.new_game()
+                elif self.menu_settings.get_choiced_index() == 1:
+                    self.view.rules()
+                elif self.menu_settings.get_choiced_index() == 2:
+                    pass
+                elif self.menu_settings.get_choiced_index() == 3:
+                    self.view.quit()
             
             self.view.canvas.after(self.refresh_rate, self.menu_update)
     
@@ -156,11 +169,13 @@ class Controller:
         self.should_game_update = False
         self.should_stage_update = False
         self.should_menu_update = True
+        self.menu_settings.reset_option()
+        self.upgrade_settings.reset_option()
+        self.menu_settings.choosing = True
         self.stage_number = 0
         self.skill_points = 0
         self.score = 0
         self.reset()
-        self.binds.reset_binds()
         self.binds.change_current_binds_dico(self.binds.menu_binds_dico)
         self.aliens.reset_number_alien_killed()
         self.view.menu()
@@ -171,6 +186,10 @@ class Controller:
         self.binds.add_bind((self.upgrade_settings.prev_option, False), "Left", self.binds.upgrade_binds_dico)
         self.binds.add_bind((self.upgrade_settings.chose_option, False), "Return", self.binds.upgrade_binds_dico)
         self.binds.add_bind((self.upgrade_settings.chose_none, False), "Escape", self.binds.upgrade_binds_dico)
+
+        self.binds.add_bind((self.menu_settings.next_option, False), "Down", self.binds.menu_binds_dico)
+        self.binds.add_bind((self.menu_settings.prev_option, False), "Up", self.binds.menu_binds_dico)
+        self.binds.add_bind((self.menu_settings.chose_option, False), "Return", self.binds.menu_binds_dico)
 
     def game_binds(self):
         self.binds.add_bind((self.p1.move_left, True), "q", self.binds.game_binds_dico)
@@ -193,7 +212,6 @@ class Controller:
         self.walls.reset()
     
     def run(self):
-        self.menu_update()
         self.go_to_menu()
         self.default_binds()
         self.view.root.mainloop()

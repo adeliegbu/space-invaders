@@ -13,6 +13,7 @@ class Settings:
         return self.options[self.choiced_index]
 
     def next_option(self):
+        print(self.choiced_index)
         if self.choiced_index < self.length - 1:
             self.choiced_index += 1
 

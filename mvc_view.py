@@ -14,7 +14,7 @@ class View:
         self.screen_height = self.root.winfo_screenheight()
         self.x0, self.y0 = self.screen_width // 2, self.screen_height // 2
 
-        self.canvas = tk.Canvas(self.root, width=self.screen_width, height=self.screen_height, highlightthickness=0)
+        self.canvas = tk.Canvas(self.root, width=self.screen_width, height=self.screen_height, highlightthickness=0, cursor="none")
         self.canvas.pack(fill="both", expand=True)
 
         self.bg_game_image = ImageTk.PhotoImage(Image.open("visuel/background_invader.jpg").resize((self.screen_width, self.screen_height), Image.LANCZOS))
@@ -55,12 +55,15 @@ class View:
         self.heart_semi_image = ImageTk.PhotoImage(Image.open("visuel/semi_life.png").resize((30, 30), Image.LANCZOS))
         self.heart_dead_image = ImageTk.PhotoImage(Image.open("visuel/no_life.png").resize((30, 30), Image.LANCZOS))
 
+        self.button_active_image = ImageTk.PhotoImage(Image.open("visuel/button_active.png").resize((300, 70), Image.LANCZOS))
+        self.button_inactive_image = ImageTk.PhotoImage(Image.open("visuel/button_inactive.png").resize((300, 70), Image.LANCZOS))
+
         self.wall_image = ImageTk.PhotoImage(Image.open("visuel/n_wall.webp").resize((20, 20), Image.LANCZOS))
         self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
         self.button_new_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.new_game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_rules = tk.Button(self.canvas, text="Règles", command=self.rules, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
-        self.button_leave = tk.Button(self.canvas, text="Quitter", command=self.leave, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
+        self.button_quit = tk.Button(self.canvas, text="Quitter", command=self.quit, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_menu = tk.Button(self.canvas, text="Menu", command=self.menu, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_options = tk.Button(self.canvas, text="Options", command=self.show_options, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
 
@@ -88,15 +91,15 @@ class View:
         self.cards_choosing_index = 0
         self.upgrade_text = []
         self.binds_overlay = []
+        self.menu_overlay = []
+        self.menu_choosing_index = 0
+        self.logo_id = []
 
     def new_game(self):
         self.overlay_reset()
 
-        self.button_new_game.place_forget()
-        self.button_rules.place_forget()
-        self.button_leave.place_forget()
-        self.button_menu.place_forget()
-        self.button_options.place_forget()
+        self.hide_image_list(self.menu_overlay)
+        self.hide_image_list(self.logo_id)
         self.binds_overlay = self.display_font_text("menu:Echap\ncheats:c", alignment="right", size=30, pad_x=2, pad_y=10, x=self.screen_width - 20, y= 20)
 
         self.controller.new_game()
@@ -105,23 +108,24 @@ class View:
     def rules(self):
         self.button_new_game.place_forget()
         self.button_rules.place_forget()
-        self.button_leave.place_forget()
+        self.button_quit.place_forget()
         self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
         self.display_font_text(rules_text, alignment="left", size=15, pad_x=0, pad_y=10, x=0, y=self.y0 // 2)
 
     def menu(self):
-        self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
-        self.button_rules.place(x=self.x0, y=self.y0 + 100, anchor="center")
-        self.button_options.place(x=self.x0, y=self.y0 + 200, anchor="center")
-        self.button_leave.place(x=self.x0, y=self.y0 + 300, anchor="center")
+        # self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
+        # self.button_rules.place(x=self.x0, y=self.y0 + 100, anchor="center")
+        # self.button_options.place(x=self.x0, y=self.y0 + 200, anchor="center")
+        # self.button_quit.place(x=self.x0, y=self.y0 + 300, anchor="center")
         self.button_menu.place_forget()
         self.rules_label.place_forget()
         self.hide_image_list(self.lives_images_list)
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
-        self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
+        self.logo_id = self.display_font_text("Space Invaders", alignment="center", size=75, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 2)
         self.hide_image_list(self.binds_overlay)
+        self.display_menu()
 
-    def leave(self):
+    def quit(self):
         self.root.quit()
         self.image_score.clear()
 
@@ -129,7 +133,7 @@ class View:
         self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
         self.button_new_game.place_forget()
         self.button_rules.place_forget()
-        self.button_leave.place_forget()
+        self.button_quit.place_forget()
         self.button_options.place_forget()
     
     def hide_image_list(self, image_list):
@@ -220,3 +224,16 @@ class View:
             self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index * 2], 0, -30)
             self.cards_choosing_index = self.controller.upgrade_settings.get_choiced_index()
             self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index * 2], 0, 30)
+    
+    def display_menu(self):
+        self.menu_overlay = []
+        self.menu_overlay.append([self.canvas.create_image(self.x0, self.screen_height // 8 * (4 + i), image=self.button_inactive_image, anchor="center") for i in range(4)])
+        self.menu_overlay.append(self.display_font_text("New game\nRegles\nOptions\nQuitter", alignment="center", size=30, pad_x=2, pad_y=self.screen_height // 8 - 30, x=self.x0, y=self.y0))
+        self.canvas.itemconfig(self.menu_overlay[0][0], image=self.button_active_image)
+
+    def dynamic_menu(self):
+        if self.menu_choosing_index != self.controller.menu_settings.get_choiced_index():
+            self.canvas.itemconfig(self.menu_overlay[0][self.menu_choosing_index], image=self.button_inactive_image)
+            self.menu_choosing_index = self.controller.menu_settings.get_choiced_index()
+            self.canvas.itemconfig(self.menu_overlay[0][self.menu_choosing_index], image=self.button_active_image)
+
