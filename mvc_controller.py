@@ -6,7 +6,7 @@ class Controller:
         self.view = View(self)
         self.canvas = self.view.canvas
 
-        self.refresh_rate = 25
+        self.refresh_rate = 24
         self.score = 0
 
         self.players_projectiles = Players_projectiles(self.view.canvas, self.refresh_rate)
