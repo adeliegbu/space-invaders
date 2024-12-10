@@ -45,7 +45,7 @@ class Controller:
             should_update_score = False
             collision, alien, _ = self.players_projectiles.collision(self.aliens)
             if collision and alien.dead(): # Evite qu'un alien donne du score si il meurt à cause d'un mur
-                self.score += 15 * alien.level
+                self.score += 15 * (alien.level + 1)
                 should_update_score = True
                 if alien.type == "doctor":
                     for players in self.players.objects_list:
@@ -215,3 +215,5 @@ class Controller:
         self.go_to_menu()
         self.default_binds()
         self.view.root.mainloop()
+
+    
