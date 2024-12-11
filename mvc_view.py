@@ -93,11 +93,10 @@ class View:
         self.binds_overlay = []
         self.menu_overlay = []
         self.menu_choosing_index = 0
+        self.options_choosing_index = [0, 0]
 
     def new_game(self):
         self.overlay_reset()
-
-        self.hide_image_list(self.menu_overlay)
         self.canvas.delete(self.logo_id)
         self.binds_overlay = self.display_font_text("menu:Echap\ncheats:c", alignment="right", size=1, pad_x=2, pad_y=10, x=self.screen_width - 20, y= 20)
 
@@ -105,19 +104,9 @@ class View:
         self.update(should_update_lives=True, should_update_score=True, should_update_stage=True, should_update_skill_points=False)
 
     def rules(self):
-        self.button_new_game.place_forget()
-        self.button_rules.place_forget()
-        self.button_quit.place_forget()
-        self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
         self.display_font_text(rules_text, alignment="left", size=0, pad_x=0, pad_y=10, x=0, y=self.y0 // 2)
 
     def menu(self):
-        # self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
-        # self.button_rules.place(x=self.x0, y=self.y0 + 100, anchor="center")
-        # self.button_options.place(x=self.x0, y=self.y0 + 200, anchor="center")
-        # self.button_quit.place(x=self.x0, y=self.y0 + 300, anchor="center")
-        self.button_menu.place_forget()
-        self.rules_label.place_forget()
         self.hide_image_list(self.lives_images_list)
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2, image=self.logo_image, anchor="center")
@@ -129,22 +118,16 @@ class View:
         self.image_score.clear()
 
     def show_options(self):
-        self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
-        self.button_new_game.place_forget()
-        self.button_rules.place_forget()
-        self.button_quit.place_forget()
-        self.button_options.place_forget()
-    
+        self.hide_image_list(self.menu_overlay)
+        self.canvas.delete(self.logo_id)
+        self.display_options()
+
     def hide_image_list(self, image_list):
         for i in range (len(image_list)):
             if isinstance(image_list[i], list):
                 self.hide_image_list(image_list[i])
             elif image_list[i] is not None:
                 self.canvas.delete(image_list[i])
-
-    def show_image_list(self, image_list):
-        for image_id in [item for sublist in image_list for item in sublist]:
-            self.canvas.itemconfigure(image_id, state="normal")
     
     def overlay_reset(self):
         # Supprimer tous les items sauf l'arrière-plan
@@ -228,11 +211,27 @@ class View:
         self.menu_overlay = []
         self.menu_overlay.append([self.canvas.create_image(self.x0, self.screen_height // 8 * (4 + i), image=self.button_inactive_image, anchor="center") for i in range(4)])
         self.menu_overlay.append(self.display_font_text("New game\nRegles\nOptions\nQuitter", alignment="center", size=5, pad_x=2, pad_y=self.screen_height // 8 - self.screen_height // 25, x=self.x0, y=self.y0))
-        self.canvas.itemconfig(self.menu_overlay[0][0], image=self.button_active_image)
+        self.canvas.itemconfig(self.menu_overlay[0][self.menu_choosing_index], image=self.button_active_image)
 
     def dynamic_menu(self):
         if self.menu_choosing_index != self.controller.menu_settings.get_choiced_index():
             self.canvas.itemconfig(self.menu_overlay[0][self.menu_choosing_index], image=self.button_inactive_image)
             self.menu_choosing_index = self.controller.menu_settings.get_choiced_index()
             self.canvas.itemconfig(self.menu_overlay[0][self.menu_choosing_index], image=self.button_active_image)
+    
+    def display_options(self):
+        self.menu_overlay = []
+        self.menu_overlay.append([self.canvas.create_image(self.screen_width // 4 * (i + 1), self.screen_height // 8, image=self.button_inactive_image, anchor="center") for i in range(3)])
+        self.menu_overlay.append([self.canvas.create_image(self.screen_width // 4 * (i + 1), self.screen_height // 4, image=self.button_inactive_image, anchor="center") for i in range(3)])
+        self.menu_overlay.append(self.display_font_text("Solo       coop       duel", alignment="center", size=5, pad_x=2, pad_y=0, x=self.x0, y=self.screen_height // 8))
+        self.menu_overlay.append(self.display_font_text(" easy      ranked     survie", alignment="center", size=5, pad_x=2, pad_y=0, x=self.x0, y=self.screen_height // 4))
+        self.canvas.itemconfig(self.menu_overlay[self.options_choosing_index[0]][self.options_choosing_index[1]], image=self.button_active_image)
 
+    def dynamic_options(self):
+        index = self.controller.options_settings.get_choiced_index()
+        sub_index = self.controller.options_settings.get_choiced_sub_index()
+        if index < 2 :
+            if self.options_choosing_index != [index, sub_index]:
+                self.canvas.itemconfig(self.menu_overlay[self.options_choosing_index[0]][self.options_choosing_index[1]], image=self.button_inactive_image)
+                self.options_choosing_index = [index, sub_index]
+                self.canvas.itemconfig(self.menu_overlay[self.options_choosing_index[0]][self.options_choosing_index[1]], image=self.button_active_image)

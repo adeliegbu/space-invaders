@@ -98,7 +98,7 @@ class Aliens(Group_object):
     def increase_aliens_level(self, stage_number):
         if not self.objects_dead():
             increasing_aliens = []
-            for _ in range(stage_number * 3):
+            for _ in range(stage_number * 8):
                 increasing_aliens.append(choice(choice(self.objects_matrix)))
             for alien in increasing_aliens:
                 alien.increase_level()

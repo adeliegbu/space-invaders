@@ -3,6 +3,7 @@ class Binds:
         self.canvas = canvas
         self.game_binds_dico = {}
         self.menu_binds_dico = {}
+        self.options_binds_dico = {}
         self.upgrade_binds_dico = {}
         self.current_binds_dico = self.game_binds_dico
 
