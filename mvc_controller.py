@@ -204,9 +204,12 @@ class Controller:
         self.binds.add_bind((self.options_settings.prev_option, False), "Up", self.binds.options_binds_dico)
         self.binds.add_bind((self.options_settings.next_sub_option, False), "Right", self.binds.options_binds_dico)
         self.binds.add_bind((self.options_settings.prev_sub_option, False), "Left", self.binds.options_binds_dico)
-        self.binds.add_bind((self.options_settings.chose_option, False), "Return", self.binds.options_binds_dico)
+        self.binds.add_bind((self.change_bind, False), "Return", self.binds.options_binds_dico)
         self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.options_binds_dico)
-
+    
+    def change_bind():
+        pass
+    
     def game_binds(self):
         with open("binds.json", "r") as file:
             data_binds = json.load(file)
@@ -239,5 +242,6 @@ class Controller:
         self.go_to_menu()
         self.default_binds()
         self.view.root.mainloop()
+    
 
     
