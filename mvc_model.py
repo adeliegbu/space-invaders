@@ -22,3 +22,5 @@ from model.settings_related.settings import Settings
 from model.settings_related.p1_settings import P1_settings
 from model.weapon_related.weapons import Weapons
 from model.settings_related.upgrade_settings import Upgrade_settings
+from model.settings_related.menu_settings import Menu_settings
+from model.settings_related.options_settings import Options_settings

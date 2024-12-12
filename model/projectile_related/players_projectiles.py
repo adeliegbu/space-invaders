@@ -1,9 +1,8 @@
 from model.projectile_related.projectiles import Projectiles
 
 class Players_projectiles(Projectiles):
-    def __init__(self, canvas, refresh_rate, image):
+    def __init__(self, canvas, refresh_rate):
         super().__init__(canvas, refresh_rate)
-        self.image = image
     
     def add_object(self, x, y, height, imprecision, power, projectile_width, projectile_height, damage, projectile_image):
         super().add_object(x, y - height, imprecision, power, projectile_width, projectile_height, damage, projectile_image)

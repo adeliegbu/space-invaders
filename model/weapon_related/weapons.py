@@ -82,9 +82,9 @@ class Weapons:
             self.imprecision += 2
             self.damage = 1
             self.munitions = 1000   # Munitions illimitées pour les aliens
-            self.cooldown.change(4000)
-            self.cooldown_rafale.add_offset(randint(0, 4000))
-            self.cooldown.add_offset(randint(0, 4000))
+            self.cooldown.change(3000)
+            self.cooldown_rafale.add_offset(randint(0, 3000))
+            self.cooldown.add_offset(randint(0, 3000))
             if type[0] == "machine_gun":       # Les aliens ont une mitraillette modifiée à rafale
                 self.rafale = 5
 

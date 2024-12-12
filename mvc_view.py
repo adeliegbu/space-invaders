@@ -1,5 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+import json
 
 from visuel.rules import rules_text
 
@@ -7,34 +8,33 @@ class View:
     def __init__(self, controller):
         self.controller = controller
 
-        self.fenetre = tk.Tk()
-        self.fenetre.attributes("-fullscreen", True)
+        self.root = tk.Tk()
+        self.root.attributes("-fullscreen", True)
 
-        self.screen_width = self.fenetre.winfo_screenwidth()
-        self.screen_height = self.fenetre.winfo_screenheight()
+        self.screen_width = self.root.winfo_screenwidth()
+        self.screen_height = self.root.winfo_screenheight()
         self.x0, self.y0 = self.screen_width // 2, self.screen_height // 2
 
-        self.bg_game_image = Image.open("visuel/background_invader.jpg")
-        self.bg_game_image = ImageTk.PhotoImage(self.bg_game_image.resize((self.screen_width, self.screen_height), Image.LANCZOS))
-
-        self.bg_menu_image = Image.open("visuel/bg_menu.jpg")
-        self.bg_menu_image = ImageTk.PhotoImage(self.bg_menu_image.resize((self.screen_width, self.screen_height), Image.LANCZOS))
-
-        self.canvas = tk.Canvas(self.fenetre, width=self.screen_width, height=self.screen_height, highlightthickness=0)
+        self.canvas = tk.Canvas(self.root, width=self.screen_width, height=self.screen_height, highlightthickness=0, cursor="none")
         self.canvas.pack(fill="both", expand=True)
+
+        self.bg_game_image = ImageTk.PhotoImage(Image.open("visuel/background_invader.jpg").resize((self.screen_width, self.screen_height), Image.LANCZOS))
+        self.bg_menu_image = ImageTk.PhotoImage(Image.open("visuel/bg_menu.jpg").resize((self.screen_width, self.screen_height), Image.LANCZOS))
 
         self.bg_game_id = self.canvas.create_image(0, 0, image=self.bg_game_image, anchor="nw")
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
 
-        self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((500, 200), Image.LANCZOS))
+        self.logo_image = ImageTk.PhotoImage(Image.open("visuel/space_logo.png").resize((self.screen_width // 3, self.screen_height // 6), Image.LANCZOS))
 
-        self.alien_image = ImageTk.PhotoImage(Image.open("visuel/alien.png").resize((80, 80), Image.LANCZOS))
-        self.alien_type0_image = ImageTk.PhotoImage(Image.open("visuel/alien_type0.png").resize((100, 60), Image.LANCZOS))
-        self.alien_type2_image = ImageTk.PhotoImage(Image.open("visuel/alien_type2.png").resize((50, 40), Image.LANCZOS))
-        self.alien_images = [self.alien_type0_image, self.alien_image, self.alien_type2_image]
-
-        self.alien_bonus_image = ImageTk.PhotoImage(Image.open("visuel/alien_bonus.png").resize((80, 50), Image.LANCZOS))
-        self.projectile_alien = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((30, 50), Image.LANCZOS))
+        # Chargement des images des aliens
+        self.alien_skins = {}
+        types = ["assault", "rafale", "machine_gun", "sniper", "tank"]
+        for type in types:
+            self.alien_skins[type] = [ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien_{type}_{i}.png").resize((self.screen_height // 20, self.screen_height // 22), Image.LANCZOS)) for i in range (1, 6)]
+        self.alien_skins["basic"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__basic.png").resize((self.screen_height // 13, self.screen_height // 13), Image.LANCZOS))
+        self.alien_skins["doctor"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__doctor.png").resize((self.screen_height // 19, self.screen_height // 22), Image.LANCZOS))
+        self.alien_skins["bonus"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__bonus.png").resize((self.screen_height // 11, self.screen_height // 18), Image.LANCZOS))
+        self.alien_skins["projectile"] = ImageTk.PhotoImage(Image.open("visuel/fire_ball.png").resize((30, 50), Image.LANCZOS))
 
         self.player_image_green = ImageTk.PhotoImage(Image.open("visuel/player_rafale_green.png"), Image.LANCZOS)
         self.projectile_player_image_green = ImageTk.PhotoImage(Image.open("visuel/projectile_green.png").rotate(90).resize((250, 250), Image.LANCZOS))
@@ -56,12 +56,17 @@ class View:
         self.heart_semi_image = ImageTk.PhotoImage(Image.open("visuel/semi_life.png").resize((30, 30), Image.LANCZOS))
         self.heart_dead_image = ImageTk.PhotoImage(Image.open("visuel/no_life.png").resize((30, 30), Image.LANCZOS))
 
+        self.button_active_image = ImageTk.PhotoImage(Image.open("visuel/button_active.png").resize((int(self.screen_width // 4.5), int(self.screen_height // 13)), Image.LANCZOS))
+        self.button_inactive_image = ImageTk.PhotoImage(Image.open("visuel/button_inactive.png").resize((int(self.screen_width // 4.5), int(self.screen_height // 13)), Image.LANCZOS))
+
+        self.arrow_left_image = ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-arrow_left.png").resize((self.screen_height // 40, self.screen_height // 40), Image.LANCZOS))
+        self.arrow_right_image = ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-arrow_right.png").resize((self.screen_height // 40, self.screen_height // 40), Image.LANCZOS))
+
         self.wall_image = ImageTk.PhotoImage(Image.open("visuel/n_wall.webp").resize((20, 20), Image.LANCZOS))
-        self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
         self.button_new_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.new_game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_rules = tk.Button(self.canvas, text="Règles", command=self.rules, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
-        self.button_leave = tk.Button(self.canvas, text="Quitter", command=self.leave, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
+        self.button_quit = tk.Button(self.canvas, text="Quitter", command=self.quit, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_menu = tk.Button(self.canvas, text="Menu", command=self.menu, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_options = tk.Button(self.canvas, text="Options", command=self.show_options, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
 
@@ -69,13 +74,15 @@ class View:
         self.font_images = {}
         characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-+"
         for char in characters:
-            self.font_images[char] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-{char}.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
-        self.font_images[":"] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-doublepoint.png").resize((size, size), Image.LANCZOS)) for size in [15, 30, 45, 60, 75]]
+            self.font_images[char] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-{char}.png").resize((size, size), Image.LANCZOS)) for size in [self.screen_height // 50, self.screen_height // 45, self.screen_height // 40, self.screen_height // 35, self.screen_height // 30, self.screen_height // 25]]
+        self.font_images[":"] = [ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-doublepoint.png").resize((size, size), Image.LANCZOS)) for size in [self.screen_height // 50, self.screen_height // 45, self.screen_height // 40, self.screen_height // 35, self.screen_height // 30, self.screen_height // 25]]
+        self.font_images["<"] = [ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-arrow_left.png").resize((size, size), Image.LANCZOS)) for size in [self.screen_height // 50, self.screen_height // 45, self.screen_height // 40, self.screen_height // 35, self.screen_height // 30, self.screen_height // 25]]
+        self.font_images[">"] = [ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-arrow_right.png").resize((size, size), Image.LANCZOS)) for size in [self.screen_height // 50, self.screen_height // 45, self.screen_height // 40, self.screen_height // 35, self.screen_height // 30, self.screen_height // 25]]
 
         self.upgrade_images = {}
         upgrades = ["cooldown", "cooldown_reload", "damage", "power", "rafale", "imprecision", "munitions", "speed", "life", "auto_reload"]
         upgrade_prices = [2, 1, 4, 2, 5, 2, 3, 1, 7, 3]
-        upgrade_texts = ["-30 cooldown", "-50 cooldown\nreload", "+1 damage", "+2 power", "+1 rafale", "+3 precision", "+3 munitions", "+1 speed", "+1 life", "auto reload"]
+        upgrade_texts = ["-30 cooldown", "-50 cd recharge", "+1 degats", "+2 puissance", "+1 rafale", "+3 precision", "+3 munitions", "+1 vitesse", "+1 vie", "recharge auto"]
         i = 0
         for upgrade in upgrades:
             self.upgrade_images[upgrade] = [ImageTk.PhotoImage(Image.open(f"visuel/upgrade_cards/up_{upgrade}.png").resize((125, 200), Image.LANCZOS)), upgrade_prices[i], upgrade_texts[i]]
@@ -89,61 +96,43 @@ class View:
         self.cards_choosing_index = 0
         self.upgrade_text = []
         self.binds_overlay = []
+        self.menu_overlay = []
+        self.menu_choosing_index = 0
+        self.options_choosing_index = [0, 0]
 
     def new_game(self):
         self.overlay_reset()
-
-        self.button_new_game.place_forget()
-        self.button_rules.place_forget()
-        self.button_leave.place_forget()
-        self.button_menu.place_forget()
-        self.button_options.place_forget()
-        self.binds_overlay = self.display_font_text("menu:Echap\ncheats:c", alignment="right", size=30, pad_x=2, pad_y=10, x=self.screen_width - 20, y= 20)
+        self.canvas.delete(self.logo_id)
+        self.binds_overlay = self.display_font_text("menu:Echap\ncheats:c", alignment="right", size=1, pad_x=2, pad_y=10, x=self.screen_width - 20, y= 20)
 
         self.controller.new_game()
         self.update(should_update_lives=True, should_update_score=True, should_update_stage=True, should_update_skill_points=False)
 
     def rules(self):
-        self.button_new_game.place_forget()
-        self.button_rules.place_forget()
-        self.button_leave.place_forget()
-        self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
-        self.display_font_text(rules_text, alignment="left", size=15, pad_x=0, pad_y=10, x=0, y=self.y0 // 2)
+        self.display_font_text(rules_text, alignment="left", size=0, pad_x=0, pad_y=10, x=0, y=self.y0 // 2)
 
     def menu(self):
-        self.button_new_game.place(x=self.x0, y=self.y0, anchor="center")
-        self.button_rules.place(x=self.x0, y=self.y0 + 100, anchor="center")
-        self.button_options.place(x=self.x0, y=self.y0 + 200, anchor="center")
-        self.button_leave.place(x=self.x0, y=self.y0 + 300, anchor="center")
-        self.button_menu.place_forget()
-        self.rules_label.place_forget()
         self.hide_image_list(self.lives_images_list)
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
-        # self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2.5, image=self.logo_image, anchor="center")
-        self.logo_id = self.display_font_text("space invaders", alignment="center", size=75, pad_x=0, pad_y=10, x=self.x0, y=self.y0 // 2.5)
+        self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2, image=self.logo_image, anchor="center")
         self.hide_image_list(self.binds_overlay)
+        self.display_menu()
 
-    def leave(self):
-        self.fenetre.quit()
+    def quit(self):
+        self.root.quit()
         self.image_score.clear()
 
     def show_options(self):
-        self.button_menu.place(x=self.x0, y=self.y0 + 300, anchor="center")
-        self.button_new_game.place_forget()
-        self.button_rules.place_forget()
-        self.button_leave.place_forget()
-        self.button_options.place_forget()
-    
+        self.hide_image_list(self.menu_overlay)
+        self.canvas.delete(self.logo_id)
+        self.display_options()
+
     def hide_image_list(self, image_list):
         for i in range (len(image_list)):
             if isinstance(image_list[i], list):
                 self.hide_image_list(image_list[i])
             elif image_list[i] is not None:
                 self.canvas.delete(image_list[i])
-
-    def show_image_list(self, image_list):
-        for image_id in [item for sublist in image_list for item in sublist]:
-            self.canvas.itemconfigure(image_id, state="normal")
     
     def overlay_reset(self):
         # Supprimer tous les items sauf l'arrière-plan
@@ -165,19 +154,20 @@ class View:
     
     def update(self, should_update_lives, should_update_score, should_update_stage, should_update_skill_points):
         if should_update_lives:
-            self.display_lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
+            for player in self.controller.players.objects_list:
+                self.display_lives(player.life, player.x, player.y, difficulty=5)
         if should_update_score:
             if self.image_score:
                 self.hide_image_list(self.image_score)
-            self.image_score = self.display_font_text(f"Score:{self.controller.score}", alignment="left", size=30, pad_x=2, pad_y=0, x= 20, y=20)
+            self.image_score = self.display_font_text(f"Score:{self.controller.score}", alignment="left", size=2, pad_x=2, pad_y=0, x= 20, y=20)
         if should_update_stage:
             if self.image_stage:
                 self.hide_image_list(self.image_stage)
-            self.image_stage = self.display_font_text(f"Stage:{self.controller.stage_number}", alignment="center",size=30, pad_x=2, pad_y=0, x=self.x0, y=20)
+            self.image_stage = self.display_font_text(f"Stage:{self.controller.stage_number}", alignment="center",size=2, pad_x=2, pad_y=0, x=self.x0, y=20)
         if should_update_skill_points:
             if self.image_upgrade_points:
                 self.hide_image_list(self.image_upgrade_points)
-            self.image_upgrade_points = self.display_font_text(f"sp:{self.controller.skill_points}", alignment="left", size=30, pad_x=2, pad_y=0, x=20, y=60)
+            self.image_upgrade_points = self.display_font_text(f"sp:{self.controller.skill_points}", alignment="left", size=2, pad_x=2, pad_y=0, x=20, y=60)
 
     def display_font_text(self, text, alignment, size, pad_x, pad_y, x, y):
         text_ids = [[]]
@@ -190,12 +180,12 @@ class View:
                 i += 1   
             elif c in self.font_images or c.upper() in self.font_images:
                 c = c.upper()
-                text_ids[i].append(self.font_images[c][size // 15 - 1])
+                text_ids[i].append(self.font_images[c][size])
             else:
                 raise ValueError(f"Caractère {c} non reconnu")
 
         for i in range(len(text_ids)):
-            line_width = (size + pad_x) * (len(text_ids[i]) - 1)
+            line_width = (self.screen_height // (50 - 5 * size) + pad_x) * (len(text_ids[i]) - 1)
             if alignment == "center":
                 offset_x = x - line_width // 2
             elif alignment == "right":
@@ -204,21 +194,61 @@ class View:
                 offset_x = x
             for j in range(len(text_ids[i])):
                 if text_ids[i][j] is not None:
-                    text_ids[i][j] = self.canvas.create_image(offset_x + ((size + pad_x) * j), y + ((size + pad_y) * i), image=text_ids[i][j], anchor="center")
+                    text_ids[i][j] = self.canvas.create_image(offset_x + ((self.screen_height // (50 - 5 * size) + pad_x) * j), y + ((self.screen_height // (50 - 5 * size) + pad_y) * i), image=text_ids[i][j], anchor="center")
 
         return text_ids
 
     def display_upgrade_stage(self):
         i = 0
         for upgrade in self.upgrade_images.values():
-            self.image_upgrade_cards.append(self.canvas.create_image(self.screen_width * (i % 5 + 2) / 8, self.screen_height * (((i // 5 * 2) + 4) / 9) + 50, image=upgrade[0], anchor="center"))
-            self.image_upgrade_cards.append(self.display_font_text(f"prix:{upgrade[1]}sp", alignment="center", size=15, pad_x=2, pad_y=10, x=self.screen_width * (i % 5 + 2) / 8, y=self.screen_height * (((i // 5 * 2) + 4) / 9) - 50))
+            self.image_upgrade_cards.append(self.canvas.create_image(self.screen_width // 6 * (i % 5 + 1), self.screen_height // 9 * ((i // 5 * 3) + 4) + 50, image=upgrade[0], anchor="center"))
+            self.image_upgrade_cards.append(self.display_font_text(f"prix:{upgrade[1]}sp\n{upgrade[2]}", alignment="center", size=0, pad_x=2, pad_y=10, x=self.screen_width // 6 * (i % 5 + 1), y=self.screen_height * (((i // 5 * 3) + 4) / 9) - 80))
             i += 1
         self.canvas.move(self.image_upgrade_cards[0], 0, 30)
-        self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nup pour valider\ndown pour passer au next stage", alignment="center", size=30, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
+        self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nEntree pour valider\nEchap pour passer au next stage", alignment="center", size=3, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
     
     def display_choosing_card(self):
         if self.cards_choosing_index != self.controller.upgrade_settings.get_choiced_index():
             self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index * 2], 0, -30)
             self.cards_choosing_index = self.controller.upgrade_settings.get_choiced_index()
             self.canvas.move(self.image_upgrade_cards[self.cards_choosing_index * 2], 0, 30)
+    
+    def display_menu(self):
+        self.menu_overlay = []
+        self.menu_overlay.append([self.canvas.create_image(self.x0, self.screen_height // 8 * (4 + i), image=self.button_inactive_image, anchor="center") for i in range(4)])
+        self.menu_overlay.append(self.display_font_text("New game\nRegles\nOptions\nQuitter", alignment="center", size=5, pad_x=2, pad_y=self.screen_height // 8 - self.screen_height // 25, x=self.x0, y=self.y0))
+        self.canvas.itemconfig(self.menu_overlay[0][self.menu_choosing_index], image=self.button_active_image)
+
+    def dynamic_menu(self):
+        if self.menu_choosing_index != self.controller.menu_settings.get_choiced_index():
+            self.canvas.itemconfig(self.menu_overlay[0][self.menu_choosing_index], image=self.button_inactive_image)
+            self.menu_choosing_index = self.controller.menu_settings.get_choiced_index()
+            self.canvas.itemconfig(self.menu_overlay[0][self.menu_choosing_index], image=self.button_active_image)
+    
+    def display_options(self):
+        with open("binds.json", "r") as file:
+            data_binds = json.load(file)
+        self.menu_overlay = []
+        self.menu_overlay.append([self.canvas.create_image(self.screen_width // 4, self.screen_height // 8 * (i + 2), image=self.button_inactive_image, anchor="center")  for i in range(5)])
+        self.menu_overlay.append([self.canvas.create_image(self.screen_width // 2, self.screen_height // 8 * (i + 2), image=self.button_inactive_image, anchor="center")  for i in range(5)])
+        self.menu_overlay.append([self.display_font_text(f"< {self.controller.options_settings.categorises[i]} >", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 4, y=self.screen_height // 8 * (i + 2)) for i in range(5)])
+        self.menu_overlay.append([self.display_font_text(self.controller.options_settings.get_choiced_sub_option(i), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (i + 2)) if i < 4 else self.display_font_text(f"{self.controller.options_settings.get_choiced_sub_option(i)}:{data_binds[0][self.controller.options_settings.get_choiced_sub_option(i)]}", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (i + 2)) for i in range(5)])
+        self.canvas.itemconfig(self.menu_overlay[0][0], image=self.button_active_image)
+
+    def dynamic_options(self):
+        index = self.controller.options_settings.get_choiced_index()
+        sub_index = self.controller.options_settings.get_choiced_sub_index(index)
+        if self.options_choosing_index[0] != index:
+            self.canvas.itemconfig(self.menu_overlay[0][self.options_choosing_index[0]], image=self.button_inactive_image)
+            self.options_choosing_index[0] = index
+            self.canvas.itemconfig(self.menu_overlay[0][self.options_choosing_index[0]], image=self.button_active_image)
+            
+        elif self.options_choosing_index[1] != sub_index:
+            self.options_choosing_index[1] = sub_index
+            self.hide_image_list(self.menu_overlay[-1][index][0])
+            if index == 4:
+                with open("binds.json", "r") as file:
+                    data_binds = json.load(file)
+                self.menu_overlay[-1][index] = self.display_font_text(f"{self.controller.options_settings.get_choiced_sub_option(index)}:{data_binds[0][self.controller.options_settings.get_choiced_sub_option(index)]}", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (index + 2))
+            else:
+                self.menu_overlay[-1][index] = self.display_font_text(self.controller.options_settings.get_choiced_sub_option(index), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (index + 2))
