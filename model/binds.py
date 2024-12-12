@@ -3,6 +3,7 @@ class Binds:
         self.canvas = canvas
         self.game_binds_dico = {}
         self.menu_binds_dico = {}
+        self.options_binds_dico = {}
         self.upgrade_binds_dico = {}
         self.current_binds_dico = self.game_binds_dico
 
@@ -34,6 +35,11 @@ class Binds:
         for command, bind in dico.items():
             if bind == key:
                 return command
+        return None
+    
+    def get_binded_key(self, command, dico):
+        if command in dico:
+            return dico[command]
         return None
     
     def active_bind(self, event):
@@ -72,5 +78,3 @@ class Binds:
     def reset_binds(self):
         self.game_binds_dico = {}
         self.reset_active_binds()
-
-        
