@@ -232,7 +232,7 @@ class View:
         self.menu_overlay.append([self.canvas.create_image(self.screen_width // 4, self.screen_height // 8 * (i + 2), image=self.button_inactive_image, anchor="center")  for i in range(5)])
         self.menu_overlay.append([self.canvas.create_image(self.screen_width // 2, self.screen_height // 8 * (i + 2), image=self.button_inactive_image, anchor="center")  for i in range(5)])
         self.menu_overlay.append([self.display_font_text(f"< {self.controller.options_settings.categorises[i]} >", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 4, y=self.screen_height // 8 * (i + 2)) for i in range(5)])
-        self.menu_overlay.append([self.display_font_text(self.controller.options_settings.get_choiced_sub_option(i), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (i + 2)) if i < 4 else self.display_font_text(f"{self.controller.options_settings.get_choiced_sub_option(i)}:{data_binds[0][self.controller.options_settings.get_choiced_sub_option(i)]}", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (i + 2)) for i in range(5)])
+        self.menu_overlay.append([self.display_font_text(self.controller.options_settings.get_choiced_sub_option(i), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (i + 2)) if i < 4 else self.display_font_text(f"{self.controller.options_settings.get_choiced_sub_option(i)}:{data_binds[0][self.controller.options_settings.get_choiced_sub_option(i)]}\nenter to config", alignment="center", size=4, pad_x=1, pad_y=30, x=self.screen_width // 2, y=self.screen_height // 8 * (i + 2)) for i in range(5)])
         self.canvas.itemconfig(self.menu_overlay[0][0], image=self.button_active_image)
 
     def dynamic_options(self):
@@ -245,10 +245,10 @@ class View:
             
         elif self.options_choosing_index[1] != sub_index:
             self.options_choosing_index[1] = sub_index
-            self.hide_image_list(self.menu_overlay[-1][index][0])
+            self.hide_image_list(self.menu_overlay[-1][index])
             if index == 4:
                 with open("binds.json", "r") as file:
                     data_binds = json.load(file)
-                self.menu_overlay[-1][index] = self.display_font_text(f"{self.controller.options_settings.get_choiced_sub_option(index)}:{data_binds[0][self.controller.options_settings.get_choiced_sub_option(index)]}", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (index + 2))
+                self.menu_overlay[-1][index] = self.display_font_text(f"{self.controller.options_settings.get_choiced_sub_option(index)}:{data_binds[0][self.controller.options_settings.get_choiced_sub_option(index)]}\nenter to config", alignment="center", size=4, pad_x=1, pad_y=30, x=self.screen_width // 2, y=self.screen_height // 8 * (index + 2))
             else:
                 self.menu_overlay[-1][index] = self.display_font_text(self.controller.options_settings.get_choiced_sub_option(index), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (index + 2))
