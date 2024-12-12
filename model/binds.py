@@ -9,6 +9,8 @@ Description: This file contains the Binds class, which manages key bindings for 
 TODO: Improve error handling for invalid key bindings and refactor methods for better efficiency.
 """
 
+import json
+
 class Binds:
     """
     A class to manage key bindings for different game states (game, menu, options, etc.).
@@ -18,7 +20,7 @@ class Binds:
     and non-maintainable actions (i.e., actions that only trigger when a key is pressed once).
     """
 
-    def __init__(self, canvas):
+    def __init__(self, canvas, options):
         """
         Initialize the Binds object and set up key bindings for different game states.
 
@@ -26,6 +28,7 @@ class Binds:
             canvas (Canvas): The tkinter canvas object to bind keys to.
         """
         self.canvas = canvas
+        self.options = options
         self.game_binds_dico = {}
         self.menu_binds_dico = {}
         self.options_binds_dico = {}
@@ -51,6 +54,31 @@ class Binds:
         """
         if not command in dico:
             dico[command] = key
+    
+    def start_getting_new_key(self):
+        """
+        Start the process of getting a new key for a command.
+
+        This method is called when a key binding is being changed.
+        """
+        self.canvas.bind("<KeyPress>", self.end_getting_new_key)
+    
+    def end_getting_new_key(self, event):
+        """
+        End the process of getting a new key for a command.
+        
+        Changes the key binding for the command to the key pressed by the user in binds.json.
+        """
+        self.canvas.bind("<KeyPress>", self.active_bind)
+        with open("binds.json", "r") as file:
+            data_binds = json.load(file)
+
+        data_binds[0][self.options.get_choiced_sub_option(4)] = event.keysym
+
+        with open("binds.json", "w") as file:
+            json.dump(data_binds, file, indent=4)
+        
+        self.options.should_update_binds_view = True
 
     def change_bind(self, command, key, dico):
         """

@@ -36,7 +36,7 @@ class Players(Group_object):
         super().__init__(canvas, refresh_rate)
         self.projectille_class = projectille_class
 
-    def add_object(self, x, y, image, projectile_image, weapon_type):
+    def add_object(self, x, y, image, projectile_image, weapon_type, difficulty):
         """
         Adds a new player to the group.
 
@@ -50,7 +50,7 @@ class Players(Group_object):
         Returns:
             None
         """
-        new_player = Player_ship(self.canvas, x, y, image, self.refresh_rate, self.projectille_class, projectile_image)
+        new_player = Player_ship(self.canvas, x, y, image, self.refresh_rate, self.projectille_class, projectile_image, difficulty)
         new_player.weapon = Weapons(new_player, (weapon_type, "player"), self.projectille_class, projectile_image)
         super().add_object(new_player)
     

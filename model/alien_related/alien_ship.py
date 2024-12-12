@@ -65,10 +65,10 @@ class Alien_ship(Ship):
 
         if self.level == 1:
             # Initialize the alien's weapon starting from level 1.
-            self.type = choice(["assault", "rafale", "machine_gun", "sniper", "tank"])
+            self.type = choice(["assault", "rafale", "mitraillette", "sniper", "tank"])
             self.change_weapon(self.type)
 
-        if self.level % 2 == 0:
+        if self.level % 2 == 0: # Every 2 levels aliens life is increased
             super().upgrade_one_caracteristic("life")
 
         upgrade_choiced = choices(

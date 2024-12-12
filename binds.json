@@ -1,8 +1,8 @@
 [
     {
-    "left": "q",
-    "right": "d",
-    "shoot": "space",
-    "reload": "r"
+        "left": "Left",
+        "right": "Right",
+        "shoot": "space",
+        "reload": "r"
     }
 ]

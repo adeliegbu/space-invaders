@@ -32,14 +32,15 @@ class Weapons:
         """
         self.shooter = shooter
         self.type = type
-        refresh_rate = shooter.refresh_rate
-
-        # Initialize cooldowns for different weapon types
-        self.cooldown = Cooldown(100, refresh_rate, 0)
-        self.cooldown_reload = Cooldown(100, refresh_rate, 0)
-        self.cooldown_rafale = Cooldown(100, refresh_rate, 0)
+        if shooter is not None:
+            refresh_rate = shooter.refresh_rate
+        else:
+            refresh_rate = 0
 
         # Default weapon attributes
+        self.cooldown_time = 100
+        self.cooldown_reload_time = 100
+        self.cooldown_rafale_time = 100
         self.damage = 0
         self.power = 0
         self.imprecision = 0
@@ -50,9 +51,9 @@ class Weapons:
 
         # Setup weapon types
         if type[0] == "assault":
-            self.cooldown = Cooldown(300, refresh_rate, 0)
-            self.cooldown_reload = Cooldown(2000, refresh_rate, 0)
-            self.cooldown_rafale = Cooldown(100, refresh_rate, 0)
+            self.cooldown_time = 300
+            self.cooldown_reload_time = 2000
+            self.cooldown_rafale_time = 100
             self.damage = 1
             self.power = 25
             self.imprecision = 1
@@ -62,9 +63,9 @@ class Weapons:
             self.projectile_height = 40
         
         elif type[0] == "sniper":
-            self.cooldown = Cooldown(1000, refresh_rate, 0)
-            self.cooldown_reload = Cooldown(4000, refresh_rate, 0)
-            self.cooldown_rafale = Cooldown(100, refresh_rate, 0)
+            self.cooldown_time = 1000
+            self.cooldown_reload_time = 4000
+            self.cooldown_rafale_time = 100
             self.damage = 2
             self.power = 35
             self.imprecision = 0
@@ -74,9 +75,9 @@ class Weapons:
             self.projectile_height = 40
         
         elif type[0] == "tank":
-            self.cooldown = Cooldown(500, refresh_rate, 0)
-            self.cooldown_reload = Cooldown(3000, refresh_rate, 0)
-            self.cooldown_rafale = Cooldown(75, refresh_rate, 0)
+            self.cooldown_time = 500
+            self.cooldown_reload_time = 3000
+            self.cooldown_rafale_time = 75
             self.damage = 2
             self.power = 13
             self.imprecision = 2
@@ -85,10 +86,10 @@ class Weapons:
             self.projectile_width = 10
             self.projectile_height = 30
         
-        elif type[0] == "machine_gun":
-            self.cooldown = Cooldown(150, refresh_rate, 0)
-            self.cooldown_reload = Cooldown(4000, refresh_rate, 0)
-            self.cooldown_rafale = Cooldown(25, refresh_rate, 0)
+        elif type[0] == "mitraillette":
+            self.cooldown_time = 150
+            self.cooldown_reload_time = 4000
+            self.cooldown_rafale_time = 25
             self.damage = 0.5
             self.power = 18
             self.imprecision = 3
@@ -98,9 +99,9 @@ class Weapons:
             self.projectile_height = 20
         
         elif type[0] == "rafale":
-            self.cooldown = Cooldown(700, refresh_rate, 0)
-            self.cooldown_reload = Cooldown(2500, refresh_rate, 0)
-            self.cooldown_rafale = Cooldown(75, refresh_rate, 0)
+            self.cooldown_time = 700
+            self.cooldown_reload_time = 2500
+            self.cooldown_rafale_time = 75
             self.damage = 1
             self.power = 25
             self.imprecision = 2
@@ -108,6 +109,10 @@ class Weapons:
             self.munitions = 12
             self.projectile_width = 8
             self.projectile_height = 40
+        
+        self.cooldown = Cooldown(self.cooldown_time, refresh_rate, 0)
+        self.cooldown_reload = Cooldown(self.cooldown_reload_time, refresh_rate, 0)
+        self.cooldown_rafale = Cooldown(self.cooldown_rafale_time, refresh_rate, 0)
         
         # Alien or bonus weapon modifications
         if type[1] == "alien":
@@ -117,11 +122,11 @@ class Weapons:
             self.cooldown.change(3000)
             self.cooldown_rafale.add_offset(randint(0, 3000))
             self.cooldown.add_offset(randint(0, 3000))
-            if type[0] == "machine_gun":       # Aliens have modified machine guns with higher burst rate
+            if type[0] == "mitraillette":       # Aliens have modified machine guns
                 self.rafale = 5
 
         elif type[1] == "bonus":
-            self.cooldown = Cooldown(125, refresh_rate, 0)
+            self.cooldown_time = 125
             self.munitions = 1000
 
         self.projectile_class = projectile_class
@@ -130,6 +135,8 @@ class Weapons:
         self.current_munitions = self.munitions
         self.reloading = False
         self.auto_reload = False
+
+        self.stats = f"cd shoot:{self.cooldown_time}\ncd reload:{self.cooldown_reload_time}\ndamage:{self.damage}\npower:{self.power}\nimprecision:{self.imprecision}\nrafale:{self.rafale}\nmunitions:{self.munitions}"
 
     def shoot(self):
         """
@@ -185,7 +192,7 @@ class Weapons:
         """
         Upgrade the damage of the weapon. For aliens or machine guns, the damage is upgraded more significantly.
         """
-        if self.type[1] == "alien" or self.type[0] == "machine_gun":
+        if self.type[1] == "alien" or self.type[0] == "mitraillette":
             self.damage += 0.5
         self.damage += 1
     

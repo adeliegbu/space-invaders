@@ -185,7 +185,7 @@ class Aliens(Group_object):
             if var > 0:
                 self.should_var_update_update = False
 
-    def increase_aliens_level(self, stage_number):
+    def increase_aliens_level(self, stage_number, difficulty):
         """
         Increase the level of a subset of aliens.
 
@@ -193,7 +193,7 @@ class Aliens(Group_object):
             stage_number (int): Determines how many aliens to level up.
         """
         if not self.objects_dead():
-            increasing_aliens = [choice(choice(self.objects_matrix)) for _ in range(stage_number * 8)]
+            increasing_aliens = [choice(choice(self.objects_matrix)) for _ in range(stage_number * 3 * (difficulty + 1))]
             for alien in increasing_aliens:
                 alien.increase_level()
                 if 0 < alien.level <= 10:

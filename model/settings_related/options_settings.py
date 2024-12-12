@@ -34,9 +34,10 @@ class Options_settings(Settings):
             - skin: green, red, blue, yellow, pink, grey
             - binds: left, right, reload, shoot
         """
-        super().__init__([["solo", "coop"], ["easy", "ranked", "defi"], ["assault", "rafale", "mitraille", "tank", "sniper"], ["green", "red", "blue", "yellow", "pink", "grey"], ["left", "right", "reload", "shoot"]])
+        super().__init__([["solo", "coop"], ["easy", "ranked", "defi"], ["assault", "rafale", "mitraillette", "tank", "sniper"], ["green", "blue", "red", "yellow", "pink"], ["left", "right", "reload", "shoot"]])
         self.categorises = ["mode", "level", "class", "skin", "binds"]
         self.choiced_sub_index_list = [0] * self.length
+        self.should_update_binds_view = False
 
     def get_choiced_sub_option(self, index):
         """

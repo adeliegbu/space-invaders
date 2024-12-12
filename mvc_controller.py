@@ -5,6 +5,9 @@ from mvc_view import View
 
 class Controller:
     def __init__(self):
+        """
+        Initialize the Controller class.
+        """
         self.view = View(self)
         self.canvas = self.view.canvas
 
@@ -21,11 +24,11 @@ class Controller:
 
         self.walls = Walls(self.view.canvas, self.refresh_rate, self.view.wall_image)
 
-        self.binds = Binds(self.view.canvas)
-
         self.upgrade_settings = Upgrade_settings()
         self.menu_settings = Menu_settings()
         self.options_settings = Options_settings()
+
+        self.binds = Binds(self.view.canvas, self.options_settings)
 
         self.should_game_update = False
         self.should_menu_update = True
@@ -34,6 +37,9 @@ class Controller:
         self.skill_points = 0
 
     def game_update(self):
+        """
+        Update the game state.
+        """
         if self.should_game_update:
 
             self.binds.execute_active_binds()
@@ -46,7 +52,7 @@ class Controller:
             
             should_update_score = False
             collision, alien, _ = self.players_projectiles.collision(self.aliens)
-            if collision and alien.dead(): # Evite qu'un alien donne du score si il meurt à cause d'un mur
+            if collision and alien.dead():  # Prevents an alien from giving score if it dies due to a wall
                 self.score += 15 * (alien.level + 1)
                 should_update_score = True
                 if alien.type == "doctor":
@@ -78,7 +84,10 @@ class Controller:
             self.view.canvas.after(self.refresh_rate, self.game_update)
 
     def stage_update(self):
-        if self.aliens_projectiles.objects_dead() and self.should_stage_update:  # Transition entre les stages
+        """
+        Update the stage.
+        """
+        if self.aliens_projectiles.objects_dead() and self.should_stage_update:  # Transition between stages
             self.should_game_update = False
             if self.upgrade_settings.choosing is False and self.upgrade_settings.choosing is not None:
                 self.aliens.reset()
@@ -92,7 +101,7 @@ class Controller:
                 self.view.update(None, None, should_update_stage=True, should_update_skill_points=None)
 
                 if self.stage_number > 1 and self.options_settings.get_choiced_sub_option(0) == "solo":
-                    self.binds.change_current_binds_dico(self.binds.upgrade_binds_dico) # Change les binds pour les binds de l'upgrade
+                    self.binds.change_current_binds_dico(self.binds.upgrade_binds_dico)  # Change binds for upgrade
                     self.skill_points += 1
                     self.view.update(None, None, None, should_update_skill_points=True)
                     self.view.display_upgrade_stage()
@@ -119,6 +128,9 @@ class Controller:
                     self.canvas.after(self.refresh_rate, self.stage_update)
 
     def next_stage(self):
+        """
+        Proceed to the next stage.
+        """
         self.should_stage_update = False
         self.upgrade_settings.choosing = False
         self.upgrade_settings.reset_option()
@@ -126,19 +138,23 @@ class Controller:
         self.view.hide_image_list(self.view.image_upgrade_cards)
         self.view.hide_image_list(self.view.upgrade_text)
         self.view.image_upgrade_cards = []
+        difficulty = self.options_settings.get_choiced_sub_index(1)
         
         for player in self.players.objects_list:
             player.weapon.reset()
-        self.aliens.create_objects_matrix(line=3, column=5)
-        self.aliens.increase_aliens_level(self.stage_number)
+        self.aliens.create_objects_matrix(line=3, column=5 + difficulty)
+        self.aliens.increase_aliens_level(self.stage_number, difficulty)
         self.aliens.increase_speed(self.stage_number // 2)
-        self.walls.add_object(self.view.screen_height * 15 // 20, 2)
+        self.walls.add_object(self.view.screen_height * 15 // 20, 3 - difficulty)
         self.should_game_update = True
         self.binds.change_current_binds_dico(self.binds.game_binds_dico)
         self.view.update(None, None, should_update_stage=True, should_update_skill_points=True)
         self.game_update()
         
     def menu_update(self):
+        """
+        Update the menu state.
+        """
         if self.should_menu_update:
             self.binds.execute_active_binds()
             if self.options_settings.choosing:
@@ -165,9 +181,12 @@ class Controller:
             self.view.canvas.after(self.refresh_rate, self.menu_update)
     
     def new_game(self):
+        """
+        Start a new game.
+        """
         self.should_game_update = True
         self.should_menu_update = False
-        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_image_green, self.view.projectile_player_image_red, weapon_type="rafale") 
+        self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_skins[self.options_settings.get_choiced_sub_option(2)][self.options_settings.get_choiced_sub_index(3)], self.view.projectile_skins[self.options_settings.get_choiced_sub_option(3)], weapon_type=self.options_settings.get_choiced_sub_option(2), difficulty=self.options_settings.get_choiced_sub_index(1)) 
 
         self.stage_number = 0
         self.should_stage_update = True
@@ -175,6 +194,9 @@ class Controller:
         self.stage_update()
     
     def go_to_menu(self):
+        """
+        Return to the main menu.
+        """
         self.should_game_update = False
         self.should_stage_update = False
         self.should_menu_update = True
@@ -190,6 +212,9 @@ class Controller:
         self.menu_update()
 
     def default_binds(self):
+        """
+        Set up the default key bindings.
+        """
         self.binds.add_bind((self.upgrade_settings.next_option, False), "Right", self.binds.upgrade_binds_dico)
         self.binds.add_bind((self.upgrade_settings.prev_option, False), "Left", self.binds.upgrade_binds_dico)
         self.binds.add_bind((self.upgrade_settings.chose_option, False), "Return", self.binds.upgrade_binds_dico)
@@ -204,36 +229,43 @@ class Controller:
         self.binds.add_bind((self.options_settings.prev_option, False), "Up", self.binds.options_binds_dico)
         self.binds.add_bind((self.options_settings.next_sub_option, False), "Right", self.binds.options_binds_dico)
         self.binds.add_bind((self.options_settings.prev_sub_option, False), "Left", self.binds.options_binds_dico)
-        self.binds.add_bind((self.change_bind, False), "Return", self.binds.options_binds_dico)
+        self.binds.add_bind((self.binds.start_getting_new_key, False), "Return", self.binds.options_binds_dico)
         self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.options_binds_dico)
-    
-    def change_bind():
-        pass
-    
+
     def game_binds(self):
+        """
+        Set up the game key bindings.
+        """
         self.binds.reset_game_binds()
         
         with open("binds.json", "r") as file:
             data_binds = json.load(file)
         for i in range(len(self.players.objects_list)):
             player = self.players.define_player(i)
-            for str_command in data_binds[i] :
+            for str_command in data_binds[i]:
                 if str_command == "reload":
                     command = getattr(player.weapon, str_command)
                     self.binds.add_bind((command, True), data_binds[i][str_command], self.binds.game_binds_dico)
                 else:
                     command = getattr(player, str_command)
+                    print(command, data_binds[i][str_command])
                     self.binds.add_bind((command, True), data_binds[i][str_command], self.binds.game_binds_dico)
 
         self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.game_binds_dico)
         self.binds.add_bind((self.cheat_next_stage, False), "n", self.binds.game_binds_dico)
     
     def cheat_next_stage(self):
+        """
+        Cheat to skip to the next stage.
+        """
         self.players_projectiles.reset()
         self.aliens_projectiles.reset()
         self.aliens.reset()
     
     def reset(self):
+        """
+        Reset the game state.
+        """
         self.aliens.reset()
         self.players.reset()
         self.players_projectiles.reset()
@@ -241,9 +273,9 @@ class Controller:
         self.walls.reset()
     
     def run(self):
+        """
+        Run the main loop of the application.
+        """
         self.go_to_menu()
         self.default_binds()
         self.view.root.mainloop()
-    
-
-    
