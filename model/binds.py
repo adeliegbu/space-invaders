@@ -37,6 +37,11 @@ class Binds:
                 return command
         return None
     
+    def get_binded_key(self, command, dico):
+        if command in dico:
+            return dico[command]
+        return None
+    
     def active_bind(self, event):
         command = self.get_binded_command(event.keysym, self.current_binds_dico)
         if command != None:
@@ -73,5 +78,3 @@ class Binds:
     def reset_binds(self):
         self.game_binds_dico = {}
         self.reset_active_binds()
-
-        

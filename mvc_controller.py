@@ -1,3 +1,5 @@
+import json
+
 from mvc_model import Players, Aliens, Walls, Players_projectiles, Aliens_projectiles, Binds, Upgrade_settings, Menu_settings, Options_settings
 from mvc_view import View
 
@@ -14,7 +16,6 @@ class Controller:
 
         self.players = Players(self.view.canvas, self.refresh_rate, self.players_projectiles)
         self.players_number = 1
-        self.p1, self.p2 = None, None
         
         self.aliens = Aliens(self.view.canvas, self.refresh_rate, self.view.alien_skins, projectile_class=self.aliens_projectiles)
 
@@ -64,7 +65,7 @@ class Controller:
             self.players.update_weapons()
             self.aliens.var_update()
 
-            if self.p1 is not None:
+            if not self.players.objects_dead():
                 self.view.update(should_update_lives=True, should_update_score=should_update_score, should_update_stage=False, should_update_skill_points=False)
 
             if self.aliens.objects_dead():
@@ -90,7 +91,7 @@ class Controller:
 
                 self.view.update(None, None, should_update_stage=True, should_update_skill_points=None)
 
-                if self.stage_number > 1:
+                if self.stage_number > 1 and self.options_settings.get_choiced_sub_option(0) == "solo":
                     self.binds.change_current_binds_dico(self.binds.upgrade_binds_dico) # Change les binds pour les binds de l'upgrade
                     self.skill_points += 1
                     self.view.update(None, None, None, should_update_skill_points=True)
@@ -99,7 +100,7 @@ class Controller:
                 else:
                     self.next_stage()
 
-            if self.stage_number > 1:
+            if self.stage_number > 1 and self.options_settings.get_choiced_sub_option(0) == "solo":
                 self.binds.execute_active_binds()
                 self.view.display_choosing_card()
 
@@ -109,7 +110,7 @@ class Controller:
                     self.next_stage()
                 elif self.skill_points >= self.upgrade_settings.choiced_price():
                     self.skill_points -= self.upgrade_settings.choiced_price()
-                    self.p1.upgrade_one_caracteristic(self.upgrade_settings.get_choiced_option())
+                    self.players.define_player(1).upgrade_one_caracteristic(self.upgrade_settings.get_choiced_option())
                     self.view.update(None, None, None, should_update_skill_points=True)
                     self.upgrade_settings.choosing = True
                     self.canvas.after(self.refresh_rate, self.stage_update)
@@ -126,7 +127,8 @@ class Controller:
         self.view.hide_image_list(self.view.upgrade_text)
         self.view.image_upgrade_cards = []
         
-        self.p1.weapon.reset()
+        for player in self.players.objects_list:
+            player.weapon.reset()
         self.aliens.create_objects_matrix(line=3, column=5)
         self.aliens.increase_aliens_level(self.stage_number)
         self.aliens.increase_speed(self.stage_number // 2)
@@ -154,6 +156,7 @@ class Controller:
                     self.menu_settings.choosing = True
                 elif self.menu_settings.get_choiced_index() == 2:
                     self.options_settings.choosing = True
+                    self.options_settings.reset_option()
                     self.binds.change_current_binds_dico(self.binds.options_binds_dico)
                     self.view.show_options()
                 elif self.menu_settings.get_choiced_index() == 3:
@@ -165,8 +168,6 @@ class Controller:
         self.should_game_update = True
         self.should_menu_update = False
         self.players.add_object(self.view.screen_width // 2, self.view.screen_height * 28 // 30, self.view.player_image_green, self.view.projectile_player_image_red, weapon_type="rafale") 
-        self.p1 = self.players.define_player(1)
-        self.p2 = self.players.define_player(2)
 
         self.stage_number = 0
         self.should_stage_update = True
@@ -207,10 +208,18 @@ class Controller:
         self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.options_binds_dico)
 
     def game_binds(self):
-        self.binds.add_bind((self.p1.move_left, True), "q", self.binds.game_binds_dico)
-        self.binds.add_bind((self.p1.move_right, True), "d", self.binds.game_binds_dico)
-        self.binds.add_bind((self.p1.shoot, True), "space", self.binds.game_binds_dico)
-        self.binds.add_bind((self.p1.weapon.reload, False), "r", self.binds.game_binds_dico)
+        with open("binds.json", "r") as file:
+            data_binds = json.load(file)
+        for i in range(len(self.players.objects_list)):
+            player = self.players.define_player(i)
+            for str_command in data_binds[i] :
+                if str_command == "reload":
+                    command = getattr(player.weapon, str_command)
+                    self.binds.add_bind((command, True), data_binds[i][str_command], self.binds.game_binds_dico)
+                else:
+                    command = getattr(player, str_command)
+                    self.binds.add_bind((command, True), data_binds[i][str_command], self.binds.game_binds_dico)
+
         self.binds.add_bind((self.go_to_menu, False), "Escape", self.binds.game_binds_dico)
         self.binds.add_bind((self.cheat_next_stage, False), "n", self.binds.game_binds_dico)
     

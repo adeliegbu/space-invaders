@@ -1,5 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+import json
 
 from visuel.rules import rules_text
 
@@ -58,8 +59,10 @@ class View:
         self.button_active_image = ImageTk.PhotoImage(Image.open("visuel/button_active.png").resize((int(self.screen_width // 4.5), int(self.screen_height // 13)), Image.LANCZOS))
         self.button_inactive_image = ImageTk.PhotoImage(Image.open("visuel/button_inactive.png").resize((int(self.screen_width // 4.5), int(self.screen_height // 13)), Image.LANCZOS))
 
+        self.arrow_left_image = ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-arrow_left.png").resize((self.screen_height // 40, self.screen_height // 40), Image.LANCZOS))
+        self.arrow_right_image = ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-arrow_right.png").resize((self.screen_height // 40, self.screen_height // 40), Image.LANCZOS))
+
         self.wall_image = ImageTk.PhotoImage(Image.open("visuel/n_wall.webp").resize((20, 20), Image.LANCZOS))
-        self.rules_label = tk.Label(self.canvas, text=str(rules_text), font=("Helvetica", 14), justify=tk.LEFT, bg="yellow", fg="darkblue", padx="30")
 
         self.button_new_game = tk.Button(self.canvas, text="Nouvelle Partie", command=self.new_game, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
         self.button_rules = tk.Button(self.canvas, text="Règles", command=self.rules, font=("Helvetica", 12, "bold"), height=2, width=10, bg="yellow", fg="darkblue", padx="30")
@@ -72,7 +75,9 @@ class View:
         characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-+"
         for char in characters:
             self.font_images[char] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-{char}.png").resize((size, size), Image.LANCZOS)) for size in [self.screen_height // 50, self.screen_height // 45, self.screen_height // 40, self.screen_height // 35, self.screen_height // 30, self.screen_height // 25]]
-        self.font_images[":"] = [ImageTk.PhotoImage(Image.open(f"visuel/font/police_space_invaders-doublepoint.png").resize((size, size), Image.LANCZOS)) for size in [self.screen_height // 50, self.screen_height // 45, self.screen_height // 40, self.screen_height // 35, self.screen_height // 30, self.screen_height // 25]]
+        self.font_images[":"] = [ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-doublepoint.png").resize((size, size), Image.LANCZOS)) for size in [self.screen_height // 50, self.screen_height // 45, self.screen_height // 40, self.screen_height // 35, self.screen_height // 30, self.screen_height // 25]]
+        self.font_images["<"] = [ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-arrow_left.png").resize((size, size), Image.LANCZOS)) for size in [self.screen_height // 50, self.screen_height // 45, self.screen_height // 40, self.screen_height // 35, self.screen_height // 30, self.screen_height // 25]]
+        self.font_images[">"] = [ImageTk.PhotoImage(Image.open("visuel/font/police_space_invaders-arrow_right.png").resize((size, size), Image.LANCZOS)) for size in [self.screen_height // 50, self.screen_height // 45, self.screen_height // 40, self.screen_height // 35, self.screen_height // 30, self.screen_height // 25]]
 
         self.upgrade_images = {}
         upgrades = ["cooldown", "cooldown_reload", "damage", "power", "rafale", "imprecision", "munitions", "speed", "life", "auto_reload"]
@@ -149,7 +154,8 @@ class View:
     
     def update(self, should_update_lives, should_update_score, should_update_stage, should_update_skill_points):
         if should_update_lives:
-            self.display_lives(self.controller.p1.life, self.controller.p1.x, self.controller.p1.y, difficulty=5)
+            for player in self.controller.players.objects_list:
+                self.display_lives(player.life, player.x, player.y, difficulty=5)
         if should_update_score:
             if self.image_score:
                 self.hide_image_list(self.image_score)
@@ -220,18 +226,29 @@ class View:
             self.canvas.itemconfig(self.menu_overlay[0][self.menu_choosing_index], image=self.button_active_image)
     
     def display_options(self):
+        with open("binds.json", "r") as file:
+            data_binds = json.load(file)
         self.menu_overlay = []
-        self.menu_overlay.append([self.canvas.create_image(self.screen_width // 4 * (i + 1), self.screen_height // 8, image=self.button_inactive_image, anchor="center") for i in range(3)])
-        self.menu_overlay.append([self.canvas.create_image(self.screen_width // 4 * (i + 1), self.screen_height // 4, image=self.button_inactive_image, anchor="center") for i in range(3)])
-        self.menu_overlay.append(self.display_font_text("Solo       coop       duel", alignment="center", size=5, pad_x=2, pad_y=0, x=self.x0, y=self.screen_height // 8))
-        self.menu_overlay.append(self.display_font_text(" easy      ranked     survie", alignment="center", size=5, pad_x=2, pad_y=0, x=self.x0, y=self.screen_height // 4))
-        self.canvas.itemconfig(self.menu_overlay[self.options_choosing_index[0]][self.options_choosing_index[1]], image=self.button_active_image)
+        self.menu_overlay.append([self.canvas.create_image(self.screen_width // 4, self.screen_height // 8 * (i + 2), image=self.button_inactive_image, anchor="center")  for i in range(5)])
+        self.menu_overlay.append([self.canvas.create_image(self.screen_width // 2, self.screen_height // 8 * (i + 2), image=self.button_inactive_image, anchor="center")  for i in range(5)])
+        self.menu_overlay.append([self.display_font_text(f"< {self.controller.options_settings.categorises[i]} >", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 4, y=self.screen_height // 8 * (i + 2)) for i in range(5)])
+        self.menu_overlay.append([self.display_font_text(self.controller.options_settings.get_choiced_sub_option(i), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (i + 2)) if i < 4 else self.display_font_text(f"{self.controller.options_settings.get_choiced_sub_option(i)}:{data_binds[0][self.controller.options_settings.get_choiced_sub_option(i)]}", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (i + 2)) for i in range(5)])
+        self.canvas.itemconfig(self.menu_overlay[0][0], image=self.button_active_image)
 
     def dynamic_options(self):
         index = self.controller.options_settings.get_choiced_index()
-        sub_index = self.controller.options_settings.get_choiced_sub_index()
-        if index < 2 :
-            if self.options_choosing_index != [index, sub_index]:
-                self.canvas.itemconfig(self.menu_overlay[self.options_choosing_index[0]][self.options_choosing_index[1]], image=self.button_inactive_image)
-                self.options_choosing_index = [index, sub_index]
-                self.canvas.itemconfig(self.menu_overlay[self.options_choosing_index[0]][self.options_choosing_index[1]], image=self.button_active_image)
+        sub_index = self.controller.options_settings.get_choiced_sub_index(index)
+        if self.options_choosing_index[0] != index:
+            self.canvas.itemconfig(self.menu_overlay[0][self.options_choosing_index[0]], image=self.button_inactive_image)
+            self.options_choosing_index[0] = index
+            self.canvas.itemconfig(self.menu_overlay[0][self.options_choosing_index[0]], image=self.button_active_image)
+            
+        elif self.options_choosing_index[1] != sub_index:
+            self.options_choosing_index[1] = sub_index
+            self.hide_image_list(self.menu_overlay[-1][index][0])
+            if index == 4:
+                with open("binds.json", "r") as file:
+                    data_binds = json.load(file)
+                self.menu_overlay[-1][index] = self.display_font_text(f"{self.controller.options_settings.get_choiced_sub_option(index)}:{data_binds[0][self.controller.options_settings.get_choiced_sub_option(index)]}", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (index + 2))
+            else:
+                self.menu_overlay[-1][index] = self.display_font_text(self.controller.options_settings.get_choiced_sub_option(index), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (index + 2))
