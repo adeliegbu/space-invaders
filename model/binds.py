@@ -75,6 +75,6 @@ class Binds:
         self.active_maintainable_binds = set()
         self.active_non_maintainable_binds = set()
     
-    def reset_binds(self):
+    def reset_game_binds(self):
         self.game_binds_dico = {}
         self.reset_active_binds()

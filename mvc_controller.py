@@ -211,6 +211,8 @@ class Controller:
         pass
     
     def game_binds(self):
+        self.binds.reset_game_binds()
+        
         with open("binds.json", "r") as file:
             data_binds = json.load(file)
         for i in range(len(self.players.objects_list)):
