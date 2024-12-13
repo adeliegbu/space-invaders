@@ -174,6 +174,14 @@ class Weapons:
                 self.reloading = False
                 self.cooldown_reload.reset()
     
+    def get_munitions_left(self):
+        """
+        Get the current ammunition count left in the weapon over total ammunition capacity.
+
+        Returns:
+            int: The remaining ammunition count.
+        """
+        return self.current_munitions / self.munitions
     def upgrade_cooldown(self):
         """
         Upgrade the cooldown time to make it faster. This method decreases the cooldown by 30.

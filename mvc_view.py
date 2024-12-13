@@ -7,6 +7,7 @@ Description: This module contains the view component of the MVC architecture for
              It handles the display of various elements on the canvas, including upgrade stages, 
              choosing cards, menus, and options.
 TODO:
+- Add missing skins for players
 - Add error handling for file operations
 - Optimize the display functions for better performance
 - Add more detailed comments and docstrings
@@ -106,7 +107,7 @@ class View:
             self.upgrade_images[upgrade] = [ImageTk.PhotoImage(Image.open(f"visuel/upgrade_cards/up_{upgrade}.png").resize((125, 200), Image.LANCZOS)), upgrade_prices[i], upgrade_texts[i]]
             i += 1
 
-        self.lives_images_list = [None] * 5
+        self.lives_munitions_images_list = [None] * 6
         self.image_score = []
         self.image_stage = []
         self.image_upgrade_points = []
@@ -139,7 +140,7 @@ class View:
         """
         Display the main menu on the canvas.
         """
-        self.hide_image_list(self.lives_images_list)
+        self.hide_image_list(self.lives_munitions_images_list)
         self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
         self.logo_id = self.canvas.create_image(self.x0, self.y0 // 2, image=self.logo_image, anchor="center")
         self.hide_image_list(self.binds_overlay)
@@ -191,7 +192,7 @@ class View:
             if item != self.bg_game_id:
                 self.canvas.delete(item)
 
-    def display_lives(self, lives, x, y, difficulty):
+    def display_lives(self, lives, weapon, x, y, difficulty):
         """
         Display the player's lives on the canvas.
         
@@ -201,16 +202,20 @@ class View:
         y (int): The y-coordinate for the lives display.
         difficulty (int): The difficulty level affecting the display.
         """
-        self.hide_image_list(self.lives_images_list)
+        self.hide_image_list(self.lives_munitions_images_list)
         j = 0
         for i in range(- difficulty // 2 + 1, difficulty // 2 + 1):
             j += 1
             if j <= lives:
-                self.lives_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_full_image, anchor="center")
+                self.lives_munitions_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_full_image, anchor="center")
             elif j - 0.5 == lives:
-                self.lives_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_semi_image, anchor="center")
+                self.lives_munitions_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_semi_image, anchor="center")
             else:
-                self.lives_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_dead_image, anchor="center")
+                self.lives_munitions_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_dead_image, anchor="center")
+        if not weapon.reloading:
+            self.lives_munitions_images_list[-1] = self.canvas.create_rectangle(x + self.screen_height // 20, y + self.screen_height // 50, x + self.screen_height // 18, y + self.screen_height // 25 * (0.5 - weapon.get_munitions_left()), fill=self.controller.options_settings.get_choiced_sub_option(3))
+        else:
+            self.lives_munitions_images_list[-1] = self.canvas.create_rectangle(x + self.screen_height // 20, y + self.screen_height // 50, x + self.screen_height // 18, y + self.screen_height // 25 * (0.5 - weapon.cooldown_reload.get_progression()), fill=self.controller.options_settings.get_choiced_sub_option(3))
     
     def update(self, should_update_lives, should_update_score, should_update_stage, should_update_skill_points):
         """
@@ -224,7 +229,7 @@ class View:
         """
         if should_update_lives:
             for player in self.controller.players.objects_list:
-                self.display_lives(player.life, player.x, player.y, difficulty=self.controller.options_settings.get_choiced_sub_index(1))
+                self.display_lives(player.life, player.weapon, player.x, player.y, difficulty=5 - 2 * self.controller.options_settings.get_choiced_sub_index(1))
         if should_update_score:
             if self.image_score:
                 self.hide_image_list(self.image_score)
@@ -385,8 +390,9 @@ class View:
                 self.hide_image_list(self.menu_overlay[-1][2])
                 self.menu_overlay[-1][2] = [self.display_font_text(self.controller.options_settings.get_choiced_sub_option(2), alignment="center", size=2, pad_x=1, pad_y=0, x=self.screen_width // 15 * 11, y=self.screen_height // 15 * 7), self.display_font_text(self.weapons_stats[self.controller.options_settings.get_choiced_sub_option(2)], alignment="left", size=2, pad_x=1, pad_y=5, x=self.screen_width // 30 * 19, y=self.screen_height // 15 * 8), self.canvas.create_image(self.screen_width // 7 * 4, self.screen_height // 3 * 2, image=self.player_skins[self.controller.options_settings.get_choiced_sub_option(2)][self.controller.options_settings.get_choiced_sub_index(3)], anchor="center")]
             elif index == 4:
-                self.canvas.itemconfig(self.menu_overlay[2][-2][self.options_choosing_index[1]], image=self.lil_button_inactive_image)
-                self.canvas.itemconfig(self.menu_overlay[2][-2][sub_index], image=self.lil_button_active_image)
+                if self.options_choosing_index[1] < 4:
+                    self.canvas.itemconfig(self.menu_overlay[2][-2][self.options_choosing_index[1]], image=self.lil_button_inactive_image)
+                    self.canvas.itemconfig(self.menu_overlay[2][-2][sub_index], image=self.lil_button_active_image)
             else:
                 self.menu_overlay[-1][index] = self.display_font_text(self.controller.options_settings.get_choiced_sub_option(index), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 2, y=self.screen_height // 8 * (index + 2))
 

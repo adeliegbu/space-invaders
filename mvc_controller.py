@@ -52,15 +52,18 @@ class Controller:
             
             should_update_score = False
             collision, alien, _ = self.players_projectiles.collision(self.aliens)
-            if collision and alien.dead():  # Prevents an alien from giving score if it dies due to a wall
-                self.score += 15 * (alien.level + 1)
-                should_update_score = True
-                if alien.type == "doctor":
-                    for players in self.players.objects_list:
-                        players.upgrade_one_caracteristic("life")
-                if alien.type == "bonus":
-                    self.skill_points += 1
-                    self.view.update(None, None, None, should_update_skill_points=True)
+            if collision:   # Prevents an alien from giving score if it dies due to a wall
+                if alien.dead():  
+                    self.score += 15 * (alien.level + 1)
+                    should_update_score = True
+                    if alien.type == "doctor":
+                        for players in self.players.objects_list:
+                            players.upgrade_one_caracteristic("life")
+                    if alien.type == "bonus":
+                        self.skill_points += 1
+                        self.view.update(None, None, None, should_update_skill_points=True)
+                else:
+                    alien.change_image(self.view.alien_skins[alien.weapon.type[0]][alien.life - 1])
 
             self.players_projectiles.collision(self.walls)
             self.aliens_projectiles.collision(self.players)
