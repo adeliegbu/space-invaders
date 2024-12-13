@@ -38,6 +38,7 @@ class Options_settings(Settings):
         self.categorises = ["mode", "level", "class", "skin", "binds"]
         self.choiced_sub_index_list = [0] * self.length
         self.should_update_binds_view = False
+        self.key_error = False
 
     def get_choiced_sub_option(self, index):
         """

@@ -72,6 +72,11 @@ class Binds:
         self.canvas.bind("<KeyPress>", self.active_bind)
         with open("binds.json", "r") as file:
             data_binds = json.load(file)
+        
+        if event.keysym in data_binds[0].values() and event.keysym != data_binds[0][self.options.get_choiced_sub_option(4)]:
+            self.start_getting_new_key()
+            self.options.key_error = True
+            return
 
         data_binds[0][self.options.get_choiced_sub_option(4)] = event.keysym
 
@@ -79,6 +84,7 @@ class Binds:
             json.dump(data_binds, file, indent=4)
         
         self.options.should_update_binds_view = True
+        self.options.key_error = False
 
     def change_bind(self, command, key, dico):
         """

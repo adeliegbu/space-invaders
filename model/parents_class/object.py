@@ -127,17 +127,7 @@ class Object:
     def dead(self):
         """Check if the object is dead."""
         return self.life <= 0
-
-    def change_image(self, image):
-        """
-        Change the image of the object.
-
-        Args:
-            image: The new image for the object.
-        """
-        self.delete()
-        self.id = self.canvas.create_image(self.x, self.y, image=image, anchor="center")
-
+    
     def delete(self):
         """Delete the object from the canvas."""
         self.canvas.delete(self.id)

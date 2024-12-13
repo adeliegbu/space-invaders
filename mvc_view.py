@@ -7,7 +7,6 @@ Description: This module contains the view component of the MVC architecture for
              It handles the display of various elements on the canvas, including upgrade stages, 
              choosing cards, menus, and options.
 TODO:
-- Add missing skins for players
 - Add error handling for file operations
 - Optimize the display functions for better performance
 - Add more detailed comments and docstrings
@@ -51,6 +50,7 @@ class View:
         # Load images for aliens, players, and projectiles
         self.alien_skins = {}
         self.player_skins = {}
+        self.display_player_skins = {}
         self.projectile_skins = {}
 
         self.alien_skins["basic"] = ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien__basic.png").resize((self.screen_height // 13, self.screen_height // 13), Image.LANCZOS))
@@ -60,7 +60,8 @@ class View:
 
         for type in ["assault", "rafale", "mitraillette", "sniper", "tank"]:
             self.alien_skins[type] = [ImageTk.PhotoImage(Image.open(f"visuel/alien_skins/alien_{type}_{level}.png").resize((self.screen_height // 20, self.screen_height // 22), Image.LANCZOS)) for level in range (1, 6)]
-            self.player_skins[type] = [ImageTk.PhotoImage(Image.open(f"visuel/player_skins/player_{type}_{color}.png").resize((self.screen_height // 15, self.screen_height // 15), Image.LANCZOS)) for color in ["green", "blue", "red", "yellow", "pink"]]
+            self.player_skins[type] = [ImageTk.PhotoImage(Image.open(f"visuel/player_skins/player_{type}_{color}.png").resize((self.screen_height // 13, self.screen_height // 13), Image.LANCZOS)) for color in ["green", "blue", "red", "yellow", "pink"]]
+            self.display_player_skins[type] = [ImageTk.PhotoImage(Image.open(f"visuel/player_skins/player_{type}_{color}.png").resize((self.screen_height // 6, self.screen_height // 6), Image.LANCZOS)) for color in ["green", "blue", "red", "yellow", "pink"]]
         
         for color in ["green", "blue", "red", "yellow", "pink"]:
             self.projectile_skins[color] = ImageTk.PhotoImage(Image.open(f"visuel/projectile_skins/projectile_{color}.png").rotate(90).resize((250, 250), Image.LANCZOS))
@@ -76,7 +77,7 @@ class View:
 
         self.button_active_image = ImageTk.PhotoImage(Image.open("visuel/button_active.png").resize((int(self.screen_width // 4.5), self.screen_height // 13), Image.LANCZOS))
         self.button_inactive_image = ImageTk.PhotoImage(Image.open("visuel/button_inactive.png").resize((int(self.screen_width // 4.5), self.screen_height // 13), Image.LANCZOS))
-        self.options_solo_bubble_image = ImageTk.PhotoImage(Image.open("visuel/options_bubble.png").resize((self.screen_width // 5 * 2, self.screen_height // 2), Image.LANCZOS))
+        self.options_solo_bubble_image = ImageTk.PhotoImage(Image.open("visuel/options_bubble.png").resize((self.screen_width // 5 * 2, self.screen_height // 20 * 9), Image.LANCZOS))
         self.options_coop_bubble_image = ImageTk.PhotoImage(Image.open("visuel/options_bubble.png").resize((self.screen_width // 5, self.screen_height // 2), Image.LANCZOS))
 
         self.lil_button_active_image = ImageTk.PhotoImage(Image.open("visuel/button_active.png").resize((self.screen_width // 6, self.screen_height // 25), Image.LANCZOS))
@@ -213,9 +214,9 @@ class View:
             else:
                 self.lives_munitions_images_list[j-1] = self.canvas.create_image(x + i * 20, y + 45, image=self.heart_dead_image, anchor="center")
         if not weapon.reloading:
-            self.lives_munitions_images_list[-1] = self.canvas.create_rectangle(x + self.screen_height // 20, y + self.screen_height // 50, x + self.screen_height // 18, y + self.screen_height // 25 * (0.5 - weapon.get_munitions_left()), fill=self.controller.options_settings.get_choiced_sub_option(3))
+            self.lives_munitions_images_list[-1] = self.canvas.create_rectangle(x + self.screen_height // 20, y + self.screen_height // 50, x + self.screen_height // 17, y + self.screen_height // 25 * (0.5 - weapon.get_munitions_left()), fill=self.controller.options_settings.get_choiced_sub_option(3))
         else:
-            self.lives_munitions_images_list[-1] = self.canvas.create_rectangle(x + self.screen_height // 20, y + self.screen_height // 50, x + self.screen_height // 18, y + self.screen_height // 25 * (0.5 - weapon.cooldown_reload.get_progression()), fill=self.controller.options_settings.get_choiced_sub_option(3))
+            self.lives_munitions_images_list[-1] = self.canvas.create_rectangle(x + self.screen_height // 20, y + self.screen_height // 50, x + self.screen_height // 17, y + self.screen_height // 25 * (0.5 - weapon.cooldown_reload.get_progression()), fill=self.controller.options_settings.get_choiced_sub_option(3))
     
     def update(self, should_update_lives, should_update_score, should_update_stage, should_update_skill_points):
         """
@@ -241,7 +242,7 @@ class View:
         if should_update_skill_points:
             if self.image_upgrade_points:
                 self.hide_image_list(self.image_upgrade_points)
-            self.image_upgrade_points = self.display_font_text(f"sp:{self.controller.skill_points}", alignment="left", size=2, pad_x=2, pad_y=0, x=20, y=60)
+            self.image_upgrade_points = self.display_font_text(f"points:{self.controller.skill_points}", alignment="left", size=2, pad_x=2, pad_y=0, x=20, y=60)
 
     def display_font_text(self, text, alignment, size, pad_x, pad_y, x, y):
         """
@@ -295,7 +296,7 @@ class View:
         i = 0
         for upgrade in self.upgrade_images.values():
             self.image_upgrade_cards.append(self.canvas.create_image(self.screen_width // 6 * (i % 5 + 1), self.screen_height // 9 * ((i // 5 * 3) + 4) + 50, image=upgrade[0], anchor="center"))
-            self.image_upgrade_cards.append(self.display_font_text(f"prix:{upgrade[1]}sp\n{upgrade[2]}", alignment="center", size=0, pad_x=2, pad_y=10, x=self.screen_width // 6 * (i % 5 + 1), y=self.screen_height * (((i // 5 * 3) + 4) / 9) - 80))
+            self.image_upgrade_cards.append(self.display_font_text(f"prix:{upgrade[1]}p\n{upgrade[2]}", alignment="center", size=0, pad_x=2, pad_y=10, x=self.screen_width // 6 * (i % 5 + 1), y=self.screen_height * (((i // 5 * 3) + 4) / 9) - 80))
             i += 1
         self.canvas.move(self.image_upgrade_cards[0], 0, 30)
         self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nEntree pour valider\nEchap pour passer au next stage", alignment="center", size=3, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
@@ -329,8 +330,8 @@ class View:
 
         self.menu_overlay = [[] for _ in range(4)]
 
-        self.menu_overlay[0].append(self.canvas.create_image(self.screen_width // 3 * 2, self.screen_height // 3 * 2, image=self.options_solo_bubble_image, anchor="center"))
-        self.menu_overlay[0].append(self.display_font_text("to modify:enter then key", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 3 * 2, y=self.screen_height // 9 * 8))
+        self.menu_overlay[0].append(self.canvas.create_image(self.screen_width // 300 * 202, self.screen_height // 30 * 20, image=self.options_solo_bubble_image, anchor="center"))
+        self.menu_overlay[0].append(self.display_font_text("to modify:enter then key", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 3 * 2, y=self.screen_height // 30 * 26))
 
         for i in range(5):
             if i < 2:
@@ -345,8 +346,8 @@ class View:
             else:
                 self.menu_overlay[2].append(self.display_font_text(f"< {self.controller.options_settings.categorises[i]} >", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 4, y=self.screen_height // 8 * (i + 2)))
 
-        self.menu_overlay[2].append([self.canvas.create_image(self.screen_width // 40 * (23 + i // 2 * 7), self.screen_height // 21 * (17 + i % 2), image=self.lil_button_inactive_image, anchor="center") for i in range(4)])
-        self.menu_overlay[2].append([self.display_font_text(f"{self.controller.options_settings.options[4][i]}:{data_binds[0][self.controller.options_settings.options[4][i]]}", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 40 * (23 + i // 2 * 7), y=self.screen_height // 21 * (17 + i % 2)) for i in range(4)])
+        self.menu_overlay[2].append([self.canvas.create_image(self.screen_width // 40 * (23 + i // 2 * 7), self.screen_height // 21 * (16 + i % 2), image=self.lil_button_inactive_image, anchor="center") for i in range(4)])
+        self.menu_overlay[2].append([self.display_font_text(f"{self.controller.options_settings.options[4][i]}:{data_binds[0][self.controller.options_settings.options[4][i]]}", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 40 * (23 + i // 2 * 7), y=self.screen_height // 21 * (16 + i % 2)) for i in range(4)])
 
         for i in range(2):
             if i == 0:
@@ -354,7 +355,9 @@ class View:
             else:
                 self.menu_overlay[-1].append(self.display_font_text(self.controller.options_settings.get_choiced_sub_option(i), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // (3 + i // 2) * 2, y=self.screen_height // 8 * (i + 2)))
 
-        self.menu_overlay[-1].append([self.display_font_text(self.controller.options_settings.get_choiced_sub_option(2), alignment="center", size=2, pad_x=1, pad_y=0, x=self.screen_width // 15 * 11, y=self.screen_height // 15 * 7), self.display_font_text(self.weapons_stats[self.controller.options_settings.get_choiced_sub_option(2)], alignment="left", size=2, pad_x=1, pad_y=5, x=self.screen_width // 30 * 19, y=self.screen_height // 15 * 8), self.canvas.create_image(self.screen_width // 7 * 4, self.screen_height // 3 * 2, image=self.player_skins[self.controller.options_settings.get_choiced_sub_option(2)][self.controller.options_settings.get_choiced_sub_index(3)], anchor="center")])
+        self.menu_overlay[-1].append([self.display_font_text(self.controller.options_settings.get_choiced_sub_option(2), alignment="center", size=4, pad_x=1, pad_y=0, x=self.screen_width // 300 * 202, y=self.screen_height // 15 * 7),
+                                      self.display_font_text(self.weapons_stats[self.controller.options_settings.get_choiced_sub_option(2)], alignment="left", size=2, pad_x=1, pad_y=5, x=self.screen_width // 30 * 19, y=self.screen_height // 15 * 8),
+                                      self.canvas.create_image(self.screen_width // 20 * 11, self.screen_height // 30 * 19, image=self.display_player_skins[self.controller.options_settings.get_choiced_sub_option(2)][self.controller.options_settings.get_choiced_sub_index(3)], anchor="center")])
 
         self.canvas.itemconfig(self.menu_overlay[1][0], image=self.button_active_image)
 
@@ -368,10 +371,17 @@ class View:
 
         if self.controller.options_settings.should_update_binds_view:
             self.hide_image_list(self.menu_overlay[2][-1])
+            self.hide_image_list(self.menu_overlay[0][-1])
+
+            self.menu_overlay[0][-1] = self.display_font_text("to modify:enter then key", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 3 * 2, y=self.screen_height // 30 * 26)
             with open("binds.json", "r") as file:
                 data_binds = json.load(file)
-            self.menu_overlay[2][-1] = [self.display_font_text(f"{self.controller.options_settings.options[4][i]}:{data_binds[0][self.controller.options_settings.options[4][i]]}", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 40 * (23 + i // 2 * 7), y=self.screen_height // 21 * (17 + i % 2)) for i in range(4)]
+            self.menu_overlay[2][-1] = [self.display_font_text(f"{self.controller.options_settings.options[4][i]}:{data_binds[0][self.controller.options_settings.options[4][i]]}", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 40 * (23 + i // 2 * 7), y=self.screen_height // 21 * (16 + i % 2)) for i in range(4)]
             self.controller.options_settings.should_update_binds_view = False
+        
+        if self.controller.options_settings.key_error:
+            self.hide_image_list(self.menu_overlay[0][-1])
+            self.menu_overlay[0][-1] = self.display_font_text("key used:retry", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 3 * 2, y=self.screen_height // 30 * 26)
 
         if self.options_choosing_index[0] != index:
             if index == 4:
@@ -388,7 +398,9 @@ class View:
                 self.menu_overlay[-1][index] = self.display_font_text(self.controller.options_settings.get_choiced_sub_option(index), alignment="center", size=5, pad_x=1, pad_y=30, x=self.screen_width // 3 * 2, y=self.screen_height // 8 * (index + 2))
             elif index == 2 or index == 3:
                 self.hide_image_list(self.menu_overlay[-1][2])
-                self.menu_overlay[-1][2] = [self.display_font_text(self.controller.options_settings.get_choiced_sub_option(2), alignment="center", size=2, pad_x=1, pad_y=0, x=self.screen_width // 15 * 11, y=self.screen_height // 15 * 7), self.display_font_text(self.weapons_stats[self.controller.options_settings.get_choiced_sub_option(2)], alignment="left", size=2, pad_x=1, pad_y=5, x=self.screen_width // 30 * 19, y=self.screen_height // 15 * 8), self.canvas.create_image(self.screen_width // 7 * 4, self.screen_height // 3 * 2, image=self.player_skins[self.controller.options_settings.get_choiced_sub_option(2)][self.controller.options_settings.get_choiced_sub_index(3)], anchor="center")]
+                self.menu_overlay[-1][2] = [self.display_font_text(self.controller.options_settings.get_choiced_sub_option(2), alignment="center", size=4, pad_x=1, pad_y=0, x=self.screen_width // 300 * 202, y=self.screen_height // 15 * 7),
+                                            self.display_font_text(self.weapons_stats[self.controller.options_settings.get_choiced_sub_option(2)], alignment="left", size=2, pad_x=1, pad_y=5, x=self.screen_width // 30 * 19, y=self.screen_height // 15 * 8),
+                                            self.canvas.create_image(self.screen_width // 20 * 11, self.screen_height // 30 * 19, image=self.display_player_skins[self.controller.options_settings.get_choiced_sub_option(2)][self.controller.options_settings.get_choiced_sub_index(3)], anchor="center")]
             elif index == 4:
                 if self.options_choosing_index[1] < 4:
                     self.canvas.itemconfig(self.menu_overlay[2][-2][self.options_choosing_index[1]], image=self.lil_button_inactive_image)
