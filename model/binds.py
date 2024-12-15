@@ -70,7 +70,7 @@ class Binds:
         Changes the key binding for the command to the key pressed by the user in binds.json.
         """
         self.canvas.bind("<KeyPress>", self.active_bind)
-        with open("binds.json", "r") as file:
+        with open("options.json", "r") as file:
             data_binds = json.load(file)
         
         if event.keysym in data_binds[0].values() and event.keysym != data_binds[0][self.options.get_choiced_sub_option(4)]:
@@ -80,7 +80,7 @@ class Binds:
 
         data_binds[0][self.options.get_choiced_sub_option(4)] = event.keysym
 
-        with open("binds.json", "w") as file:
+        with open("options.json", "w") as file:
             json.dump(data_binds, file, indent=4)
         
         self.options.should_update_binds_view = True

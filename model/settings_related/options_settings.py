@@ -34,7 +34,7 @@ class Options_settings(Settings):
             - skin: green, red, blue, yellow, pink, grey
             - binds: left, right, reload, shoot
         """
-        super().__init__([["solo", "coop"], ["easy", "ranked", "defi"], ["assault", "rafale", "mitraillette", "tank", "sniper"], ["green", "blue", "red", "yellow", "pink"], ["left", "right", "reload", "shoot"]])
+        super().__init__([["solo"], ["easy", "ranked", "defi"], ["assault", "rafale", "mitraillette", "tank", "sniper"], ["green", "blue", "red", "yellow", "pink"], ["left", "right", "reload", "shoot"]])
         self.categorises = ["mode", "level", "class", "skin", "binds"]
         self.choiced_sub_index_list = [0] * self.length
         self.should_update_binds_view = False

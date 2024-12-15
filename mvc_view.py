@@ -117,6 +117,7 @@ class View:
         self.upgrade_text = []
         self.binds_overlay = []
         self.menu_overlay = []
+        self.lost_overlay = []
         self.menu_choosing_index = 0
         self.options_choosing_index = [0, 0]
 
@@ -162,6 +163,34 @@ class View:
         Quit the application.
         """
         self.root.quit()
+    
+    def lost(self):
+        """
+        Display the game over screen on the canvas.
+        """
+        self.hide_image_list(self.lost_overlay)
+        self.overlay_reset()
+        self.bg_menu_id = self.canvas.create_image(0, 0, image=self.bg_menu_image, anchor="nw")
+
+        self.lost_overlay.append(self.canvas.create_image(self.x0 / 2, self.screen_height / 20 * 11, image=self.options_solo_bubble_image, anchor="center"))
+        self.lost_overlay.append(self.display_font_text(f"difficulty:{self.controller.options_settings.get_choiced_sub_option(1)}", alignment="center", size=4, pad_x=0, pad_y=0, x=self.x0 / 2, y=self.screen_height / 5 * 2))
+        self.lost_overlay.append(self.display_font_text(f"Class:{self.controller.options_settings.get_choiced_sub_option(2)}\n\nScore:{self.controller.score}\nStage:{self.controller.stage_number}", alignment="left", size=3, pad_x=2, pad_y=5, x=self.x0 / 5, y=self.screen_height / 2))
+        self.lost_overlay.append(self.display_font_text("menu:Echap", alignment="right", size=2, pad_x=2, pad_y=10, x=self.screen_width - 20, y= 20))
+        self.lost_overlay.append(self.display_font_text("save score:", alignment="left", size=3, pad_x=2, pad_y=10, x=self.x0 / 4, y=self.screen_height / 20 * 13))
+
+        with open("options.json", "r") as file:
+            data = json.load(file)
+        
+        self.lost_overlay.append(self.display_font_text("leaderboard", alignment="center", size=5, pad_x=2, pad_y=10, x=self.screen_width / 3 * 2, y=self.screen_height / 20 * 6))
+        i = 0
+        for name, score in data[1].items():
+            self.lost_overlay.append(self.display_font_text(f"{i + 1}", alignment="center", size=3, pad_x=2, pad_y=10, x=self.screen_width / 2, y=self.screen_height / 20 * (8 + i)))
+            self.lost_overlay.append(self.display_font_text(f"{name}", alignment="center", size=3, pad_x=2, pad_y=10, x=self.screen_width / 30 * 18, y=self.screen_height / 20 * (8 + i)))
+            self.lost_overlay.append(self.display_font_text(f":", alignment="center", size=3, pad_x=2, pad_y=10, x=self.screen_width / 30 * 21, y=self.screen_height / 20 * (8 + i)))
+            self.lost_overlay.append(self.display_font_text(f"{score}", alignment="left", size=3, pad_x=2, pad_y=10, x=self.screen_width / 30 * 22, y=self.screen_height / 20 * (8 + i)))
+            i += 1
+
+        self.lost_overlay.append(self.display_font_text("Game Over", alignment="center", size=5, pad_x=2, pad_y=0, x=self.x0, y=self.y0 / 4))
 
     def show_options(self):
         """
@@ -299,7 +328,7 @@ class View:
             self.image_upgrade_cards.append(self.display_font_text(f"prix:{upgrade[1]}p\n{upgrade[2]}", alignment="center", size=0, pad_x=2, pad_y=10, x=self.screen_width // 6 * (i % 5 + 1), y=self.screen_height * (((i // 5 * 3) + 4) / 9) - 80))
             i += 1
         self.canvas.move(self.image_upgrade_cards[0], 0, 30)
-        self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nEntree pour valider\nEchap pour passer au next stage", alignment="center", size=3, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
+        self.upgrade_text = self.display_font_text("Choisissez une amelioration\nLeft - Right\nEntree pour valider\ndelete pour passer au next stage", alignment="center", size=3, pad_x=2, pad_y=10, x=self.x0, y=self.y0 // 4)
 
     def display_choosing_card(self):
         """
@@ -325,12 +354,12 @@ class View:
         Display the options menu on the canvas.
         This reads the key bindings from a JSON file and displays them.
         """
-        with open("binds.json", "r") as file:
+        with open("options.json", "r") as file:
             data_binds = json.load(file)
 
         self.menu_overlay = [[] for _ in range(4)]
 
-        self.menu_overlay[0].append(self.canvas.create_image(self.screen_width // 300 * 202, self.screen_height // 30 * 20, image=self.options_solo_bubble_image, anchor="center"))
+        self.menu_overlay[0].append(self.canvas.create_image(self.screen_width / 3 * 2, self.screen_height // 30 * 20, image=self.options_solo_bubble_image, anchor="center"))
         self.menu_overlay[0].append(self.display_font_text("to modify:enter then key", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 3 * 2, y=self.screen_height // 30 * 26))
 
         for i in range(5):
@@ -346,16 +375,13 @@ class View:
             else:
                 self.menu_overlay[2].append(self.display_font_text(f"< {self.controller.options_settings.categorises[i]} >", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // 4, y=self.screen_height // 8 * (i + 2)))
 
-        self.menu_overlay[2].append([self.canvas.create_image(self.screen_width // 40 * (23 + i // 2 * 7), self.screen_height // 21 * (16 + i % 2), image=self.lil_button_inactive_image, anchor="center") for i in range(4)])
-        self.menu_overlay[2].append([self.display_font_text(f"{self.controller.options_settings.options[4][i]}:{data_binds[0][self.controller.options_settings.options[4][i]]}", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 40 * (23 + i // 2 * 7), y=self.screen_height // 21 * (16 + i % 2)) for i in range(4)])
+        self.menu_overlay[2].append([self.canvas.create_image(self.screen_width // 40 * (23 + i // 2 * 7), self.screen_height // 23 * (18 + i % 2), image=self.lil_button_inactive_image, anchor="center") for i in range(4)])
+        self.menu_overlay[2].append([self.display_font_text(f"{self.controller.options_settings.options[4][i]}:{data_binds[0][self.controller.options_settings.options[4][i]]}", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 40 * (23 + i // 2 * 7), y=self.screen_height // 23 * (18 + i % 2)) for i in range(4)])
 
         for i in range(2):
-            if i == 0:
-                self.menu_overlay[-1].append(self.display_font_text("soon", alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // (3 + i // 2) * 2, y=self.screen_height // 8 * (i + 2)))
-            else:
-                self.menu_overlay[-1].append(self.display_font_text(self.controller.options_settings.get_choiced_sub_option(i), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // (3 + i // 2) * 2, y=self.screen_height // 8 * (i + 2)))
+            self.menu_overlay[-1].append(self.display_font_text(self.controller.options_settings.get_choiced_sub_option(i), alignment="center", size=5, pad_x=2, pad_y=0, x=self.screen_width // (3 + i // 2) * 2, y=self.screen_height // 8 * (i + 2)))
 
-        self.menu_overlay[-1].append([self.display_font_text(self.controller.options_settings.get_choiced_sub_option(2), alignment="center", size=4, pad_x=1, pad_y=0, x=self.screen_width // 300 * 202, y=self.screen_height // 15 * 7),
+        self.menu_overlay[-1].append([self.display_font_text(self.controller.options_settings.get_choiced_sub_option(2), alignment="center", size=4, pad_x=1, pad_y=0, x=self.screen_width / 3 * 2, y=self.screen_height / 45 * 22),
                                       self.display_font_text(self.weapons_stats[self.controller.options_settings.get_choiced_sub_option(2)], alignment="left", size=2, pad_x=1, pad_y=5, x=self.screen_width // 30 * 19, y=self.screen_height // 15 * 8),
                                       self.canvas.create_image(self.screen_width // 20 * 11, self.screen_height // 30 * 19, image=self.display_player_skins[self.controller.options_settings.get_choiced_sub_option(2)][self.controller.options_settings.get_choiced_sub_index(3)], anchor="center")])
 
@@ -374,9 +400,9 @@ class View:
             self.hide_image_list(self.menu_overlay[0][-1])
 
             self.menu_overlay[0][-1] = self.display_font_text("to modify:enter then key", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 3 * 2, y=self.screen_height // 30 * 26)
-            with open("binds.json", "r") as file:
+            with open("options.json", "r") as file:
                 data_binds = json.load(file)
-            self.menu_overlay[2][-1] = [self.display_font_text(f"{self.controller.options_settings.options[4][i]}:{data_binds[0][self.controller.options_settings.options[4][i]]}", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 40 * (23 + i // 2 * 7), y=self.screen_height // 21 * (16 + i % 2)) for i in range(4)]
+            self.menu_overlay[2][-1] = [self.display_font_text(f"{self.controller.options_settings.options[4][i]}:{data_binds[0][self.controller.options_settings.options[4][i]]}", alignment="center", size=1, pad_x=1, pad_y=0, x=self.screen_width // 40 * (23 + i // 2 * 7), y=self.screen_height // 23 * (18 + i % 2)) for i in range(4)]
             self.controller.options_settings.should_update_binds_view = False
         
         if self.controller.options_settings.key_error:
@@ -398,7 +424,7 @@ class View:
                 self.menu_overlay[-1][index] = self.display_font_text(self.controller.options_settings.get_choiced_sub_option(index), alignment="center", size=5, pad_x=1, pad_y=30, x=self.screen_width // 3 * 2, y=self.screen_height // 8 * (index + 2))
             elif index == 2 or index == 3:
                 self.hide_image_list(self.menu_overlay[-1][2])
-                self.menu_overlay[-1][2] = [self.display_font_text(self.controller.options_settings.get_choiced_sub_option(2), alignment="center", size=4, pad_x=1, pad_y=0, x=self.screen_width // 300 * 202, y=self.screen_height // 15 * 7),
+                self.menu_overlay[-1][2] = [self.display_font_text(self.controller.options_settings.get_choiced_sub_option(2), alignment="center", size=4, pad_x=1, pad_y=0, x=self.screen_width / 3 * 2, y=self.screen_height / 45 * 22),
                                             self.display_font_text(self.weapons_stats[self.controller.options_settings.get_choiced_sub_option(2)], alignment="left", size=2, pad_x=1, pad_y=5, x=self.screen_width // 30 * 19, y=self.screen_height // 15 * 8),
                                             self.canvas.create_image(self.screen_width // 20 * 11, self.screen_height // 30 * 19, image=self.display_player_skins[self.controller.options_settings.get_choiced_sub_option(2)][self.controller.options_settings.get_choiced_sub_index(3)], anchor="center")]
             elif index == 4:

@@ -34,7 +34,7 @@ class Player_ship(Ship):
             projectile_image: The image of the projectiles fired by the player ship.
         """
         super().__init__(
-            canvas, x, y, x_speed=13, y_speed=0, width=60, height=40, 
+            canvas, x, y, x_speed=13, y_speed=0, width=70, height=40, 
             life=6 - (difficulty * 2 + 1), damage=1, image=image, refresh_rate=refresh_rate, 
             projectile_class=projectile_class, projectile_image=projectile_image
         )

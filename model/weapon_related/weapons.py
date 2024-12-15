@@ -124,6 +124,7 @@ class Weapons:
             self.cooldown.add_offset(randint(0, 3000))
             if type[0] == "mitraillette":       # Aliens have modified machine guns
                 self.rafale = 5
+                self.damage = 0.5
 
         elif type[1] == "bonus":
             self.cooldown_time = 125

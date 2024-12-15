@@ -193,7 +193,7 @@ class Aliens(Group_object):
             stage_number (int): Determines how many aliens to level up.
         """
         if not self.objects_dead():
-            increasing_aliens = [choice(choice(self.objects_matrix)) for _ in range(stage_number * 3 * (difficulty + 1))]
+            increasing_aliens = [choice(choice(self.objects_matrix)) for _ in range(5 + stage_number * 2 * (difficulty + 1))]
             for alien in increasing_aliens:
                 alien.increase_level()
                 if 0 < alien.level <= 10:
