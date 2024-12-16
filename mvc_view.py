@@ -184,10 +184,11 @@ class View:
         self.lost_overlay.append(self.display_font_text("leaderboard", alignment="center", size=5, pad_x=2, pad_y=10, x=self.screen_width / 3 * 2, y=self.screen_height / 20 * 6))
         i = 0
         for name, score in data[1].items():
-            self.lost_overlay.append(self.display_font_text(f"{i + 1}", alignment="center", size=3, pad_x=2, pad_y=10, x=self.screen_width / 2, y=self.screen_height / 20 * (8 + i)))
-            self.lost_overlay.append(self.display_font_text(f"{name}", alignment="center", size=3, pad_x=2, pad_y=10, x=self.screen_width / 30 * 18, y=self.screen_height / 20 * (8 + i)))
-            self.lost_overlay.append(self.display_font_text(f":", alignment="center", size=3, pad_x=2, pad_y=10, x=self.screen_width / 30 * 21, y=self.screen_height / 20 * (8 + i)))
-            self.lost_overlay.append(self.display_font_text(f"{score}", alignment="left", size=3, pad_x=2, pad_y=10, x=self.screen_width / 30 * 22, y=self.screen_height / 20 * (8 + i)))
+            if i < 10:
+                self.lost_overlay.append(self.display_font_text(f"{i + 1}", alignment="center", size=3, pad_x=2, pad_y=10, x=self.screen_width / 2, y=self.screen_height / 20 * (8 + i)))
+                self.lost_overlay.append(self.display_font_text(f"{name}", alignment="center", size=3, pad_x=2, pad_y=10, x=self.screen_width / 30 * 18, y=self.screen_height / 20 * (8 + i)))
+                self.lost_overlay.append(self.display_font_text(f":", alignment="center", size=3, pad_x=2, pad_y=10, x=self.screen_width / 30 * 21, y=self.screen_height / 20 * (8 + i)))
+                self.lost_overlay.append(self.display_font_text(f"{score}", alignment="left", size=3, pad_x=2, pad_y=10, x=self.screen_width / 30 * 22, y=self.screen_height / 20 * (8 + i)))
             i += 1
 
         self.lost_overlay.append(self.display_font_text("Game Over", alignment="center", size=5, pad_x=2, pad_y=0, x=self.x0, y=self.y0 / 4))

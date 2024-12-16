@@ -65,7 +65,7 @@ class Controller:
                         self.view.update(None, None, None, should_update_skill_points=True)
                 else:
                     if alien.type != "doctor":
-                        alien.change_image(self.view.alien_skins[alien.weapon.type[0]][alien.life - 1])
+                        alien.change_image(self.view.alien_skins[alien.weapon.type[0]][int(alien.life - 1)])
 
             self.players_projectiles.collision(self.walls)
             self.aliens_projectiles.collision(self.players)
@@ -105,7 +105,7 @@ class Controller:
 
                 self.stage_number += 1
 
-                self.view.update(None, None, should_update_stage=True, should_update_skill_points=None)
+                self.view.update(None, None, should_update_stage=True, should_update_skill_points=True)
 
                 if self.stage_number > 1:
                     self.score += 100
